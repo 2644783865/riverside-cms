@@ -1,0 +1,74 @@
+﻿@using RiversideCms.Mvc.Extensions
+@using Riverside.Cms.Services.Core.Client
+@using Riverside.Cms.Services.Element.Client
+
+@model ElementView
+
+@{
+    NavigationBarElementSettings settings = (NavigationBarElementSettings)Model.Settings;
+    NavigationBarElementContent content = (NavigationBarElementContent)Model.Content;
+    bool userLoggedOn = User.Identity.IsAuthenticated;
+    bool showLoggedOffUserOptions = settings.ShowLoggedOffUserOptions && !userLoggedOn;
+    bool showLoggedOnUserOptions = settings.ShowLoggedOnUserOptions && userLoggedOn;
+
+    bool adminTabs = showLoggedOnUserOptions || showLoggedOffUserOptions;
+    bool pageTabs = settings.Tabs.Count() > 0;
+}
+
+<div class="rcms-nav-bar">
+    <nav class="navbar navbar-inverse">
+        <div class="container">
+            <div class="navbar-header">
+                @if (adminTabs || pageTabs)
+                {
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                }
+                @if (settings.NavBarName != null)
+                {
+                    <a class="navbar-brand" href="@Url.Content("~/")">@settings.NavBarName</a>
+                }
+            </div>
+            @if (pageTabs || adminTabs)
+            {
+                <div id="navbar" class="navbar-collapse collapse">
+                    @if (pageTabs)
+                    {
+                        <ul class="nav navbar-nav">
+                            @foreach (NavigationBarTab tab in settings.Tabs)
+                            {
+                                <li class="@if (tab.NavigationBarTabId == content.ActiveNavigationBarTabId) {<text>active</text>}">@Html.PageLink(tab.PageId, tab.Name)</li>
+                            }
+                        </ul>
+                    }
+                    @if (adminTabs)
+                    {
+                        <ul class="nav navbar-nav navbar-right admin-options">
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                                    <span class="caret"></span>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li class="dropdown-header">User Options</li>                                    @if (showLoggedOnUserOptions)
+                                    {
+                                        <li>@Html.RouteLink("Update your profile", "UpdateProfile")</li>
+                                        <li>@Html.RouteLink("Change your password", "ChangePassword")</li>
+                                        <li>@Html.RouteLink("Log out", "Logout")</li>
+                                    }
+                                    @if (showLoggedOffUserOptions)
+                                    {
+                                        <li>@Html.RouteLink("Log in", "Login")</li>
+                                    }
+                                </ul>
+                            </li>
+                        </ul>
+                    }
+                </div>
+            }
+        </div>
+    </nav>
+</div>

@@ -13,14 +13,16 @@ namespace Element.Api.Controllers
         private readonly ICodeSnippetElementService _codeSnippetElementService;
         private readonly IFooterElementService _footerElementService;
         private readonly IHtmlElementService _htmlElementService;
+        private readonly INavigationBarElementService _navigationBarElementService;
         private readonly IPageHeaderElementService _pageHeaderElementService;
         private readonly IShareElementService _shareElementService;
 
-        public ElementsController(ICodeSnippetElementService codeSnippetElementService, IFooterElementService footerElementService, IHtmlElementService htmlElementService, IPageHeaderElementService pageHeaderElementService, IShareElementService shareElementService)
+        public ElementsController(ICodeSnippetElementService codeSnippetElementService, IFooterElementService footerElementService, IHtmlElementService htmlElementService, INavigationBarElementService navigationBarElementService, IPageHeaderElementService pageHeaderElementService, IShareElementService shareElementService)
         {
             _codeSnippetElementService = codeSnippetElementService;
             _footerElementService = footerElementService;
             _htmlElementService = htmlElementService;
+            _navigationBarElementService = navigationBarElementService;
             _pageHeaderElementService = pageHeaderElementService;
             _shareElementService = shareElementService;
         }
@@ -86,6 +88,32 @@ namespace Element.Api.Controllers
         public async Task<IActionResult> ReadHtmlElementContent(long tenantId, long elementId, [FromQuery]long pageId)
         {
             HtmlElementContent elementContent = await _htmlElementService.ReadElementContentAsync(tenantId, elementId, pageId);
+            if (elementContent == null)
+                return NotFound();
+            return Ok(elementContent);
+        }
+
+        // NAVIGATION BAR
+
+        [HttpGet]
+        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/a94c34c0-1a4c-4c91-a669-2f830cf1ea5f/elements/{elementId:int}")]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(NavigationBarElementSettings), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> ReadNavigationBarElementSettings(long tenantId, long elementId)
+        {
+            NavigationBarElementSettings elementSettings = await _navigationBarElementService.ReadElementSettingsAsync(tenantId, elementId);
+            if (elementSettings == null)
+                return NotFound();
+            return Ok(elementSettings);
+        }
+
+        [HttpGet]
+        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/a94c34c0-1a4c-4c91-a669-2f830cf1ea5f/elements/{elementId:int}/content")]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(NavigationBarElementContent), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> ReadNavigationBarElementContent(long tenantId, long elementId, [FromQuery]long pageId)
+        {
+            NavigationBarElementContent elementContent = await _navigationBarElementService.ReadElementContentAsync(tenantId, elementId, pageId);
             if (elementContent == null)
                 return NotFound();
             return Ok(elementContent);

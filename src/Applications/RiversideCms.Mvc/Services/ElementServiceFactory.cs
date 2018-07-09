@@ -11,14 +11,16 @@ namespace RiversideCms.Mvc.Services
         private readonly ICodeSnippetElementService _codeSnippetElementService;
         private readonly IFooterElementService _footerElementService;
         private readonly IHtmlElementService _htmlElementService;
+        private readonly INavigationBarElementService _navigationBarElementService;
         private readonly IPageHeaderElementService _pageHeaderElementService;
         private readonly IShareElementService _shareElementService;
 
-        public ElementServiceFactory(ICodeSnippetElementService codeSnippetElementService, IFooterElementService footerElementService, IHtmlElementService htmlElementService, IPageHeaderElementService pageHeaderElementService, IShareElementService shareElementService)
+        public ElementServiceFactory(ICodeSnippetElementService codeSnippetElementService, IFooterElementService footerElementService, IHtmlElementService htmlElementService, INavigationBarElementService navigationBarElementService, IPageHeaderElementService pageHeaderElementService, IShareElementService shareElementService)
         {
             _codeSnippetElementService = codeSnippetElementService;
             _footerElementService = footerElementService;
             _htmlElementService = htmlElementService;
+            _navigationBarElementService = navigationBarElementService;
             _pageHeaderElementService = pageHeaderElementService;
             _shareElementService = shareElementService;
         }
@@ -35,6 +37,9 @@ namespace RiversideCms.Mvc.Services
 
                 case "c92ee4c4-b133-44cc-8322-640e99c334dc":
                     return await _htmlElementService.ReadElementSettingsAsync(tenantId, elementId);
+
+                case "a94c34c0-1a4c-4c91-a669-2f830cf1ea5f":
+                    return await _navigationBarElementService.ReadElementSettingsAsync(tenantId, elementId);
 
                 case "1cbac30c-5deb-404e-8ea8-aabc20c82aa8":
                     return await _pageHeaderElementService.ReadElementSettingsAsync(tenantId, elementId);
@@ -59,6 +64,9 @@ namespace RiversideCms.Mvc.Services
 
                 case "c92ee4c4-b133-44cc-8322-640e99c334dc":
                     return await _htmlElementService.ReadElementContentAsync(tenantId, elementId, pageId);
+
+                case "a94c34c0-1a4c-4c91-a669-2f830cf1ea5f":
+                    return await _navigationBarElementService.ReadElementContentAsync(tenantId, elementId, pageId);
 
                 case "1cbac30c-5deb-404e-8ea8-aabc20c82aa8":
                     return await _pageHeaderElementService.ReadElementContentAsync(tenantId, elementId, pageId);
