@@ -5,17 +5,14 @@ namespace Riverside.Cms.Services.Element.Domain
 {
     public class NavigationBarTab
     {
-        public long TenantId { get; set; }
-        public long ElementId { get; set; }
-        public long NavigationBarTabId { get; set; }
+        public long TabId { get; set; }
         public string Name { get; set; }
-        public int SortOrder { get; set; }
         public long PageId { get; set; }
     }
 
     public class NavigationBarElementSettings : ElementSettings
     {
-        public string NavBarName { get; set; }
+        public string Brand { get; set; }
         public bool ShowLoggedOnUserOptions { get; set; }
         public bool ShowLoggedOffUserOptions { get; set; }
         public IEnumerable<NavigationBarTab> Tabs { get; set; }
