@@ -17,6 +17,7 @@ namespace Riverside.Cms.Services.Element.Client
     public class NavigationBarContentTab
     {
         public bool Active { get; set; }
+        public bool Home { get; set; }
         public long PageId { get; set; }
         public string Name { get; set; }
         public string PageName { get; set; }

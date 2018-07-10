@@ -14,6 +14,7 @@ namespace Riverside.Cms.Services.Element.Domain
     public class NavigationBarContentTab
     {
         public bool Active { get; set; }
+        public bool Home { get; set; }
         public long PageId { get; set; }
         public string Name { get; set; }
         public string PageName { get; set; }
@@ -86,13 +87,15 @@ namespace Riverside.Cms.Services.Element.Domain
                 {
                     if (currentPage == null)
                         currentPage = await GetCurrentPage(elementSettings.TenantId, pageId);
-                    bool active = TabIsActive(tabPage, currentPage);
+                    bool home = tabPage.ParentPageId == null;
+                    bool active = !home && TabIsActive(tabPage, currentPage);
                     tabs.Add(new NavigationBarContentTab
                     {
                         Active = active,
                         Name = tab.Name == string.Empty ? tabPage.Name : tab.Name,
                         PageId = tab.PageId,
-                        PageName = tabPage.Name
+                        PageName = tabPage.Name,
+                        Home = home
                     });
                 }
             }

@@ -18,9 +18,12 @@ namespace RiversideCms.Mvc.Extensions
                 return htmlHelper.RouteLink(page.Name, "Page", new { pageId = page.PageId, description = UrlUtils.UrlFriendly(page.Name) });
         }
 
-        public static IHtmlContent PageLink(this IHtmlHelper htmlHelper, string linkText, long pageId, string pageName)
+        public static IHtmlContent PageLink(this IHtmlHelper htmlHelper, string linkText, long pageId, string pageName, bool home)
         {
-            return htmlHelper.RouteLink(linkText, "Page", new { pageId = pageId, description = UrlUtils.UrlFriendly(pageName) });
+            if (home)
+                return htmlHelper.RouteLink(linkText, "Home");
+            else
+                return htmlHelper.RouteLink(linkText, "Page", new { pageId = pageId, description = UrlUtils.UrlFriendly(pageName) });
         }
     }
 }
