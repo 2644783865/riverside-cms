@@ -9,9 +9,17 @@ namespace Riverside.Cms.Services.Element.Client
 {
     public class NavigationBarTab
     {
+        public long PageId { get; set; }
         public long TabId { get; set; }
         public string Name { get; set; }
+    }
+
+    public class NavigationBarContentTab
+    {
+        public bool Active { get; set; }
         public long PageId { get; set; }
+        public string Name { get; set; }
+        public string PageName { get; set; }
     }
 
     public class NavigationBarElementSettings : ElementSettings
@@ -24,7 +32,7 @@ namespace Riverside.Cms.Services.Element.Client
 
     public class NavigationBarElementContent : IElementContent
     {
-        public long? ActiveNavigationBarTabId { get; set; }
+        public IEnumerable<NavigationBarContentTab> Tabs { get; set; }
     }
 
     public interface INavigationBarElementService : IElementSettingsService<NavigationBarElementSettings>, IElementContentService<NavigationBarElementContent>

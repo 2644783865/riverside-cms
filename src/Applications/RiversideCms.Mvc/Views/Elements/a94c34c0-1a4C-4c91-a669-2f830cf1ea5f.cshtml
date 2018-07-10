@@ -10,9 +10,8 @@
     bool userLoggedOn = User.Identity.IsAuthenticated;
     bool showLoggedOffUserOptions = settings.ShowLoggedOffUserOptions && !userLoggedOn;
     bool showLoggedOnUserOptions = settings.ShowLoggedOnUserOptions && userLoggedOn;
-
     bool adminTabs = showLoggedOnUserOptions || showLoggedOffUserOptions;
-    bool pageTabs = settings.Tabs.Count() > 0;
+    bool pageTabs = content.Tabs.Count() > 0;
 }
 
 <div class="rcms-nav-bar">
@@ -39,9 +38,9 @@
                     @if (pageTabs)
                     {
                         <ul class="nav navbar-nav">
-                            @foreach (NavigationBarTab tab in settings.Tabs)
+                            @foreach (NavigationBarContentTab tab in content.Tabs)
                             {
-                                <li class="@if (tab.TabId == content.ActiveNavigationBarTabId) {<text>active</text>}">@Html.PageLink(tab.PageId, tab.Name)</li>
+                                <li class="@if (tab.Active) {<text>active</text>}">@Html.PageLink(tab.Name, tab.PageId, tab.PageName)</li>
                             }
                         </ul>
                     }
