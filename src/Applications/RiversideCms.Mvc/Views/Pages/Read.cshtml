@@ -8,10 +8,16 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
 <head>
-    <meta name="viewport" content="width=device-width" />
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="format-detection" content="telephone=no">
     <title>@Model.View.Title</title>
+    <link href="@Url.Content("~/css/bootstrap.min.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/css/font-awesome.min.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/css/site.css")" rel="stylesheet" type="text/css" />
 </head>
 <body>
     @Html.Raw(Model.View.BeginRender)
@@ -35,5 +41,8 @@
     }
 
     @Html.Raw(Model.View.EndRender)
+
+    <script src="@Url.Content("~/js/jquery-1.10.2.min.js")"></script>
+    <script src="@Url.Content("~/js/bootstrap.min.js")"></script>
 </body>
 </html>
