@@ -74,6 +74,7 @@ namespace RiversideCms.Mvc
                 routes.MapRoute("Page", "pages/{pageId}/{*description}", new { controller = "pages", action = "read" });
                 routes.MapRoute("Login", "account/login", new { controller = "account", action = "login" });
                 routes.MapRoute("Logout", "account/logout", new { controller = "account", action = "logout" });
+                routes.MapRoute("Register", "account/register", new { controller = "account", action = "register" });
                 routes.MapRoute("UpdateProfile", "account/updateprofile", new { controller = "account", action = "updateprofile" });
                 routes.MapRoute("ChangePassword", "account/changepassword", new { controller = "account", action = "changepassword" });
                 routes.MapRoute(
