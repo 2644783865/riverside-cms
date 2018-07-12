@@ -14,6 +14,11 @@ namespace Riverside.Cms.Services.Core.Domain
             _pageRepository = pageRepository;
         }
 
+        public async Task<IEnumerable<Page>> ListPagesInHierarchyAsync(long tenantId, long pageId)
+        {
+            return await _pageRepository.ListPagesInHierarchyAsync(tenantId, pageId);
+        }
+
         public Task<Page> ReadPageAsync(long tenantId, long pageId)
         {
             return _pageRepository.ReadPageAsync(tenantId, pageId);

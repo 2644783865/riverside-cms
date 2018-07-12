@@ -21,9 +21,18 @@ namespace Riverside.Cms.Services.Element.Client
         public bool ShowBreadcrumbs { get; set; }
     }
 
+    public class PageHeaderBreadcrumb
+    {
+        public bool Home { get; set; }
+        public long PageId { get; set; }
+        public string Name { get; set; }
+        public string PageName { get; set; }
+    }
+
     public class PageHeaderElementContent : IElementContent
     {
         public Page Page { get; set; }
+        public IEnumerable<PageHeaderBreadcrumb> Breadcrumbs { get; set; }
     }
 
     public interface IPageHeaderElementService : IElementSettingsService<PageHeaderElementSettings>, IElementContentService<PageHeaderElementContent>

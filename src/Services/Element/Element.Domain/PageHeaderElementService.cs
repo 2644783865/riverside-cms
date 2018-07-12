@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Riverside.Cms.Services.Core.Client;
@@ -18,9 +19,18 @@ namespace Riverside.Cms.Services.Element.Domain
         public bool ShowBreadcrumbs { get; set; }
     }
 
+    public class PageHeaderBreadcrumb
+    {
+        public bool Home { get; set; }
+        public long PageId { get; set; }
+        public string Name { get; set; }
+        public string PageName { get; set; }
+    }
+
     public class PageHeaderElementContent : IElementContent
     {
         public Page Page { get; set; }
+        public IEnumerable<PageHeaderBreadcrumb> Breadcrumbs { get; set; }
     }
 
     public interface IPageHeaderElementService : IElementSettingsService<PageHeaderElementSettings>, IElementContentService<PageHeaderElementContent>
@@ -43,28 +53,29 @@ namespace Riverside.Cms.Services.Element.Domain
             return _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
         }
 
-        private async void PopulatePageHierarchy(Page page)
-        {
-            Page hierarchyPage = page;
-            while (hierarchyPage != null && hierarchyPage.ParentPageId != null)
-            {
-                hierarchyPage.ParentPage = await _pageService.ReadPageAsync(page.TenantId, hierarchyPage.ParentPageId.Value);
-                hierarchyPage = hierarchyPage.ParentPage;
-            }
-        }
-
         public async Task<PageHeaderElementContent> ReadElementContentAsync(long tenantId, long elementId, long pageId)
         {
             PageHeaderElementSettings elementSettings = await _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
 
             Page page = await _pageService.ReadPageAsync(tenantId, pageId);
 
+            IEnumerable<PageHeaderBreadcrumb> breadcrumbs = null;
             if (elementSettings.ShowBreadcrumbs)
-                PopulatePageHierarchy(page);
+            {
+                IEnumerable<Page> pages = await _pageService.ListPagesInHierarchyAsync(tenantId, pageId);
+                breadcrumbs = pages.Reverse().Select(p => new PageHeaderBreadcrumb
+                {
+                    Home = p.ParentPageId == null,
+                    Name = p.ParentPageId == null ? "Home" : p.Name,
+                    PageId = p.PageId,
+                    PageName = p.Name
+                });
+            }
 
             return new PageHeaderElementContent
             {
-                Page = page
+                Page = page,
+                Breadcrumbs = breadcrumbs
             };
         }
     }

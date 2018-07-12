@@ -9,6 +9,8 @@ namespace Riverside.Cms.Services.Core.Client
     {
         Task<Page> ReadPageAsync(long tenantId, long pageId);
 
+        Task<List<Page>> ListPagesInHierarchyAsync(long tenantId, long pageId);
+
         Task<List<PageZone>> SearchPageZonesAsync(long tenantId, long pageId);
         Task<PageZone> ReadPageZoneAsync(long tenantId, long pageId, long pageZoneId);
 

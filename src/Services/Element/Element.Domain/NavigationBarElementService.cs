@@ -53,42 +53,29 @@ namespace Riverside.Cms.Services.Element.Domain
             return _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
         }
 
-        private async Task<Page> GetCurrentPage(long tenantId, long pageId)
+        private bool TabIsActive(Page tabPage, List<Page> currentPageHierarchy)
         {
-            Page currentPage = await _pageService.ReadPageAsync(tenantId, pageId);
-            Page hierarchyPage = currentPage;
-            while (hierarchyPage != null && hierarchyPage.ParentPageId != null)
+            foreach (Page page in currentPageHierarchy)
             {
-                hierarchyPage.ParentPage = await _pageService.ReadPageAsync(tenantId, hierarchyPage.ParentPageId.Value);
-                hierarchyPage = hierarchyPage.ParentPage;
+                if (page.PageId == tabPage.PageId)
+                    return true;
             }
-            return currentPage;
-        }
-
-        private bool TabIsActive(Page tabPage, Page currentPage)
-        {
-            bool active = false;
-            while (!active && currentPage != null)
-            {
-                active = currentPage.PageId == tabPage.PageId;
-                currentPage = currentPage.ParentPage;
-            }
-            return active;
+            return false;
         }
 
         private async Task<List<NavigationBarContentTab>> GetContentTabs(NavigationBarElementSettings elementSettings, long pageId)
         {
             List<NavigationBarContentTab> tabs = new List<NavigationBarContentTab>();
-            Page currentPage = null;
+            List<Page> currentPageHierarchy = null;
             foreach (NavigationBarTab tab in elementSettings.Tabs)
             {
                 Page tabPage = await _pageService.ReadPageAsync(elementSettings.TenantId, tab.PageId);
                 if (tabPage != null)
                 {
-                    if (currentPage == null)
-                        currentPage = await GetCurrentPage(elementSettings.TenantId, pageId);
+                    if (currentPageHierarchy == null)
+                        currentPageHierarchy = await _pageService.ListPagesInHierarchyAsync(elementSettings.TenantId, pageId);
                     bool home = tabPage.ParentPageId == null;
-                    bool active = !home && TabIsActive(tabPage, currentPage);
+                    bool active = !home && TabIsActive(tabPage, currentPageHierarchy);
                     tabs.Add(new NavigationBarContentTab
                     {
                         Active = active,

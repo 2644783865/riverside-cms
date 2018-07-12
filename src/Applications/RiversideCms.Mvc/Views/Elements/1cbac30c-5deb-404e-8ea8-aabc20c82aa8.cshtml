@@ -63,12 +63,10 @@
 
     @if (settings.ShowBreadcrumbs)
     {
-        Page hierarchyPage = content.Page;
         <ol class="breadcrumb">
-            @while (hierarchyPage != null)
+            @foreach (PageHeaderBreadcrumb breadcrumb in content.Breadcrumbs)
             {
-                <li>@Html.PageLink(hierarchyPage)</li>
-                hierarchyPage = hierarchyPage.ParentPage;
+                <li>@Html.PageLink(breadcrumb.Name, breadcrumb.PageId, breadcrumb.PageName, breadcrumb.Home)</li>
             }
         </ol>
     }

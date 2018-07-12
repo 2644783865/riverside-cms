@@ -45,6 +45,28 @@ namespace Riverside.Cms.Services.Core.Client
             }
         }
 
+        public async Task<List<Page>> ListPagesInHierarchyAsync(long tenantId, long pageId)
+        {
+            try
+            {
+                RestClient client = new RestClient(_options.Value.ApiBaseUrl);
+                RestRequest request = new RestRequest("tenants/{tenantId}/pages/{pageId}/hierarchy", Method.GET);
+                request.AddUrlSegment("tenantId", tenantId);
+                request.AddUrlSegment("pageId", pageId);
+                IRestResponse<List<Page>> response = await client.ExecuteAsync<List<Page>>(request);
+                CheckResponseStatus(response);
+                return response.Data;
+            }
+            catch (CoreClientException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new CoreClientException("Core API failed", ex);
+            }
+        }
+
         public async Task<List<PageZone>> SearchPageZonesAsync(long tenantId, long pageId)
         {
             try

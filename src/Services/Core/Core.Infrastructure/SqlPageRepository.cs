@@ -23,15 +23,73 @@ namespace Riverside.Cms.Services.Core.Infrastructure
             using (SqlConnection connection = new SqlConnection(_options.Value.SqlConnectionString))
             {
                 connection.Open();
-
                 Page page = await connection.QueryFirstOrDefaultAsync<Page>(
                     @"SELECT TenantId, PageId, ParentPageId, Name, Description, Created, Updated, Occurred, MasterPageId,
                         ImageUploadId, PreviewImageUploadId, ThumbnailImageUploadId
                         FROM cms.Page WHERE TenantId = @TenantId AND PageId = @PageId",
                     new { TenantId = tenantId, PageId = pageId }
                 );
-
                 return page;
+            }
+        }
+
+        public async Task<IEnumerable<Page>> ListPagesInHierarchyAsync(long tenantId, long pageId)
+        {
+            using (SqlConnection connection = new SqlConnection(_options.Value.SqlConnectionString))
+            {
+                connection.Open();
+                IEnumerable<Page> pages = await connection.QueryAsync<Page>(
+                    @";WITH [Pages] AS
+                        (
+	                        SELECT
+		                        0 AS [Level],
+		                        cms.[Page].PageId,
+		                        cms.[Page].ParentPageId
+	                        FROM
+		                        cms.[Page]
+	                        WHERE
+		                        cms.[Page].TenantId = @TenantId AND
+		                        cms.[Page].PageId = @PageId
+	                        UNION ALL
+	                        SELECT
+		                        [Pages].[Level] + 1 AS [Level],
+		                        ParentPage.PageId,
+		                        ParentPage.ParentPageId
+	                        FROM
+		                        cms.[Page] ParentPage
+	                        INNER JOIN
+		                        [Pages]
+	                        ON
+		                        ParentPage.TenantId = @TenantId AND
+		                        ParentPage.PageId = [Pages].ParentPageId
+                        )
+
+                        SELECT
+	                        cms.[Page].TenantId,
+	                        cms.[Page].PageId,
+	                        cms.[Page].ParentPageId,
+	                        cms.[Page].MasterPageId,
+	                        cms.[Page].Name,
+	                        cms.[Page].[Description],
+	                        cms.[Page].Created,
+	                        cms.[Page].Updated,
+	                        cms.[Page].Occurred,
+	                        cms.[Page].ImageTenantId,
+	                        cms.[Page].ThumbnailImageUploadId,
+	                        cms.[Page].PreviewImageUploadId,
+	                        cms.[Page].ImageUploadId
+                        FROM
+	                        cms.[Page]
+                        INNER JOIN
+	                        [Pages]
+                        ON
+	                        cms.[Page].TenantId = @TenantId AND
+	                        cms.[Page].PageId = [Pages].PageId
+                        ORDER BY
+	                        [Pages].[Level] ASC",
+                    new { TenantId = tenantId, PageId = pageId }
+                );
+                return pages;
             }
         }
 

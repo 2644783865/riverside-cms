@@ -30,6 +30,15 @@ namespace Core.API.Controllers
         }
 
         [HttpGet]
+        [Route("api/v1/core/tenants/{tenantId:int}/pages/{pageId:int}/hierarchy")]
+        [ProducesResponseType(typeof(IEnumerable<Page>), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> ListPagesInHierarchy(long tenantId, long pageId)
+        {
+            IEnumerable<Page> pages = await _pageService.ListPagesInHierarchyAsync(tenantId, pageId);
+            return Ok(pages);
+        }
+
+        [HttpGet]
         [Route("api/v1/core/tenants/{tenantId:int}/pages/{pageId:int}/zones")]
         [ProducesResponseType(typeof(IEnumerable<PageZone>), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> SearchPageZones(long tenantId, long pageId)
