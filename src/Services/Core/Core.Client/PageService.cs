@@ -27,8 +27,8 @@ namespace Riverside.Cms.Services.Core.Client
         {
             try
             {
-                RestClient client = new RestClient(_options.Value.ApiBaseUrl);
-                RestRequest request = new RestRequest(_options.Value.ApiPageUrl, Method.GET);
+                RestClient client = new RestClient(_options.Value.CoreApiBaseUrl);
+                RestRequest request = new RestRequest("tenants/{tenantId}/pages/{pageId}", Method.GET);
                 request.AddUrlSegment("tenantId", tenantId);
                 request.AddUrlSegment("pageId", pageId);
                 IRestResponse<Page> response = await client.ExecuteAsync<Page>(request);
@@ -49,7 +49,7 @@ namespace Riverside.Cms.Services.Core.Client
         {
             try
             {
-                RestClient client = new RestClient(_options.Value.ApiBaseUrl);
+                RestClient client = new RestClient(_options.Value.CoreApiBaseUrl);
                 RestRequest request = new RestRequest("tenants/{tenantId}/pages/{pageId}/hierarchy", Method.GET);
                 request.AddUrlSegment("tenantId", tenantId);
                 request.AddUrlSegment("pageId", pageId);
@@ -71,8 +71,8 @@ namespace Riverside.Cms.Services.Core.Client
         {
             try
             {
-                RestClient client = new RestClient(_options.Value.ApiBaseUrl);
-                RestRequest request = new RestRequest(_options.Value.ApiPageZonesUrl, Method.GET);
+                RestClient client = new RestClient(_options.Value.CoreApiBaseUrl);
+                RestRequest request = new RestRequest("tenants/{tenantId}/pages/{pageId}/zones", Method.GET);
                 request.AddUrlSegment("tenantId", tenantId);
                 request.AddUrlSegment("pageId", pageId);
                 IRestResponse<List<PageZone>> response = await client.ExecuteAsync<List<PageZone>>(request);
@@ -93,8 +93,8 @@ namespace Riverside.Cms.Services.Core.Client
         {
             try
             {
-                RestClient client = new RestClient(_options.Value.ApiBaseUrl);
-                RestRequest request = new RestRequest(_options.Value.ApiPageZoneUrl, Method.GET);
+                RestClient client = new RestClient(_options.Value.CoreApiBaseUrl);
+                RestRequest request = new RestRequest("tenants/{tenantId}/pages/{pageId}/zones/{pageZoneId}", Method.GET);
                 request.AddUrlSegment("tenantId", tenantId);
                 request.AddUrlSegment("pageId", pageId);
                 request.AddUrlSegment("pageZoneId", pageZoneId);
@@ -116,8 +116,8 @@ namespace Riverside.Cms.Services.Core.Client
         {
             try
             {
-                RestClient client = new RestClient(_options.Value.ApiBaseUrl);
-                RestRequest request = new RestRequest(_options.Value.ApiPageZoneElementsUrl, Method.GET);
+                RestClient client = new RestClient(_options.Value.CoreApiBaseUrl);
+                RestRequest request = new RestRequest("tenants/{tenantId}/pages/{pageId}/zones/{pageZoneId}/elements", Method.GET);
                 request.AddUrlSegment("tenantId", tenantId);
                 request.AddUrlSegment("pageId", pageId);
                 request.AddUrlSegment("pageZoneId", pageZoneId);
@@ -139,8 +139,8 @@ namespace Riverside.Cms.Services.Core.Client
         {
             try
             {
-                RestClient client = new RestClient(_options.Value.ApiBaseUrl);
-                RestRequest request = new RestRequest(_options.Value.ApiPageZoneElementUrl, Method.GET);
+                RestClient client = new RestClient(_options.Value.CoreApiBaseUrl);
+                RestRequest request = new RestRequest("tenants/{tenantId}/pages/{pageId}/zones/{pageZoneId}/elements/{pageZoneElementId}", Method.GET);
                 request.AddUrlSegment("tenantId", tenantId);
                 request.AddUrlSegment("pageId", pageId);
                 request.AddUrlSegment("pageZoneId", pageZoneId);

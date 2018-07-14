@@ -27,7 +27,7 @@ namespace Riverside.Cms.Services.Core.Client
         {
             try
             {
-                RestClient client = new RestClient(_options.Value.ApiBaseUrl);
+                RestClient client = new RestClient(_options.Value.CoreApiBaseUrl);
                 RestRequest request = new RestRequest("tenants/{tenantId}/pageviews/{pageId}", Method.GET);
                 request.AddUrlSegment("tenantId", tenantId);
                 request.AddUrlSegment("pageId", pageId);
@@ -49,7 +49,7 @@ namespace Riverside.Cms.Services.Core.Client
         {
             try
             {
-                RestClient client = new RestClient(_options.Value.ApiBaseUrl);
+                RestClient client = new RestClient(_options.Value.CoreApiBaseUrl);
                 RestRequest request = new RestRequest("tenants/{tenantId}/pageviews/{pageId}/zones", Method.GET);
                 request.AddUrlSegment("tenantId", tenantId);
                 request.AddUrlSegment("pageId", pageId);
@@ -71,7 +71,7 @@ namespace Riverside.Cms.Services.Core.Client
         {
             try
             {
-                RestClient client = new RestClient(_options.Value.ApiBaseUrl);
+                RestClient client = new RestClient(_options.Value.CoreApiBaseUrl);
                 RestRequest request = new RestRequest("tenants/{tenantId}/pageviews/{pageId}/zones/{masterPageZoneId}", Method.GET);
                 request.AddUrlSegment("tenantId", tenantId);
                 request.AddUrlSegment("pageId", pageId);
@@ -94,7 +94,7 @@ namespace Riverside.Cms.Services.Core.Client
         {
             try
             {
-                RestClient client = new RestClient(_options.Value.ApiBaseUrl);
+                RestClient client = new RestClient(_options.Value.CoreApiBaseUrl);
                 RestRequest request = new RestRequest("tenants/{tenantId}/pageviews/{pageId}/zones/{masterPageZoneId}/elements", Method.GET);
                 request.AddUrlSegment("tenantId", tenantId);
                 request.AddUrlSegment("pageId", pageId);
