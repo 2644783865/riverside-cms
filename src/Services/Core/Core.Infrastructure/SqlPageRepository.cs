@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Dapper;
 using Microsoft.Extensions.Options;
 using Riverside.Cms.Services.Core.Domain;
+using static Dapper.SqlMapper;
 
 namespace Riverside.Cms.Services.Core.Infrastructure
 {
@@ -23,13 +24,48 @@ namespace Riverside.Cms.Services.Core.Infrastructure
             using (SqlConnection connection = new SqlConnection(_options.Value.SqlConnectionString))
             {
                 connection.Open();
-                Page page = await connection.QueryFirstOrDefaultAsync<Page>(
-                    @"SELECT TenantId, PageId, ParentPageId, Name, Description, Created, Updated, Occurred, MasterPageId,
-                        ImageUploadId, PreviewImageUploadId, ThumbnailImageUploadId
-                        FROM cms.Page WHERE TenantId = @TenantId AND PageId = @PageId",
-                    new { TenantId = tenantId, PageId = pageId }
-                );
-                return page;
+                using (GridReader gr = await connection.QueryMultipleAsync(@"
+                    SELECT
+                        TenantId,
+                        PageId,
+                        ParentPageId,
+                        Name,
+                        Description,
+                        Created,
+                        Updated,
+                        Occurred,
+                        MasterPageId,
+                        ImageUploadId,
+                        PreviewImageUploadId,
+                        ThumbnailImageUploadId
+                    FROM
+                        cms.Page
+                    WHERE
+                        TenantId = @TenantId AND
+                        PageId = @PageId
+
+                    SELECT
+                        cms.Tag.TagId,
+                        cms.Tag.Name
+                    FROM
+                        cms.Tag
+                    INNER JOIN
+                        cms.TagPage
+                    ON
+                        cms.Tag.TenantId = cms.TagPage.TenantId AND
+                        cms.Tag.TagId = cms.TagPage.TagId
+                    WHERE
+                        cms.TagPage.TenantId = @TenantId AND
+                        cms.TagPage.PageId = @PageId
+                    ORDER BY
+                        cms.Tag.Name",
+                    new { TenantId = tenantId, PageId = pageId }))
+                {
+                    Page page = await gr.ReadFirstOrDefaultAsync<Page>();
+                    if (page != null)
+                        page.Tags = await gr.ReadAsync<Tag>();
+                    return page;
+                }
             }
         }
 

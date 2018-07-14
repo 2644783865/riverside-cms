@@ -22,6 +22,8 @@ namespace Riverside.Cms.Services.Core.Client
         public long? PreviewImageUploadId { get; set; }
         public long? ThumbnailImageUploadId { get; set; }
 
+        public IEnumerable<Tag> Tags { get; set; }
+
         public List<PageZone> PageZones { get; set; }
     }
 }

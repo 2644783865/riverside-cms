@@ -29,6 +29,8 @@ namespace Riverside.Cms.Services.Core.Domain
                 MasterPageId = masterPage.MasterPageId,
                 PageId = pageId,
                 Title = page.Name,
+                Description = page.Description ?? string.Empty,
+                Keywords = string.Join(", ", page.Tags.Select(t => t.Name)),
                 BeginRender = masterPage.BeginRender,
                 EndRender = masterPage.EndRender
             };
