@@ -32,7 +32,7 @@
         {
             @Html.Raw(pageViewZoneElement.BeginRender)
 
-            <div class="rcms-element" id="element-id-@pageViewZoneElement.ElementId">
+            <div class="rcms-element" id="@(pageViewZoneElement.ElementTypeId + "_" + pageViewZoneElement.ElementId)">
                 @{ if (Model.Elements.ContainsKey(pageViewZoneElement.ElementId)) { Html.RenderPartial(Model.Elements[pageViewZoneElement.ElementId].PartialViewName, Model.Elements[pageViewZoneElement.ElementId].ElementView); } }
             </div>
 
