@@ -145,9 +145,33 @@ namespace Riverside.Cms.Services.Storage.Infrastructure
             {
                 connection.Open();
 
-                BlobDto dto = await connection.QueryFirstOrDefaultAsync<BlobDto>(
-                    @"SELECT TenantId, BlobId, Size, ContentType, Name, Folder1, Folder2, Folder3, Width, Height, Created, Updated
-                        FROM Blob WHERE TenantId = @TenantId AND BlobId = @BlobId", 
+                BlobDto dto = await connection.QueryFirstOrDefaultAsync<BlobDto>(@"
+                    SELECT
+                        cms.Upload.TenantId,
+                        cms.Upload.UploadId AS BlobId,
+                        cms.Upload.Size,
+                        CASE cms.Upload.UploadType
+                            WHEN 0 THEN 'application/octet-stream'
+                            WHEN 1 THEN 'image/xyz'
+                        END AS ContentType,
+                        cms.Upload.Name,
+                        NULL AS Folder1,
+                        NULL AS Folder2,
+                        NULL AS Folder3,
+                        cms.Image.Width,
+                        cms.Image.Height,
+                        cms.Upload.Created,
+                        cms.Upload.Updated
+                    FROM
+                        cms.Upload
+                    LEFT JOIN
+                        cms.Image
+                    ON
+                        cms.Upload.TenantId = cms.Image.TenantId AND
+	                    cms.Upload.UploadId = cms.Image.UploadId
+                    WHERE
+                        cms.Upload.TenantId = @TenantId AND
+                        cms.Upload.UploadId = @BlobId", 
                     new { TenantId = tenantId, BlobId = blobId }
                 );
 

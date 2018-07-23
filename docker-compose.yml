@@ -20,6 +20,7 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - core.api
+      - storage.api
 
   riversidecms.mvc:
     image: riversidecms.mvc
@@ -29,3 +30,4 @@ services:
     depends_on:
       - core.api
       - element.api
+      - storage.api

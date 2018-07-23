@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Riverside.Cms.Services.Core.Client;
 using Riverside.Cms.Services.Element.Client;
+using Riverside.Cms.Services.Storage.Client;
 using RiversideCms.Mvc.Services;
 
 namespace RiversideCms.Mvc
@@ -42,6 +43,7 @@ namespace RiversideCms.Mvc
         {
             services.Configure<CoreApiOptions>(Configuration);
             services.Configure<ElementApiOptions>(Configuration);
+            services.Configure<StorageApiOptions>(Configuration);
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.

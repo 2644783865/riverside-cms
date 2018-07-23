@@ -35,9 +35,9 @@ namespace Riverside.Cms.Services.Core.Infrastructure
                         Updated,
                         Occurred,
                         MasterPageId,
-                        ImageUploadId,
-                        PreviewImageUploadId,
-                        ThumbnailImageUploadId
+                        ImageUploadId AS ImageBlobId,
+                        PreviewImageUploadId AS PreviewImageBlobId,
+                        ThumbnailImageUploadId AS ThumbnailImageBlobId
                     FROM
                         cms.Page
                     WHERE
@@ -110,10 +110,9 @@ namespace Riverside.Cms.Services.Core.Infrastructure
 	                        cms.[Page].Created,
 	                        cms.[Page].Updated,
 	                        cms.[Page].Occurred,
-	                        cms.[Page].ImageTenantId,
-	                        cms.[Page].ThumbnailImageUploadId,
-	                        cms.[Page].PreviewImageUploadId,
-	                        cms.[Page].ImageUploadId
+	                        cms.[Page].ThumbnailImageUploadId AS ThumbnailImageBlobId,
+	                        cms.[Page].PreviewImageUploadId AS PreviewImageBlobId,
+	                        cms.[Page].ImageUploadId AS ImageBlobId
                         FROM
 	                        cms.[Page]
                         INNER JOIN

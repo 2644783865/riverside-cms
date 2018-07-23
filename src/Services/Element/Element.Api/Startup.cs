@@ -11,6 +11,7 @@ using Microsoft.Extensions.Options;
 using Riverside.Cms.Services.Core.Client;
 using Riverside.Cms.Services.Element.Domain;
 using Riverside.Cms.Services.Element.Infrastructure;
+using Riverside.Cms.Services.Storage.Client;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace Element.Api
@@ -27,6 +28,8 @@ namespace Element.Api
         private void ConfigureDependencyInjectionServices(IServiceCollection services)
         {
             services.AddTransient<IPageService, PageService>();
+
+            services.AddTransient<IStorageService, StorageService>();
 
             services.AddTransient<ICodeSnippetElementService, CodeSnippetElementService>();
             services.AddTransient<IFooterElementService, FooterElementService>();
@@ -47,6 +50,7 @@ namespace Element.Api
         {
             services.Configure<CoreApiOptions>(Configuration);
             services.Configure<SqlOptions>(Configuration);
+            services.Configure<StorageApiOptions>(Configuration);
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.

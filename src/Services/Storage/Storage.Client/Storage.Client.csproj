@@ -2,16 +2,16 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <RootNamespace>Riverside.Cms.Services.Element.Infrastructure</RootNamespace>
+    <RootNamespace>Riverside.Cms.Services.Storage.Client</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Dapper" Version="1.50.4" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="2.1.1" />
+    <PackageReference Include="RestSharp" Version="106.3.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Element.Domain\Element.Domain.csproj" />
+    <ProjectReference Include="..\..\..\Utilities\Net\Net.RestSharpExtensions\Net.RestSharpExtensions.csproj" />
   </ItemGroup>
 
 </Project>

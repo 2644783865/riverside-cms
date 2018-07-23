@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Riverside.Cms.Services.Core.Client;
+using Riverside.Cms.Services.Storage.Client;
 
 namespace Riverside.Cms.Services.Element.Domain
 {
@@ -30,6 +31,7 @@ namespace Riverside.Cms.Services.Element.Domain
     public class PageHeaderElementContent : IElementContent
     {
         public Page Page { get; set; }
+        public IDictionary<long, BlobImage> Images { get; set; }
         public IEnumerable<PageHeaderBreadcrumb> Breadcrumbs { get; set; }
     }
 
@@ -41,11 +43,13 @@ namespace Riverside.Cms.Services.Element.Domain
     {
         private readonly IElementRepository<PageHeaderElementSettings> _elementRepository;
         private readonly IPageService _pageService;
+        private readonly IStorageService _storageService;
 
-        public PageHeaderElementService(IElementRepository<PageHeaderElementSettings> elementRepository, IPageService pageService)
+        public PageHeaderElementService(IElementRepository<PageHeaderElementSettings> elementRepository, IPageService pageService, IStorageService storageService)
         {
             _elementRepository = elementRepository;
             _pageService = pageService;
+            _storageService = storageService;
         }
 
         public Task<PageHeaderElementSettings> ReadElementSettingsAsync(long tenantId, long elementId)
@@ -58,6 +62,18 @@ namespace Riverside.Cms.Services.Element.Domain
             PageHeaderElementSettings elementSettings = await _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
 
             Page page = await _pageService.ReadPageAsync(tenantId, pageId);
+
+            BlobImage image = page.ImageBlobId.HasValue ? (BlobImage) await _storageService.ReadBlobAsync(tenantId, page.ImageBlobId.Value) : null;
+            BlobImage previewImage = page.PreviewImageBlobId.HasValue ? (BlobImage) await _storageService.ReadBlobAsync(tenantId, page.PreviewImageBlobId.Value) : null;
+            BlobImage thumbnailImage = page.ThumbnailImageBlobId.HasValue ? (BlobImage) await _storageService.ReadBlobAsync(tenantId, page.ThumbnailImageBlobId.Value) : null;
+
+            IDictionary<long, BlobImage> images = new Dictionary<long, BlobImage>();
+            if (image != null)
+                images.Add(image.BlobId, image);
+            if (previewImage != null)
+                images.Add(previewImage.BlobId, previewImage);
+            if (thumbnailImage != null)
+                images.Add(thumbnailImage.BlobId, thumbnailImage);
 
             IEnumerable<PageHeaderBreadcrumb> breadcrumbs = null;
             if (elementSettings.ShowBreadcrumbs)
@@ -75,6 +91,7 @@ namespace Riverside.Cms.Services.Element.Domain
             return new PageHeaderElementContent
             {
                 Page = page,
+                Images = images,
                 Breadcrumbs = breadcrumbs
             };
         }

@@ -18,9 +18,9 @@ namespace Riverside.Cms.Services.Core.Client
 
         public long MasterPageId { get; set; }
 
-        public long? ImageUploadId { get; set; }
-        public long? PreviewImageUploadId { get; set; }
-        public long? ThumbnailImageUploadId { get; set; }
+        public long? ImageBlobId { get; set; }
+        public long? PreviewImageBlobId { get; set; }
+        public long? ThumbnailImageBlobId { get; set; }
 
         public IEnumerable<Tag> Tags { get; set; }
 
