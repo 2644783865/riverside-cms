@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Riverside.Cms.Services.Core.Domain;
 using Riverside.Cms.Services.Core.Infrastructure;
+using Riverside.Cms.Services.Storage.Client;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace Core.API
@@ -25,6 +26,8 @@ namespace Core.API
 
         private void ConfigureDependencyInjectionServices(IServiceCollection services)
         {
+            services.AddTransient<IStorageService, StorageService>();
+
             services.AddTransient<IPageService, PageService>();
             services.AddTransient<IPageViewService, PageViewService>();
             services.AddTransient<IMasterPageService, MasterPageService>();
@@ -35,6 +38,7 @@ namespace Core.API
         private void ConfigureOptionServices(IServiceCollection services)
         {
             services.Configure<SqlOptions>(Configuration);
+            services.Configure<StorageApiOptions>(Configuration);
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.

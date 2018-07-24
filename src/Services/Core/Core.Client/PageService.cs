@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using RestSharp;
+using Riverside.Cms.Services.Storage.Client;
 using Riverside.Cms.Utilities.Net.RestSharpExtensions;
 
 namespace Riverside.Cms.Services.Core.Client
@@ -38,6 +40,27 @@ namespace Riverside.Cms.Services.Core.Client
             catch (CoreClientException)
             {
                 throw;
+            }
+            catch (Exception ex)
+            {
+                throw new CoreClientException("Core API failed", ex);
+            }
+        }
+
+        public async Task<BlobContent> ReadPageImageAsync(long tenantId, long pageId, PageImageType pageImageType)
+        {
+            try
+            {
+                string uri = $"{_options.Value.CoreApiBaseUrl}tenants/{tenantId}/pages/{pageId}/images/{pageImageType.ToString().ToLower()}";
+                using (HttpClient httpClient = new HttpClient())
+                {
+                    HttpResponseMessage response = await httpClient.GetAsync(uri);
+                    return new BlobContent
+                    {
+                        Type = response.Content.Headers.ContentType.MediaType,
+                        Stream = await response.Content.ReadAsStreamAsync()
+                    };
+                }
             }
             catch (Exception ex)
             {

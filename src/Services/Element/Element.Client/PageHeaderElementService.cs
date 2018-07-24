@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using RestSharp;
 using Riverside.Cms.Services.Core.Client;
+using Riverside.Cms.Services.Storage.Client;
 using Riverside.Cms.Utilities.Net.RestSharpExtensions;
 
 namespace Riverside.Cms.Services.Element.Client
@@ -32,6 +33,7 @@ namespace Riverside.Cms.Services.Element.Client
     public class PageHeaderElementContent : IElementContent
     {
         public Page Page { get; set; }
+        public Dictionary<long, BlobImage> Images { get; set; }
         public IEnumerable<PageHeaderBreadcrumb> Breadcrumbs { get; set; }
     }
 

@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Riverside.Cms.Services.Storage.Client;
 
 namespace Riverside.Cms.Services.Core.Client
 {
     public interface IPageService
     {
         Task<Page> ReadPageAsync(long tenantId, long pageId);
+        Task<BlobContent> ReadPageImageAsync(long tenantId, long pageId, PageImageType pageImageType);
 
         Task<List<Page>> ListPagesInHierarchyAsync(long tenantId, long pageId);
 

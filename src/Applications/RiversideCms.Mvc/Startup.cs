@@ -25,6 +25,7 @@ namespace RiversideCms.Mvc
         private void ConfigureDependencyInjectionServices(IServiceCollection services)
         {
             // Core services
+            services.AddTransient<IPageService, PageService>();
             services.AddTransient<IPageViewService, PageViewService>();
 
             // Element services
@@ -73,6 +74,7 @@ namespace RiversideCms.Mvc
             app.UseMvc(routes =>
             {
                 routes.MapRoute("Home", "", new { controller = "pages", action = "home" });
+                routes.MapRoute("PageImage", "pages/{pageId}/images/{pageImageType}/{*description}", new { controller = "pages", action = "readimage" });
                 routes.MapRoute("Page", "pages/{pageId}/{*description}", new { controller = "pages", action = "read" });
                 routes.MapRoute("Login", "account/login", new { controller = "account", action = "login" });
                 routes.MapRoute("Logout", "account/logout", new { controller = "account", action = "logout" });

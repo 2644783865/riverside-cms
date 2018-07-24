@@ -2,16 +2,19 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Riverside.Cms.Services.Storage.Client;
 
 namespace Riverside.Cms.Services.Core.Domain
 {
     public class PageService : IPageService
     {
         private readonly IPageRepository _pageRepository;
+        private readonly IStorageService _storageService;
 
-        public PageService(IPageRepository pageRepository)
+        public PageService(IPageRepository pageRepository, IStorageService storageService)
         {
             _pageRepository = pageRepository;
+            _storageService = storageService;
         }
 
         public async Task<IEnumerable<Page>> ListPagesInHierarchyAsync(long tenantId, long pageId)
@@ -22,6 +25,35 @@ namespace Riverside.Cms.Services.Core.Domain
         public Task<Page> ReadPageAsync(long tenantId, long pageId)
         {
             return _pageRepository.ReadPageAsync(tenantId, pageId);
+        }
+
+        private long? GetBlobId(Page page, PageImageType pageImageType)
+        {
+            switch (pageImageType)
+            {
+                case PageImageType.Original:
+                    return page.ImageBlobId;
+
+                case PageImageType.Preview:
+                    return page.PreviewImageBlobId;
+
+                case PageImageType.Thumbnail:
+                    return page.ThumbnailImageBlobId;
+
+                default:
+                    return null;
+            }
+        }
+
+        public async Task<BlobContent> ReadPageImageAsync(long tenantId, long pageId, PageImageType pageImageType)
+        {
+            Page page = await _pageRepository.ReadPageAsync(tenantId, pageId);
+            if (page == null)
+                return null;
+            long? blobId = GetBlobId(page, pageImageType);
+            if (blobId == null)
+                return null;
+            return await _storageService.ReadBlobContentAsync(tenantId, blobId.Value);
         }
 
         public Task<IEnumerable<PageZone>> SearchPageZonesAsync(long tenantId, long pageId)

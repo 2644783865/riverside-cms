@@ -5,6 +5,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Riverside.Cms.Services.Core.Domain;
+using Riverside.Cms.Services.Storage.Client;
 
 namespace Core.API.Controllers
 {
@@ -27,6 +28,17 @@ namespace Core.API.Controllers
             if (page == null)
                 return NotFound();
             return Ok(page);
+        }
+
+        [HttpGet]
+        [Route("api/v1/core/tenants/{tenantId:int}/pages/{pageId:int}/images/{pageImageType}")]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> ReadPageImage(long tenantId, long pageId, PageImageType pageImageType)
+        {
+            BlobContent blobContent = await _pageService.ReadPageImageAsync(tenantId, pageId, pageImageType);
+            if (blobContent == null)
+                return NotFound();
+            return File(blobContent.Stream, blobContent.Type);
         }
 
         [HttpGet]

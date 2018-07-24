@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Riverside.Cms.Services.Core.Client;
 using Riverside.Cms.Services.Element.Client;
+using Riverside.Cms.Services.Storage.Client;
 using RiversideCms.Mvc.Models;
 using RiversideCms.Mvc.Services;
 
@@ -13,13 +14,15 @@ namespace RiversideCms.Mvc.Controllers
     public class PagesController : Controller
     {
         private readonly IElementServiceFactory _elementServiceFactory;
+        private readonly IPageService _pageService;
         private readonly IPageViewService _pageViewService;
 
         private const long TenantId = 6;
 
-        public PagesController(IElementServiceFactory elementServiceFactory, IPageViewService pageViewService)
+        public PagesController(IElementServiceFactory elementServiceFactory, IPageService pageService, IPageViewService pageViewService)
         {
             _elementServiceFactory = elementServiceFactory;
+            _pageService = pageService;
             _pageViewService = pageViewService;
         }
 
@@ -69,6 +72,16 @@ namespace RiversideCms.Mvc.Controllers
             };
 
             return View("Read", pageRender);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ReadImage(long pageId, PageImageType pageImageType)
+        {
+            long tenantId = TenantId;
+
+            BlobContent blobContent = await _pageService.ReadPageImageAsync(tenantId, pageId, pageImageType);
+
+            return File(blobContent.Stream, blobContent.Type);
         }
     }
 }

@@ -5,4 +5,8 @@
     <RootNamespace>Riverside.Cms.Services.Core.Domain</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\Storage\Storage.Client\Storage.Client.csproj" />
+  </ItemGroup>
+
 </Project>

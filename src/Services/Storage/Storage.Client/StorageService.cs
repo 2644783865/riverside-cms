@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
@@ -56,6 +58,27 @@ namespace Riverside.Cms.Services.Storage.Client
             catch (StorageClientException)
             {
                 throw;
+            }
+            catch (Exception ex)
+            {
+                throw new StorageClientException("Storage API failed", ex);
+            }
+        }
+
+        public async Task<BlobContent> ReadBlobContentAsync(long tenantId, long blobId)
+        {
+            try
+            {
+                string uri = $"{_options.Value.StorageApiBaseUrl}tenants/{tenantId}/blobs/{blobId}/content";
+                using (HttpClient httpClient = new HttpClient())
+                {
+                    HttpResponseMessage response = await httpClient.GetAsync(uri);
+                    return new BlobContent
+                    {
+                        Type = response.Content.Headers.ContentType.MediaType,
+                        Stream = await response.Content.ReadAsStreamAsync()
+                    };
+                }
             }
             catch (Exception ex)
             {
