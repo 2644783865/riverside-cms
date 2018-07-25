@@ -5,8 +5,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
-using RestSharp;
-using Riverside.Cms.Utilities.Net.RestSharpExtensions;
+using Newtonsoft.Json;
 
 namespace Riverside.Cms.Services.Storage.Client
 {
@@ -17,12 +16,6 @@ namespace Riverside.Cms.Services.Storage.Client
         public StorageService(IOptions<StorageApiOptions> options)
         {
             _options = options;
-        }
-
-        private void CheckResponseStatus<T>(IRestResponse<T> response) where T : new()
-        {
-            if (response.ErrorException != null)
-                throw new StorageClientException($"Storage API failed with response status {response.ResponseStatus}", response.ErrorException);
         }
 
         private Blob GetBlob(BlobImage blobImage)
@@ -44,20 +37,15 @@ namespace Riverside.Cms.Services.Storage.Client
         {
             try
             {
-                RestClient client = new RestClient(_options.Value.StorageApiBaseUrl);
-                RestRequest request = new RestRequest("tenants/{tenantId}/blobs/{blobId}", Method.GET);
-                request.AddUrlSegment("tenantId", tenantId);
-                request.AddUrlSegment("blobId", blobId);
-                IRestResponse<BlobImage> response = await client.ExecuteAsync<BlobImage>(request);
-                CheckResponseStatus(response);
-                BlobImage blobImage = response.Data;
-                if (blobImage.Width == 0 && blobImage.Height == 0)
-                    return GetBlob(blobImage);
-                return blobImage;
-            }
-            catch (StorageClientException)
-            {
-                throw;
+                string uri = $"{_options.Value.StorageApiBaseUrl}tenants/{tenantId}/blobs/{blobId}";
+                using (HttpClient httpClient = new HttpClient())
+                {
+                    string json = await httpClient.GetStringAsync(uri);
+                    BlobImage blobImage = JsonConvert.DeserializeObject<BlobImage>(json);
+                    if (blobImage.Width == 0 && blobImage.Height == 0)
+                        return GetBlob(blobImage);
+                    return blobImage;
+                }
             }
             catch (Exception ex)
             {

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
-using RestSharp;
-using Riverside.Cms.Utilities.Net.RestSharpExtensions;
+using Newtonsoft.Json;
 
 namespace Riverside.Cms.Services.Core.Client
 {
@@ -17,27 +17,16 @@ namespace Riverside.Cms.Services.Core.Client
             _options = options;
         }
 
-        private void CheckResponseStatus<T>(IRestResponse<T> response) where T : new()
-        {
-            if (response.ErrorException != null)
-                throw new CoreClientException($"Core API failed with response status {response.ResponseStatus}", response.ErrorException);
-        }
-
         public async Task<PageView> ReadPageViewAsync(long tenantId, long pageId)
         {
             try
             {
-                RestClient client = new RestClient(_options.Value.CoreApiBaseUrl);
-                RestRequest request = new RestRequest("tenants/{tenantId}/pageviews/{pageId}", Method.GET);
-                request.AddUrlSegment("tenantId", tenantId);
-                request.AddUrlSegment("pageId", pageId);
-                IRestResponse<PageView> response = await client.ExecuteAsync<PageView>(request);
-                CheckResponseStatus(response);
-                return response.Data;
-            }
-            catch (CoreClientException)
-            {
-                throw;
+                string uri = $"{_options.Value.CoreApiBaseUrl}tenants/{tenantId}/pageviews/{pageId}";
+                using (HttpClient httpClient = new HttpClient())
+                {
+                    string json = await httpClient.GetStringAsync(uri);
+                    return JsonConvert.DeserializeObject<PageView>(json);
+                }
             }
             catch (Exception ex)
             {
@@ -49,17 +38,12 @@ namespace Riverside.Cms.Services.Core.Client
         {
             try
             {
-                RestClient client = new RestClient(_options.Value.CoreApiBaseUrl);
-                RestRequest request = new RestRequest("tenants/{tenantId}/pageviews/{pageId}/zones", Method.GET);
-                request.AddUrlSegment("tenantId", tenantId);
-                request.AddUrlSegment("pageId", pageId);
-                IRestResponse<List<PageViewZone>> response = await client.ExecuteAsync<List<PageViewZone>>(request);
-                CheckResponseStatus(response);
-                return response.Data;
-            }
-            catch (CoreClientException)
-            {
-                throw;
+                string uri = $"{_options.Value.CoreApiBaseUrl}tenants/{tenantId}/pageviews/{pageId}/zones";
+                using (HttpClient httpClient = new HttpClient())
+                {
+                    string json = await httpClient.GetStringAsync(uri);
+                    return JsonConvert.DeserializeObject<List<PageViewZone>>(json);
+                }
             }
             catch (Exception ex)
             {
@@ -71,18 +55,12 @@ namespace Riverside.Cms.Services.Core.Client
         {
             try
             {
-                RestClient client = new RestClient(_options.Value.CoreApiBaseUrl);
-                RestRequest request = new RestRequest("tenants/{tenantId}/pageviews/{pageId}/zones/{masterPageZoneId}", Method.GET);
-                request.AddUrlSegment("tenantId", tenantId);
-                request.AddUrlSegment("pageId", pageId);
-                request.AddUrlSegment("masterPageZoneId", masterPageZoneId);
-                IRestResponse<PageViewZone> response = await client.ExecuteAsync<PageViewZone>(request);
-                CheckResponseStatus(response);
-                return response.Data;
-            }
-            catch (CoreClientException)
-            {
-                throw;
+                string uri = $"{_options.Value.CoreApiBaseUrl}tenants/{tenantId}/pageviews/{pageId}/zones/{masterPageZoneId}";
+                using (HttpClient httpClient = new HttpClient())
+                {
+                    string json = await httpClient.GetStringAsync(uri);
+                    return JsonConvert.DeserializeObject<PageViewZone>(json);
+                }
             }
             catch (Exception ex)
             {
@@ -94,18 +72,12 @@ namespace Riverside.Cms.Services.Core.Client
         {
             try
             {
-                RestClient client = new RestClient(_options.Value.CoreApiBaseUrl);
-                RestRequest request = new RestRequest("tenants/{tenantId}/pageviews/{pageId}/zones/{masterPageZoneId}/elements", Method.GET);
-                request.AddUrlSegment("tenantId", tenantId);
-                request.AddUrlSegment("pageId", pageId);
-                request.AddUrlSegment("masterPageZoneId", masterPageZoneId);
-                IRestResponse<List<PageViewZoneElement>> response = await client.ExecuteAsync<List<PageViewZoneElement>>(request);
-                CheckResponseStatus(response);
-                return response.Data;
-            }
-            catch (CoreClientException)
-            {
-                throw;
+                string uri = $"{_options.Value.CoreApiBaseUrl}tenants/{tenantId}/pageviews/{pageId}/zones/{masterPageZoneId}/elements";
+                using (HttpClient httpClient = new HttpClient())
+                {
+                    string json = await httpClient.GetStringAsync(uri);
+                    return JsonConvert.DeserializeObject<List<PageViewZoneElement>>(json);
+                }
             }
             catch (Exception ex)
             {
