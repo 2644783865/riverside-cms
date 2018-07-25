@@ -38,7 +38,7 @@ namespace Core.API.Controllers
             BlobContent blobContent = await _pageService.ReadPageImageAsync(tenantId, pageId, pageImageType);
             if (blobContent == null)
                 return NotFound();
-            return File(blobContent.Stream, blobContent.Type);
+            return File(blobContent.Stream, blobContent.Type, blobContent.Name);
         }
 
         [HttpGet]

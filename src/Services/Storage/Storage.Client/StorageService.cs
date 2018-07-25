@@ -63,6 +63,7 @@ namespace Riverside.Cms.Services.Storage.Client
                     HttpResponseMessage response = await httpClient.GetAsync(uri);
                     return new BlobContent
                     {
+                        Name = response.Content.Headers.ContentDisposition.FileName,
                         Type = response.Content.Headers.ContentType.MediaType,
                         Stream = await response.Content.ReadAsStreamAsync()
                     };

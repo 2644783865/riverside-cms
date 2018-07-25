@@ -8,6 +8,7 @@ namespace Riverside.Cms.Services.Storage.Client
     public class BlobContent
     {
         public Stream Stream { get; set; }
+        public string Name { get; set; }
         public string Type { get; set; }
     }
 }

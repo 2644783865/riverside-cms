@@ -84,7 +84,7 @@ namespace Storage.API.Controllers
             BlobContent blobContent = await _storageService.ReadBlobContentAsync(tenantId, blobId);
             if (blobContent == null)
                 return NotFound();
-            return File(blobContent.Stream, blobContent.Type);
+            return File(blobContent.Stream, blobContent.Type, blobContent.Name);
         }
 
         [HttpPost]

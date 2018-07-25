@@ -100,6 +100,7 @@ namespace Riverside.Cms.Services.Storage.Domain
             blob.Path = "pages/images";
             BlobContent blobContent = new BlobContent
             {
+                Name = blob.Name,
                 Type = blob.ContentType,
                 Stream = await _blobService.ReadBlobContentAsync(blob)
             };
