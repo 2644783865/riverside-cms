@@ -5,7 +5,13 @@ using System.Threading.Tasks;
 
 namespace RiversideCms.Mvc.Models
 {
-    public class ElementView
+    public interface IElementView
+    {
+        object Settings { get; set; }
+        object Content { get; set; }
+    }
+
+    public class ElementView : IElementView
     {
         public object Settings { get; set; }
         public object Content { get; set; }

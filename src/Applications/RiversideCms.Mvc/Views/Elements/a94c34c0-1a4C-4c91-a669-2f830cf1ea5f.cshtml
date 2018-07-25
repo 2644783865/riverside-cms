@@ -2,16 +2,14 @@
 @using Riverside.Cms.Services.Core.Client
 @using Riverside.Cms.Services.Element.Client
 
-@model ElementView
+@model ElementView<NavigationBarElementSettings, NavigationBarElementContent>
 
 @{
-    NavigationBarElementSettings settings = (NavigationBarElementSettings)Model.Settings;
-    NavigationBarElementContent content = (NavigationBarElementContent)Model.Content;
     bool userLoggedOn = User.Identity.IsAuthenticated;
-    bool showLoggedOffUserOptions = settings.ShowLoggedOffUserOptions && !userLoggedOn;
-    bool showLoggedOnUserOptions = settings.ShowLoggedOnUserOptions && userLoggedOn;
+    bool showLoggedOffUserOptions = Model.Settings.ShowLoggedOffUserOptions && !userLoggedOn;
+    bool showLoggedOnUserOptions = Model.Settings.ShowLoggedOnUserOptions && userLoggedOn;
     bool adminTabs = showLoggedOnUserOptions || showLoggedOffUserOptions;
-    bool pageTabs = content.Tabs.Count() > 0;
+    bool pageTabs = Model.Content.Tabs.Count() > 0;
 }
 
 <div class="rcms-nav-bar">
@@ -27,9 +25,9 @@
                         <span class="icon-bar"></span>
                     </button>
                 }
-                @if (settings.Brand != string.Empty)
+                @if (Model.Settings.Brand != string.Empty)
                 {
-                    <a class="navbar-brand" href="@Url.Content("~/")">@settings.Brand</a>
+                    <a class="navbar-brand" href="@Url.Content("~/")">@Model.Settings.Brand</a>
                 }
             </div>
             @if (pageTabs || adminTabs)
@@ -38,7 +36,7 @@
                     @if (pageTabs)
                     {
                         <ul class="nav navbar-nav">
-                            @foreach (NavigationBarContentTab tab in content.Tabs)
+                            @foreach (NavigationBarContentTab tab in Model.Content.Tabs)
                             {
                                 <li class="@if (tab.Active) {<text>active</text>}">@Html.PageLink(tab.Name, tab.PageId, tab.PageName, tab.Home)</li>
                             }

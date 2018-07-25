@@ -2,52 +2,50 @@
 @using Riverside.Cms.Services.Core.Client
 @using Riverside.Cms.Services.Element.Client
 
-@model ElementView
+@model ElementView<PageHeaderElementSettings, PageHeaderElementContent>
 
-@{ 
-    PageHeaderElementSettings settings = (PageHeaderElementSettings)Model.Settings;
-    PageHeaderElementContent content = (PageHeaderElementContent)Model.Content;
-    bool showThumbnailImage = settings.ShowImage && content.Page.ThumbnailImageBlobId.HasValue && content.Images.ContainsKey(content.Page.ThumbnailImageBlobId.Value);
-    bool showUpdated = settings.ShowUpdated && !(settings.ShowCreated && (content.Page.Created.Date == content.Page.Updated.Date));
-    bool showOccurred = settings.ShowOccurred && content.Page.Occurred.HasValue;
-    bool occursInFuture = showOccurred && content.Page.Occurred.Value > DateTime.UtcNow;
+@{
+    bool showThumbnailImage = Model.Settings.ShowImage && Model.Content.Page.ThumbnailImageBlobId.HasValue && Model.Content.Images.ContainsKey(Model.Content.Page.ThumbnailImageBlobId.Value);
+    bool showUpdated = Model.Settings.ShowUpdated && !(Model.Settings.ShowCreated && (Model.Content.Page.Created.Date == Model.Content.Page.Updated.Date));
+    bool showOccurred = Model.Settings.ShowOccurred && Model.Content.Page.Occurred.HasValue;
+    bool occursInFuture = showOccurred && Model.Content.Page.Occurred.Value > DateTime.UtcNow;
 }
 
 <div class="rcms-page-header">
 
-    @if (settings.ShowName)
+    @if (Model.Settings.ShowName)
     {
-        <h1>@content.Page.Name</h1>
+        <h1>@Model.Content.Page.Name</h1>
     }
 
-    @if (settings.ShowDescription && content.Page.Description != null)
+    @if (Model.Settings.ShowDescription && Model.Content.Page.Description != null)
     {
-        @Html.MarkdownToHtml(content.Page.Description)
+        @Html.MarkdownToHtml(Model.Content.Page.Description)
     }
 
     @if (showThumbnailImage)
     {
         <div class="media-object">
             <img 
-                 src="@Url.RouteUrl("PageImage", new { pageid = content.Page.PageId, pageImageType = "thumbnail", description = Url.UrlFriendly(content.Page.Name), t = content.Page.ThumbnailImageBlobId})" alt="@content.Page.Name"
-                 width="@content.Images[content.Page.ThumbnailImageBlobId.Value].Width"
-                 height="@content.Images[content.Page.ThumbnailImageBlobId.Value].Height"
+                 src="@Url.RouteUrl("PageImage", new { pageid = Model.Content.Page.PageId, pageImageType = "thumbnail", description = Url.UrlFriendly(Model.Content.Page.Name), t = Model.Content.Page.ThumbnailImageBlobId})" alt="@Model.Content.Page.Name"
+                 width="@Model.Content.Images[Model.Content.Page.ThumbnailImageBlobId.Value].Width"
+                 height="@Model.Content.Images[Model.Content.Page.ThumbnailImageBlobId.Value].Height"
             />
         </div>
     }
 
-    @if (settings.ShowCreated || showUpdated || showOccurred)
+    @if (Model.Settings.ShowCreated || showUpdated || showOccurred)
     {
         <dl>
-            @if (settings.ShowCreated)
+            @if (Model.Settings.ShowCreated)
             {
                 <dt>Posted</dt>
-                <dd>@Html.Date(content.Page.Created)</dd>
+                <dd>@Html.Date(Model.Content.Page.Created)</dd>
             }
             @if (showUpdated)
             {
                 <dt>Updated</dt>
-                <dd>@Html.Date(content.Page.Updated)</dd>
+                <dd>@Html.Date(Model.Content.Page.Updated)</dd>
             }
             @if (showOccurred)
             {
@@ -55,15 +53,15 @@
                 {<text>Occurs</text> }
             else
             { <text>Occurred</text>}</dt>
-                <dd>@Html.Date(content.Page.Occurred.Value)</dd>
+                <dd>@Html.Date(Model.Content.Page.Occurred.Value)</dd>
             }
         </dl>
     }
 
-    @if (settings.ShowBreadcrumbs)
+    @if (Model.Settings.ShowBreadcrumbs)
     {
         <ol class="breadcrumb">
-            @foreach (PageHeaderBreadcrumb breadcrumb in content.Breadcrumbs)
+            @foreach (PageHeaderBreadcrumb breadcrumb in Model.Content.Breadcrumbs)
             {
                 <li>@Html.PageLink(breadcrumb.Name, breadcrumb.PageId, breadcrumb.PageName, breadcrumb.Home)</li>
             }

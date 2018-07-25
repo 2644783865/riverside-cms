@@ -9,6 +9,6 @@ namespace RiversideCms.Mvc.Models
     public class ElementRender
     {
         public string PartialViewName { get; set; }
-        public ElementView ElementView { get; set; }
+        public IElementView ElementView { get; set; }
     }
 }

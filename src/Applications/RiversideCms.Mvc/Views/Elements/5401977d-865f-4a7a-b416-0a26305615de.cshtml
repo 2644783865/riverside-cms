@@ -1,12 +1,10 @@
 ﻿@using Riverside.Cms.Services.Element.Client
 
-@model ElementView
+@model ElementView<CodeSnippetElementSettings>
 
 @{ 
-    CodeSnippetElementSettings settings = (CodeSnippetElementSettings)Model.Settings;
-
     string cssClass = null;
-    switch (settings.Language)
+    switch (Model.Settings.Language)
     {
         case Language.Apache:
         case Language.Bash:
@@ -29,7 +27,7 @@
         case Language.Ruby:
         case Language.Sql:
         case Language.Xml:
-            cssClass = settings.Language.ToString().ToLower();
+            cssClass = Model.Settings.Language.ToString().ToLower();
             break;
 
         case Language.CPlusPlus:
@@ -44,6 +42,6 @@
 
 <div class="rcms-code-snippet">
 
-    <pre><code class="@cssClass">@settings.Code</code></pre>
+    <pre><code class="@cssClass">@Model.Settings.Code</code></pre>
 
 </div>

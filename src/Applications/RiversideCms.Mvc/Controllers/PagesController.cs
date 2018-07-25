@@ -28,16 +28,10 @@ namespace RiversideCms.Mvc.Controllers
 
         private async Task<ElementRender> GetElementRender(long tenantId, Guid elementTypeId, long elementId, long pageId)
         {
-            IElementSettings elementSettings = await _elementServiceFactory.ReadElementSettingsAsync(tenantId, elementTypeId, elementId);
-            object elementContent = await _elementServiceFactory.ReadElementContentAsync(tenantId, elementTypeId, elementId, pageId);
-            if (elementSettings == null)
+            IElementView elementView = await _elementServiceFactory.GetElementViewAsync(tenantId, elementTypeId, elementId, pageId);
+            if (elementView == null)
                 return new ElementRender { PartialViewName = "~/Views/Elements/NotFound.cshtml" };
 
-            ElementView elementView = new ElementView
-            {
-                Settings = elementSettings,
-                Content = elementContent
-            };
             return new ElementRender
             {
                 PartialViewName = $"~/Views/Elements/{elementTypeId}.cshtml",
