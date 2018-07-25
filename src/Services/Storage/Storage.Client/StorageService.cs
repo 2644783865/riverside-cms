@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -53,11 +54,11 @@ namespace Riverside.Cms.Services.Storage.Client
             }
         }
 
-        public async Task<BlobContent> ReadBlobContentAsync(long tenantId, long blobId)
+        public async Task<BlobContent> ReadBlobContentAsync(long tenantId, long blobId, string path)
         {
             try
             {
-                string uri = $"{_options.Value.StorageApiBaseUrl}tenants/{tenantId}/blobs/{blobId}/content";
+                string uri = $"{_options.Value.StorageApiBaseUrl}tenants/{tenantId}/blobs/{blobId}/content?path={WebUtility.UrlEncode(path)}";
                 using (HttpClient httpClient = new HttpClient())
                 {
                     HttpResponseMessage response = await httpClient.GetAsync(uri);

@@ -79,9 +79,9 @@ namespace Storage.API.Controllers
         [HttpGet]
         [Route("api/v1/storage/tenants/{tenantId:int}/blobs/{blobId:int}/content")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public async Task<IActionResult> ReadBlobContent(long tenantId, long blobId)
+        public async Task<IActionResult> ReadBlobContent(long tenantId, long blobId, [FromQuery(Name = "path")]string path)
         {
-            BlobContent blobContent = await _storageService.ReadBlobContentAsync(tenantId, blobId);
+            BlobContent blobContent = await _storageService.ReadBlobContentAsync(tenantId, blobId, path);
             if (blobContent == null)
                 return NotFound();
             return File(blobContent.Stream, blobContent.Type, blobContent.Name);

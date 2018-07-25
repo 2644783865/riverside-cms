@@ -94,10 +94,10 @@ namespace Riverside.Cms.Services.Storage.Domain
             return _storageRepository.ReadBlobAsync(tenantId, blobId);
         }
 
-        public async Task<BlobContent> ReadBlobContentAsync(long tenantId, long blobId)
+        public async Task<BlobContent> ReadBlobContentAsync(long tenantId, long blobId, string path)
         {
             Blob blob = await _storageRepository.ReadBlobAsync(tenantId, blobId);
-            blob.Path = "pages/images";
+            blob.Path = path;
             BlobContent blobContent = new BlobContent
             {
                 Name = blob.Name,

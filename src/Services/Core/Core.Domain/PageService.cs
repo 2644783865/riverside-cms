@@ -11,6 +11,8 @@ namespace Riverside.Cms.Services.Core.Domain
         private readonly IPageRepository _pageRepository;
         private readonly IStorageService _storageService;
 
+        private const string PageImagePath = "pages/images";
+
         public PageService(IPageRepository pageRepository, IStorageService storageService)
         {
             _pageRepository = pageRepository;
@@ -53,7 +55,7 @@ namespace Riverside.Cms.Services.Core.Domain
             long? blobId = GetBlobId(page, pageImageType);
             if (blobId == null)
                 return null;
-            return await _storageService.ReadBlobContentAsync(tenantId, blobId.Value);
+            return await _storageService.ReadBlobContentAsync(tenantId, blobId.Value, PageImagePath);
         }
 
         public Task<IEnumerable<PageZone>> SearchPageZonesAsync(long tenantId, long pageId)
