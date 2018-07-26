@@ -28,7 +28,7 @@ namespace Riverside.Cms.Services.Element.Domain
         public IEnumerable<NavigationBarTab> Tabs { get; set; }
     }
 
-    public class NavigationBarElementContent : IElementContent
+    public class NavigationBarElementContent : ElementContent
     {
         public IEnumerable<NavigationBarContentTab> Tabs { get; set; }
     }
@@ -95,6 +95,9 @@ namespace Riverside.Cms.Services.Element.Domain
 
             return new NavigationBarElementContent
             {
+                TenantId = tenantId,
+                ElementId = elementId,
+                ElementTypeId = elementSettings.ElementTypeId,
                 Tabs = await GetContentTabs(elementSettings, pageId)
             };
         }

@@ -15,7 +15,7 @@ namespace Riverside.Cms.Services.Element.Client
         public string Message { get; set; }
     }
 
-    public class FooterElementContent : IElementContent
+    public class FooterElementContent : ElementContent
     {
         public string FormattedMessage { get; set; }
     }

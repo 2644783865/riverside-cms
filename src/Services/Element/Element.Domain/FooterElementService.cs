@@ -12,7 +12,7 @@ namespace Riverside.Cms.Services.Element.Domain
         public string Message { get; set; }
     }
 
-    public class FooterElementContent : IElementContent
+    public class FooterElementContent : ElementContent
     {
         public string FormattedMessage { get; set; }
     }
@@ -47,6 +47,9 @@ namespace Riverside.Cms.Services.Element.Domain
             FooterElementSettings elementSettings = await _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
             return new FooterElementContent
             {
+                TenantId = tenantId,
+                ElementId = elementId,
+                ElementTypeId = elementSettings.ElementTypeId,
                 FormattedMessage = FormatMessage(elementSettings.Message)
             };
         }

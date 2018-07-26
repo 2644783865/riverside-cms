@@ -36,7 +36,7 @@ namespace Riverside.Cms.Services.Element.Client
         public int Height { get; set; }
     }
 
-    public class PageHeaderElementContent : IElementContent
+    public class PageHeaderElementContent : ElementContent
     {
         public DateTime? Created { get; set; }
         public DateTime? Updated { get; set; }

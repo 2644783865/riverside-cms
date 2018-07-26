@@ -10,7 +10,7 @@ namespace Riverside.Cms.Services.Element.Domain
         public string Html { get; set; }
     }
 
-    public class HtmlElementContent : IElementContent
+    public class HtmlElementContent : ElementContent
     {
         public string FormattedHtml { get; set; }
     }
@@ -43,6 +43,9 @@ namespace Riverside.Cms.Services.Element.Domain
             HtmlElementSettings elementSettings = await _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
             return new HtmlElementContent
             {
+                TenantId = tenantId,
+                ElementId = elementId,
+                ElementTypeId = elementSettings.ElementTypeId,
                 FormattedHtml = FormatHtml(elementSettings.Html)
             };
         }
