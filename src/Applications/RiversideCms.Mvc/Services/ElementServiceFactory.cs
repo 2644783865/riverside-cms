@@ -33,7 +33,8 @@ namespace RiversideCms.Mvc.Services
                 case "5401977d-865f-4a7a-b416-0a26305615de":
                     return new ElementView<CodeSnippetElementSettings>
                     {
-                        Settings = await _codeSnippetElementService.ReadElementSettingsAsync(tenantId, elementId)
+                        Settings = await _codeSnippetElementService.ReadElementSettingsAsync(tenantId, elementId),
+                        Content = await _codeSnippetElementService.ReadElementContentAsync(tenantId, elementId, pageId)
                     };
 
                 case "f1c2b384-4909-47c8-ada7-cd3cc7f32620":

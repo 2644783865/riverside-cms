@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -41,7 +39,7 @@ namespace Riverside.Cms.Services.Element.Client
         public Language Language { get; set; }
     }
 
-    public interface ICodeSnippetElementService : IElementSettingsService<CodeSnippetElementSettings>
+    public interface ICodeSnippetElementService : IElementSettingsService<CodeSnippetElementSettings>, IElementContentService<ElementContent>
     {
     }
 
@@ -63,6 +61,23 @@ namespace Riverside.Cms.Services.Element.Client
                 {
                     string json = await httpClient.GetStringAsync(uri);
                     return JsonConvert.DeserializeObject<CodeSnippetElementSettings>(json);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new ElementClientException("Element API failed", ex);
+            }
+        }
+
+        public async Task<ElementContent> ReadElementContentAsync(long tenantId, long elementId, long pageId)
+        {
+            try
+            {
+                string uri = $"{_options.Value.ElementApiBaseUrl}tenants/{tenantId}/elementtypes/5401977d-865f-4a7a-b416-0a26305615de/elements/{elementId}/content?pageid={pageId}";
+                using (HttpClient httpClient = new HttpClient())
+                {
+                    string json = await httpClient.GetStringAsync(uri);
+                    return JsonConvert.DeserializeObject<FooterElementContent>(json);
                 }
             }
             catch (Exception ex)

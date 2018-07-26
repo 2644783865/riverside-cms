@@ -41,6 +41,18 @@ namespace Element.Api.Controllers
             return Ok(elementSettings);
         }
 
+        [HttpGet]
+        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/5401977d-865f-4a7a-b416-0a26305615de/elements/{elementId:int}/content")]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ElementContent), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> ReadCodeSnippetElementContent(long tenantId, long elementId, [FromQuery]long pageId)
+        {
+            ElementContent elementContent = await _codeSnippetElementService.ReadElementContentAsync(tenantId, elementId, pageId);
+            if (elementContent == null)
+                return NotFound();
+            return Ok(elementContent);
+        }
+
         // FOOTER
 
         [HttpGet]

@@ -38,7 +38,7 @@ namespace Riverside.Cms.Services.Element.Domain
         public Language Language { get; set; }
     }
 
-    public interface ICodeSnippetElementService : IElementSettingsService<CodeSnippetElementSettings>
+    public interface ICodeSnippetElementService : IElementSettingsService<CodeSnippetElementSettings>, IElementContentService<ElementContent>
     {
     }
 
@@ -54,6 +54,17 @@ namespace Riverside.Cms.Services.Element.Domain
         public Task<CodeSnippetElementSettings> ReadElementSettingsAsync(long tenantId, long elementId)
         {
             return _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
+        }
+
+        public async Task<ElementContent> ReadElementContentAsync(long tenantId, long elementId, long pageId)
+        {
+            CodeSnippetElementSettings elementSettings = await _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
+            return new ElementContent
+            {
+                TenantId = tenantId,
+                ElementId = elementId,
+                ElementTypeId = elementSettings.ElementTypeId
+            };
         }
     }
 }
