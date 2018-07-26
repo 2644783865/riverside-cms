@@ -28,10 +28,26 @@ namespace Riverside.Cms.Services.Element.Domain
         public string PageName { get; set; }
     }
 
+    public class PageHeaderImage
+    {
+        public long TenantId { get; set; }
+        public long BlobId { get; set; }
+        public long PageId { get; set; }
+        public int Width { get; set; }
+        public int Height { get; set; }
+    }
+
     public class PageHeaderElementContent : IElementContent
     {
-        public Page Page { get; set; }
-        public IDictionary<long, BlobImage> Images { get; set; }
+        public DateTime? Created { get; set; }
+        public DateTime? Updated { get; set; }
+        public DateTime? Occurred { get; set; }
+        public bool OccursInFuture { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+
+        public PageHeaderImage Image { get; set; }
+
         public IEnumerable<PageHeaderBreadcrumb> Breadcrumbs { get; set; }
     }
 
@@ -63,37 +79,41 @@ namespace Riverside.Cms.Services.Element.Domain
 
             Page page = await _pageService.ReadPageAsync(tenantId, pageId);
 
-            BlobImage image = page.ImageBlobId.HasValue ? (BlobImage) await _storageService.ReadBlobAsync(tenantId, page.ImageBlobId.Value) : null;
-            BlobImage previewImage = page.PreviewImageBlobId.HasValue ? (BlobImage) await _storageService.ReadBlobAsync(tenantId, page.PreviewImageBlobId.Value) : null;
-            BlobImage thumbnailImage = page.ThumbnailImageBlobId.HasValue ? (BlobImage) await _storageService.ReadBlobAsync(tenantId, page.ThumbnailImageBlobId.Value) : null;
+            PageHeaderElementContent elementContent = new PageHeaderElementContent();
 
-            IDictionary<long, BlobImage> images = new Dictionary<long, BlobImage>();
-            if (image != null)
-                images.Add(image.BlobId, image);
-            if (previewImage != null)
-                images.Add(previewImage.BlobId, previewImage);
-            if (thumbnailImage != null)
-                images.Add(thumbnailImage.BlobId, thumbnailImage);
+            elementContent.Created = elementSettings.ShowCreated ? (DateTime?)page.Created : null;
+            elementContent.Updated = elementSettings.ShowUpdated && !(elementSettings.ShowCreated && (page.Created.Date == page.Updated.Date)) ? (DateTime?)page.Updated : null;
+            elementContent.Occurred = elementSettings.ShowOccurred && page.Occurred.HasValue ? page.Occurred : null;
+            elementContent.OccursInFuture = elementContent.Occurred.HasValue && (page.Occurred.Value.Date > DateTime.UtcNow.Date);
+            elementContent.Name = elementSettings.ShowName ? page.Name : null;
+            elementContent.Description = elementSettings.ShowDescription ? page.Description : null;
 
-            IEnumerable<PageHeaderBreadcrumb> breadcrumbs = null;
+            if (elementSettings.ShowImage && page.ThumbnailImageBlobId.HasValue)
+            {
+                BlobImage thumbnailImage = (BlobImage) await _storageService.ReadBlobAsync(tenantId, page.ThumbnailImageBlobId.Value);
+                elementContent.Image = new PageHeaderImage
+                {
+                    TenantId = tenantId,
+                    BlobId = thumbnailImage.BlobId,
+                    PageId = page.PageId,
+                    Height = thumbnailImage.Height,
+                    Width = thumbnailImage.Width
+                };
+            }
+
             if (elementSettings.ShowBreadcrumbs)
             {
                 IEnumerable<Page> pages = await _pageService.ListPagesInHierarchyAsync(tenantId, pageId);
-                breadcrumbs = pages.Reverse().Select(p => new PageHeaderBreadcrumb
+                elementContent.Breadcrumbs = pages.Reverse().Select(p => new PageHeaderBreadcrumb
                 {
                     Home = p.ParentPageId == null,
-                    Name = p.ParentPageId == null ? "Home" : p.Name,
+                    Name = p.Name,
                     PageId = p.PageId,
                     PageName = p.Name
                 });
             }
 
-            return new PageHeaderElementContent
-            {
-                Page = page,
-                Images = images,
-                Breadcrumbs = breadcrumbs
-            };
+            return elementContent;
         }
     }
 }

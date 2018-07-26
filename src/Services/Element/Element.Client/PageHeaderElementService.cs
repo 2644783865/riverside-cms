@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using Riverside.Cms.Services.Core.Client;
-using Riverside.Cms.Services.Storage.Client;
 
 namespace Riverside.Cms.Services.Element.Client
 {
@@ -30,10 +27,26 @@ namespace Riverside.Cms.Services.Element.Client
         public string PageName { get; set; }
     }
 
+    public class PageHeaderImage
+    {
+        public long TenantId { get; set; }
+        public long BlobId { get; set; }
+        public long PageId { get; set; }
+        public int Width { get; set; }
+        public int Height { get; set; }
+    }
+
     public class PageHeaderElementContent : IElementContent
     {
-        public Page Page { get; set; }
-        public Dictionary<long, BlobImage> Images { get; set; }
+        public DateTime? Created { get; set; }
+        public DateTime? Updated { get; set; }
+        public DateTime? Occurred { get; set; }
+        public bool OccursInFuture { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+
+        public PageHeaderImage Image { get; set; }
+
         public IEnumerable<PageHeaderBreadcrumb> Breadcrumbs { get; set; }
     }
 
