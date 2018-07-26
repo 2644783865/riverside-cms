@@ -53,7 +53,7 @@ namespace Riverside.Cms.Services.Storage.Infrastructure
             Blob blob = null;
             if (dto == null)
                 return blob;
-            if (dto.Width.HasValue && dto.Height.HasValue)
+            if (dto.BlobType == BlobType.Image)
                 blob = new BlobImage { Width = dto.Width.Value, Height = dto.Height.Value };
             else
                 blob = new Blob();
@@ -150,6 +150,7 @@ namespace Riverside.Cms.Services.Storage.Infrastructure
                         cms.Upload.TenantId,
                         cms.Upload.UploadId AS BlobId,
                         cms.Upload.Size,
+                        cms.Upload.UploadType AS BlobType,
                         CASE cms.Upload.UploadType
                             WHEN 0 THEN 'application/octet-stream'
                             WHEN 1 THEN 'image/xyz'

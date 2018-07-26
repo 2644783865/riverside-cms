@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Riverside.Cms.Services.Storage.Domain;
 
 namespace Riverside.Cms.Services.Storage.Infrastructure
 {
@@ -9,6 +10,7 @@ namespace Riverside.Cms.Services.Storage.Infrastructure
         public long TenantId { get; set; }
         public long BlobId { get; set; }
         public int Size { get; set; }
+        public BlobType BlobType { get; set; }
         public string ContentType { get; set; }
         public string Folder1 { get; set; }
         public string Folder2 { get; set; }

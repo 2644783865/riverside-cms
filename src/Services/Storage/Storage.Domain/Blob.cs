@@ -9,6 +9,7 @@ namespace Riverside.Cms.Services.Storage.Domain
         public long TenantId { get; set; }
         public long BlobId { get; set; }
         public int Size { get; set; }
+        public BlobType BlobType { get; set; }
         public string ContentType { get; set; }
         public string Path { get; set; }
         public string Name { get; set; }

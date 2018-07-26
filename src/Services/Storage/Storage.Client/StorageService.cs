@@ -19,21 +19,6 @@ namespace Riverside.Cms.Services.Storage.Client
             _options = options;
         }
 
-        private Blob GetBlob(BlobImage blobImage)
-        {
-            return new Blob
-            {
-                BlobId = blobImage.BlobId,
-                ContentType = blobImage.ContentType,
-                Created = blobImage.Created,
-                Name = blobImage.Name,
-                Path = blobImage.Path,
-                Size = blobImage.Size,
-                TenantId = blobImage.TenantId,
-                Updated = blobImage.Updated
-            };
-        }
-
         public async Task<Blob> ReadBlobAsync(long tenantId, long blobId)
         {
             try
@@ -42,10 +27,15 @@ namespace Riverside.Cms.Services.Storage.Client
                 using (HttpClient httpClient = new HttpClient())
                 {
                     string json = await httpClient.GetStringAsync(uri);
-                    BlobImage blobImage = JsonConvert.DeserializeObject<BlobImage>(json);
-                    if (blobImage.Width == 0 && blobImage.Height == 0)
-                        return GetBlob(blobImage);
-                    return blobImage;
+                    BlobTypeModel blobTypeModel = JsonConvert.DeserializeObject<BlobTypeModel>(json);
+                    switch (blobTypeModel.BlobType)
+                    {
+                        case BlobType.Image:
+                            return JsonConvert.DeserializeObject<BlobImage>(json);
+
+                        default:
+                            return JsonConvert.DeserializeObject<Blob>(json);
+                    }
                 }
             }
             catch (Exception ex)
