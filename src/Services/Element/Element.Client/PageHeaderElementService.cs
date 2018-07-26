@@ -29,7 +29,6 @@ namespace Riverside.Cms.Services.Element.Client
 
     public class PageHeaderImage
     {
-        public long TenantId { get; set; }
         public long BlobId { get; set; }
         public long PageId { get; set; }
         public int Width { get; set; }

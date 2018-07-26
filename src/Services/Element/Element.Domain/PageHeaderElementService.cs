@@ -30,7 +30,6 @@ namespace Riverside.Cms.Services.Element.Domain
 
     public class PageHeaderImage
     {
-        public long TenantId { get; set; }
         public long BlobId { get; set; }
         public long PageId { get; set; }
         public int Width { get; set; }
@@ -98,7 +97,6 @@ namespace Riverside.Cms.Services.Element.Domain
                 BlobImage thumbnailImage = (BlobImage) await _storageService.ReadBlobAsync(tenantId, page.ThumbnailImageBlobId.Value);
                 elementContent.Image = new PageHeaderImage
                 {
-                    TenantId = tenantId,
                     BlobId = thumbnailImage.BlobId,
                     PageId = page.PageId,
                     Height = thumbnailImage.Height,
