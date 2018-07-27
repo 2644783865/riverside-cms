@@ -14,15 +14,17 @@ namespace RiversideCms.Mvc.Services
         private readonly IHtmlElementService _htmlElementService;
         private readonly INavigationBarElementService _navigationBarElementService;
         private readonly IPageHeaderElementService _pageHeaderElementService;
+        private readonly IPageListElementService _pageListElementService;
         private readonly IShareElementService _shareElementService;
 
-        public ElementServiceFactory(ICodeSnippetElementService codeSnippetElementService, IFooterElementService footerElementService, IHtmlElementService htmlElementService, INavigationBarElementService navigationBarElementService, IPageHeaderElementService pageHeaderElementService, IShareElementService shareElementService)
+        public ElementServiceFactory(ICodeSnippetElementService codeSnippetElementService, IFooterElementService footerElementService, IHtmlElementService htmlElementService, INavigationBarElementService navigationBarElementService, IPageHeaderElementService pageHeaderElementService, IPageListElementService pageListElementService, IShareElementService shareElementService)
         {
             _codeSnippetElementService = codeSnippetElementService;
             _footerElementService = footerElementService;
             _htmlElementService = htmlElementService;
             _navigationBarElementService = navigationBarElementService;
             _pageHeaderElementService = pageHeaderElementService;
+            _pageListElementService = pageListElementService;
             _shareElementService = shareElementService;
         }
 
@@ -63,6 +65,13 @@ namespace RiversideCms.Mvc.Services
                     {
                         Settings = await _pageHeaderElementService.ReadElementSettingsAsync(tenantId, elementId),
                         Content = await _pageHeaderElementService.ReadElementContentAsync(tenantId, elementId, pageId)
+                    };
+
+                case "61f55535-9f3e-4ef5-96a2-bc84d648842a":
+                    return new ElementView<PageListElementSettings, PageListElementContent>
+                    {
+                        Settings = await _pageListElementService.ReadElementSettingsAsync(tenantId, elementId),
+                        Content = await _pageListElementService.ReadElementContentAsync(tenantId, elementId, pageId)
                     };
 
                 case "cf0d7834-54fb-4a6e-86db-0f238f8b1ac1":

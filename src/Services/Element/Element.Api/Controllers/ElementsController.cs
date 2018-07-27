@@ -15,15 +15,17 @@ namespace Element.Api.Controllers
         private readonly IHtmlElementService _htmlElementService;
         private readonly INavigationBarElementService _navigationBarElementService;
         private readonly IPageHeaderElementService _pageHeaderElementService;
+        private readonly IPageListElementService _pageListElementService;
         private readonly IShareElementService _shareElementService;
 
-        public ElementsController(ICodeSnippetElementService codeSnippetElementService, IFooterElementService footerElementService, IHtmlElementService htmlElementService, INavigationBarElementService navigationBarElementService, IPageHeaderElementService pageHeaderElementService, IShareElementService shareElementService)
+        public ElementsController(ICodeSnippetElementService codeSnippetElementService, IFooterElementService footerElementService, IHtmlElementService htmlElementService, INavigationBarElementService navigationBarElementService, IPageHeaderElementService pageHeaderElementService, IPageListElementService pageListElementService, IShareElementService shareElementService)
         {
             _codeSnippetElementService = codeSnippetElementService;
             _footerElementService = footerElementService;
             _htmlElementService = htmlElementService;
             _navigationBarElementService = navigationBarElementService;
             _pageHeaderElementService = pageHeaderElementService;
+            _pageListElementService = pageListElementService;
             _shareElementService = shareElementService;
         }
 
@@ -152,6 +154,32 @@ namespace Element.Api.Controllers
         public async Task<IActionResult> ReadPageHeaderElementContent(long tenantId, long elementId, [FromQuery]long pageId)
         {
             PageHeaderElementContent elementContent = await _pageHeaderElementService.ReadElementContentAsync(tenantId, elementId, pageId);
+            if (elementContent == null)
+                return NotFound();
+            return Ok(elementContent);
+        }
+
+        // PAGE LIST
+
+        [HttpGet]
+        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/61f55535-9f3e-4ef5-96a2-bc84d648842a/elements/{elementId:int}")]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(PageListElementSettings), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> ReadPageListElementSettings(long tenantId, long elementId)
+        {
+            PageListElementSettings elementSettings = await _pageListElementService.ReadElementSettingsAsync(tenantId, elementId);
+            if (elementSettings == null)
+                return NotFound();
+            return Ok(elementSettings);
+        }
+
+        [HttpGet]
+        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/61f55535-9f3e-4ef5-96a2-bc84d648842a/elements/{elementId:int}/content")]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(PageListElementContent), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> ReadPageListElementContent(long tenantId, long elementId, [FromQuery]long pageId)
+        {
+            PageListElementContent elementContent = await _pageListElementService.ReadElementContentAsync(tenantId, elementId, pageId);
             if (elementContent == null)
                 return NotFound();
             return Ok(elementContent);

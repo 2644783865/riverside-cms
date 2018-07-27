@@ -34,6 +34,7 @@ namespace RiversideCms.Mvc
             services.AddTransient<IHtmlElementService, HtmlElementService>();
             services.AddTransient<INavigationBarElementService, NavigationBarElementService>();
             services.AddTransient<IPageHeaderElementService, PageHeaderElementService>();
+            services.AddTransient<IPageListElementService, PageListElementService>();
             services.AddTransient<IShareElementService, ShareElementService>();
 
             // Element factory
