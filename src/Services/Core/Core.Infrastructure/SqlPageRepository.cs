@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Text;
+using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using Microsoft.Extensions.Options;
@@ -128,12 +128,22 @@ namespace Riverside.Cms.Services.Core.Infrastructure
             }
         }
 
+        private IEnumerable<Page> PopulatePageTags(IEnumerable<Page> pages, IEnumerable<PageTag> pageTags)
+        {
+            foreach (Page page in pages)
+            {
+                page.Tags = pageTags.Where(pt => pt.PageId == page.PageId).Select(pt => new Tag { TagId = pt.TagId, Name = pt.Name });
+                yield return page;
+            }
+        }
+
         public async Task<PageListResult> ListPages(long tenantId, long? parentPageId, bool recursive, PageType pageType, SortBy sortBy, bool sortAsc, int pageIndex, int pageSize)
         {
             using (SqlConnection connection = new SqlConnection(_options.Value.SqlConnectionString))
             {
                 connection.Open();
                 using (GridReader gr = await connection.QueryMultipleAsync(@"
+                    DECLARE @Pages TABLE ([RowNumber] [int] NOT NULL PRIMARY KEY CLUSTERED, [PageId] [bigint] NOT NULL)
                     DECLARE @RowNumberLowerBound int
                     DECLARE @RowNumberUpperBound int
                     SET @RowNumberLowerBound = @PageSize * @PageIndex
@@ -151,19 +161,30 @@ namespace Riverside.Cms.Services.Core.Infrastructure
 			                    CASE WHEN @SortBy = 1 /* PageSortBy.Updated  */ AND @SortAsc = 1 THEN cms.[Page].Updated  END ASC,
 			                    CASE WHEN @SortBy = 2 /* PageSortBy.Occurred */ AND @SortAsc = 1 THEN cms.[Page].Occurred END ASC,
 			                    CASE WHEN @SortBy = 3 /* PageSortBy.Name     */ AND @SortAsc = 1 THEN cms.[Page].Name     END ASC) AS RowNumber,
-                            cms.[Page].TenantId,
 		                    cms.[Page].PageId
                         FROM
                             cms.[Page]
 	                    INNER JOIN
 		                    cms.[MasterPage]
 	                    ON
-		                    cms.[Page].TenantId		= cms.MasterPage.TenantId AND
+		                    cms.[Page].TenantId = cms.MasterPage.TenantId AND
 		                    cms.[Page].MasterPageId = cms.MasterPage.MasterPageId
                         WHERE
-		                    cms.[Page].TenantId		= @TenantId AND (cms.[Page].ParentPageId = @ParentPageId OR (@ParentPageId IS NULL AND cms.[Page].ParentPageId IS NULL)) AND
-		                    cms.MasterPage.PageType	= @PageType
+		                    cms.[Page].TenantId = @TenantId AND (cms.[Page].ParentPageId = @ParentPageId OR (@ParentPageId IS NULL AND cms.[Page].ParentPageId IS NULL)) AND
+		                    cms.MasterPage.PageType = @PageType
                     )
+
+                    INSERT INTO
+                        @Pages (RowNumber, PageId)
+                    SELECT
+                        [Pages].RowNumber,
+                        [Pages].PageId
+                    FROM
+                        [Pages]
+                    WHERE
+	                    [Pages].RowNumber > @RowNumberLowerBound AND [Pages].RowNumber < @RowNumberUpperBound
+                    ORDER BY
+                        [Pages].RowNumber ASC
 
                     SELECT
 	                    cms.[Page].TenantId,
@@ -180,16 +201,34 @@ namespace Riverside.Cms.Services.Core.Infrastructure
 	                    cms.[Page].PreviewImageUploadId,
 	                    cms.[Page].ImageUploadId
                     FROM
-	                    [Pages]
+	                    @Pages Pages
                     INNER JOIN
 	                    cms.[Page]
                     ON
-	                    [Pages].TenantId = cms.[Page].TenantId AND
-	                    [Pages].PageId	 = cms.[Page].PageId
-                    WHERE
-	                    [Pages].RowNumber > @RowNumberLowerBound AND [Pages].RowNumber < @RowNumberUpperBound
+	                    cms.[Page].TenantId = @TenantId AND
+	                    cms.[Page].PageId = Pages.PageId
                     ORDER BY
-                        [Pages].RowNumber ASC
+                        Pages.RowNumber ASC
+
+                    SELECT
+                        cms.TagPage.PageId,
+                        cms.Tag.TagId,
+                        cms.Tag.Name
+                    FROM
+                        cms.Tag
+                    INNER JOIN
+                        cms.TagPage
+                    ON
+                        cms.Tag.TenantId = cms.TagPage.TenantId AND
+                        cms.Tag.TagId = cms.TagPage.TagId
+                    INNER JOIN
+                        @Pages Pages
+                    ON
+                        cms.TagPage.TenantId = @TenantId AND
+                        cms.TagPage.PageId = Pages.PageId
+                    ORDER BY
+                        cms.TagPage.PageId,
+                        cms.Tag.Name
 
                     SELECT
 	                    COUNT(*) AS Total
@@ -198,11 +237,11 @@ namespace Riverside.Cms.Services.Core.Infrastructure
                     INNER JOIN
 	                    cms.[MasterPage]
                     ON
-	                    cms.[Page].TenantId		= cms.MasterPage.TenantId AND
+	                    cms.[Page].TenantId = cms.MasterPage.TenantId AND
 	                    cms.[Page].MasterPageId = cms.MasterPage.MasterPageId
                     WHERE
-	                    cms.[Page].TenantId		= @TenantId AND (cms.[Page].ParentPageId = @ParentPageId OR (@ParentPageId IS NULL AND cms.[Page].ParentPageId IS NULL)) AND
-	                    cms.MasterPage.PageType	= @PageType
+	                    cms.[Page].TenantId = @TenantId AND (cms.[Page].ParentPageId = @ParentPageId OR (@ParentPageId IS NULL AND cms.[Page].ParentPageId IS NULL)) AND
+	                    cms.MasterPage.PageType = @PageType
                 ",
                 new
                 {
@@ -215,10 +254,14 @@ namespace Riverside.Cms.Services.Core.Infrastructure
                     PageSize = pageSize
                 }))
                 {
+                    IEnumerable<Page> pages = await gr.ReadAsync<Page>();
+                    IEnumerable<PageTag> pageTabs = await gr.ReadAsync<PageTag>();
+                    int total = await gr.ReadFirstAsync<int>();
+                    pages = PopulatePageTags(pages, pageTabs);
                     return new PageListResult
                     {
-                        Pages = await gr.ReadAsync<Page>(),
-                        Total = gr.ReadFirst<int>()
+                        Pages = pages,
+                        Total = total
                     };
                 }
             }
