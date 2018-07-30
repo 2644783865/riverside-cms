@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Riverside.Cms.Services.Core.Client
+namespace Riverside.Cms.Services.Core.Domain
 {
-    public enum PageSortBy
+    public enum SortBy
     {
         Created,
         Updated,

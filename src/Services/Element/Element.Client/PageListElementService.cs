@@ -13,7 +13,7 @@ namespace Riverside.Cms.Services.Element.Client
     {
         public long? PageId { get; set; }
         public string DisplayName { get; set; }
-        public PageSortBy SortBy { get; set; }
+        public SortBy SortBy { get; set; }
         public bool SortAsc { get; set; }
         public bool ShowRelated { get; set; }
         public bool ShowDescription { get; set; }

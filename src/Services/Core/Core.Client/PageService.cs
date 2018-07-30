@@ -74,6 +74,24 @@ namespace Riverside.Cms.Services.Core.Client
             }
         }
 
+        public async Task<PageListResult> ListPages(long tenantId, long? parentPageId, bool recursive, PageType pageType, SortBy sortBy, bool sortAsc, int pageIndex, int pageSize)
+        {
+            try
+            {
+                string uri = $"{_options.Value.CoreApiBaseUrl}tenants/{tenantId}/pages?recursive={recursive.ToString().ToLower()}&pagetype={(int)pageType}&sortby={(int)sortBy}&sortasc={sortAsc.ToString().ToLower()}&pageindex={pageIndex}&pagesize={pageSize}" +
+                    (parentPageId.HasValue ? $"&parentpageid={parentPageId.Value}" : string.Empty);
+                using (HttpClient httpClient = new HttpClient())
+                {
+                    string json = await httpClient.GetStringAsync(uri);
+                    return JsonConvert.DeserializeObject<PageListResult>(json);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new CoreClientException("Core API failed", ex);
+            }
+        }
+
         public async Task<List<PageZone>> SearchPageZonesAsync(long tenantId, long pageId)
         {
             try

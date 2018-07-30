@@ -10,7 +10,7 @@ namespace Riverside.Cms.Services.Element.Domain
     {
         public long? PageId { get; set; }
         public string DisplayName { get; set; }
-        public PageSortBy SortBy { get; set; }
+        public SortBy SortBy { get; set; }
         public bool SortAsc { get; set; }
         public bool ShowRelated { get; set; }
         public bool ShowDescription { get; set; }
@@ -49,10 +49,12 @@ namespace Riverside.Cms.Services.Element.Domain
     public class PageListElementService : IPageListElementService
     {
         private readonly IElementRepository<PageListElementSettings> _elementRepository;
+        private readonly IPageService _pageService;
 
-        public PageListElementService(IElementRepository<PageListElementSettings> elementRepository)
+        public PageListElementService(IElementRepository<PageListElementSettings> elementRepository, IPageService pageService)
         {
             _elementRepository = elementRepository;
+            _pageService = pageService;
         }
 
         public Task<PageListElementSettings> ReadElementSettingsAsync(long tenantId, long elementId)
