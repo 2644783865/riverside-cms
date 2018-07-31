@@ -140,7 +140,7 @@ namespace Riverside.Cms.Services.Core.Infrastructure
         private string GetPagesCteNonRecursiveSql()
         {
             return @"
-                WITH [Pages] AS
+                ;WITH [Pages] AS
                 (
                     SELECT TOP (@RowNumberUpperBound)
                         ROW_NUMBER() OVER (ORDER BY
@@ -161,7 +161,8 @@ namespace Riverside.Cms.Services.Core.Infrastructure
 		                cms.[Page].TenantId = cms.MasterPage.TenantId AND
 		                cms.[Page].MasterPageId = cms.MasterPage.MasterPageId
                     WHERE
-		                cms.[Page].TenantId = @TenantId AND (cms.[Page].ParentPageId = @ParentPageId OR (@ParentPageId IS NULL AND cms.[Page].ParentPageId IS NULL)) AND
+		                cms.[Page].TenantId = @TenantId AND
+                        cms.[Page].ParentPageId = @ParentPageId AND
 		                cms.MasterPage.PageType = @PageType
                 )
             ";
@@ -171,10 +172,10 @@ namespace Riverside.Cms.Services.Core.Infrastructure
         {
             return @"
                 DECLARE @Folders TABLE(
-                    PageId bigint NULL
+                    PageId [bigint] NOT NULL PRIMARY KEY CLUSTERED
                 )
 
-                -- Record all child folders under page that is passed to this stored procedure 
+                -- Record all child folders under page that is passed to this stored procedure
 
                 ;WITH [Folders] AS
                 (
@@ -188,7 +189,8 @@ namespace Riverside.Cms.Services.Core.Infrastructure
 		                cms.[Page].TenantId = cms.[MasterPage].TenantId AND
 		                cms.[Page].MasterPageId = cms.[MasterPage].MasterPageId
                     WHERE
-		                cms.[Page].TenantId = @TenantId AND (cms.[Page].ParentPageId = @ParentPageId OR (@ParentPageId IS NULL AND cms.[Page].ParentPageId IS NULL)) AND
+		                cms.[Page].TenantId = @TenantId AND
+                        cms.[Page].ParentPageId = @ParentPageId AND
 		                cms.[MasterPage].PageType = 0 /* PageType.Folder */
 	                UNION ALL
 	                SELECT
@@ -218,27 +220,21 @@ namespace Riverside.Cms.Services.Core.Infrastructure
 
                 -- Record the page that is passed to this stored procedure
 
-                IF (@ParentPageId IS NULL)
-	                INSERT INTO
-		                @Folders (PageId)
-	                VALUES
-		                (NULL)
-                ELSE
-	                INSERT INTO
-		                @Folders (PageId)
-	                SELECT
-		                cms.[Page].PageId
-	                FROM
-		                cms.[Page]
-	                INNER JOIN
-		                cms.[MasterPage]
-	                ON
-		                cms.[Page].TenantId = cms.[MasterPage].TenantId AND
-		                cms.[Page].MasterPageId = cms.[MasterPage].MasterPageId
-	                WHERE
-		                cms.[Page].TenantId = @TenantId AND
-		                cms.[Page].PageId = @ParentPageId AND
-		                cms.[MasterPage].PageType = 0 /* PageType.Folder */
+	            INSERT INTO
+		            @Folders (PageId)
+	            SELECT
+		            cms.[Page].PageId
+	            FROM
+		            cms.[Page]
+	            INNER JOIN
+		            cms.[MasterPage]
+	            ON
+		            cms.[Page].TenantId = cms.[MasterPage].TenantId AND
+		            cms.[Page].MasterPageId = cms.[MasterPage].MasterPageId
+	            WHERE
+		            cms.[Page].TenantId = @TenantId AND
+		            cms.[Page].PageId = @ParentPageId AND
+		            cms.[MasterPage].PageType = 0 /* PageType.Folder */
 
                 -- Get pages into order so that we can extract the right pages according to the paging and sorting parameters
 
@@ -260,7 +256,8 @@ namespace Riverside.Cms.Services.Core.Infrastructure
 	                INNER JOIN
 		                cms.[Page]
 	                ON
-		                cms.[Page].TenantId = @TenantId AND (cms.[Page].ParentPageId = [FoldersTable].PageId OR ([FoldersTable].PageId IS NULL AND cms.[Page].ParentPageId IS NULL))
+		                cms.[Page].TenantId = @TenantId AND
+                        cms.[Page].ParentPageId = [FoldersTable].PageId
 	                INNER JOIN
 		                cms.[MasterPage]
 	                ON
@@ -293,7 +290,8 @@ namespace Riverside.Cms.Services.Core.Infrastructure
 	                cms.[Page].TenantId = cms.MasterPage.TenantId AND
 	                cms.[Page].MasterPageId = cms.MasterPage.MasterPageId
                 WHERE
-	                cms.[Page].TenantId = @TenantId AND (cms.[Page].ParentPageId = @ParentPageId OR (@ParentPageId IS NULL AND cms.[Page].ParentPageId IS NULL)) AND
+	                cms.[Page].TenantId = @TenantId AND
+                    cms.[Page].ParentPageId = @ParentPageId AND
 	                cms.MasterPage.PageType = @PageType
             ";
         }
@@ -308,7 +306,8 @@ namespace Riverside.Cms.Services.Core.Infrastructure
                 INNER JOIN
 	                @Folders [FoldersTable]
                 ON
-	                cms.[Page].TenantId = @TenantId AND (cms.[Page].ParentPageId = [FoldersTable].PageId OR ([FoldersTable].PageId IS NULL AND cms.[Page].ParentPageId IS NULL))
+	                cms.[Page].TenantId = @TenantId AND
+                    cms.[Page].ParentPageId = [FoldersTable].PageId
                 INNER JOIN
 	                cms.[MasterPage]
                 ON
@@ -338,6 +337,9 @@ namespace Riverside.Cms.Services.Core.Infrastructure
                     DECLARE @RowNumberUpperBound int
                     SET @RowNumberLowerBound = @PageSize * @PageIndex
                     SET @RowNumberUpperBound = @RowNumberLowerBound + @PageSize + 1;
+
+                    IF (@ParentPageId IS NULL)
+	                    SET @ParentPageId = (SELECT PageId FROM cms.[Page] WHERE cms.[Page].TenantId = @TenantId AND cms.[Page].ParentPageId IS NULL)
 
                     {GetPagesCteSql(recursive)}
 
