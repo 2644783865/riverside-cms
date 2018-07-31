@@ -69,71 +69,111 @@ namespace Riverside.Cms.Services.Core.Infrastructure
             }
         }
 
-        public async Task<IEnumerable<Page>> ListPagesInHierarchyAsync(long tenantId, long pageId)
-        {
-            using (SqlConnection connection = new SqlConnection(_options.Value.SqlConnectionString))
-            {
-                connection.Open();
-                IEnumerable<Page> pages = await connection.QueryAsync<Page>(
-                    @";WITH [Pages] AS
-                        (
-	                        SELECT
-		                        0 AS [Level],
-		                        cms.[Page].PageId,
-		                        cms.[Page].ParentPageId
-	                        FROM
-		                        cms.[Page]
-	                        WHERE
-		                        cms.[Page].TenantId = @TenantId AND
-		                        cms.[Page].PageId = @PageId
-	                        UNION ALL
-	                        SELECT
-		                        [Pages].[Level] + 1 AS [Level],
-		                        ParentPage.PageId,
-		                        ParentPage.ParentPageId
-	                        FROM
-		                        cms.[Page] ParentPage
-	                        INNER JOIN
-		                        [Pages]
-	                        ON
-		                        ParentPage.TenantId = @TenantId AND
-		                        ParentPage.PageId = [Pages].ParentPageId
-                        )
-
-                        SELECT
-	                        cms.[Page].TenantId,
-	                        cms.[Page].PageId,
-	                        cms.[Page].ParentPageId,
-	                        cms.[Page].MasterPageId,
-	                        cms.[Page].Name,
-	                        cms.[Page].[Description],
-	                        cms.[Page].Created,
-	                        cms.[Page].Updated,
-	                        cms.[Page].Occurred,
-	                        cms.[Page].ThumbnailImageUploadId AS ThumbnailImageBlobId,
-	                        cms.[Page].PreviewImageUploadId AS PreviewImageBlobId,
-	                        cms.[Page].ImageUploadId AS ImageBlobId
-                        FROM
-	                        cms.[Page]
-                        INNER JOIN
-	                        [Pages]
-                        ON
-	                        cms.[Page].TenantId = @TenantId AND
-	                        cms.[Page].PageId = [Pages].PageId
-                        ORDER BY
-	                        [Pages].[Level] ASC",
-                    new { TenantId = tenantId, PageId = pageId }
-                );
-                return pages;
-            }
-        }
-
         private IEnumerable<Page> PopulatePageTags(IEnumerable<Page> pages, IEnumerable<PageTag> pageTags)
         {
             foreach (Page page in pages)
             {
                 page.Tags = pageTags.Where(pt => pt.PageId == page.PageId).Select(pt => new Tag { TagId = pt.TagId, Name = pt.Name });
                 yield return page;
+            }
+        }
+
+        public async Task<IEnumerable<Page>> ListPagesInHierarchyAsync(long tenantId, long pageId)
+        {
+            using (SqlConnection connection = new SqlConnection(_options.Value.SqlConnectionString))
+            {
+                connection.Open();
+                using (GridReader gr = await connection.QueryMultipleAsync(@"
+                    DECLARE @Pages TABLE ([Level] [int] NOT NULL PRIMARY KEY CLUSTERED, [PageId] [bigint] NOT NULL)
+
+                    ;WITH [Pages] AS
+                    (
+	                    SELECT
+		                    0 AS [Level],
+		                    cms.[Page].PageId,
+		                    cms.[Page].ParentPageId
+	                    FROM
+		                    cms.[Page]
+	                    WHERE
+		                    cms.[Page].TenantId = @TenantId AND
+		                    cms.[Page].PageId = @PageId
+	                    UNION ALL
+	                    SELECT
+		                    [Pages].[Level] + 1 AS [Level],
+		                    ParentPage.PageId,
+		                    ParentPage.ParentPageId
+	                    FROM
+		                    cms.[Page] ParentPage
+	                    INNER JOIN
+		                    [Pages]
+	                    ON
+		                    ParentPage.TenantId = @TenantId AND
+		                    ParentPage.PageId = [Pages].ParentPageId
+                    )
+
+                    INSERT INTO
+                        @Pages (Level, PageId)
+                    SELECT
+                        [Pages].Level,
+                        [Pages].PageId
+                    FROM
+                        [Pages]
+                    ORDER BY
+                        [Pages].[Level] ASC
+
+                    SELECT
+	                    cms.[Page].TenantId,
+	                    cms.[Page].PageId,
+	                    cms.[Page].ParentPageId,
+	                    cms.[Page].MasterPageId,
+	                    cms.[Page].Name,
+	                    cms.[Page].[Description],
+	                    cms.[Page].Created,
+	                    cms.[Page].Updated,
+	                    cms.[Page].Occurred,
+	                    cms.[Page].ThumbnailImageUploadId AS ThumbnailImageBlobId,
+	                    cms.[Page].PreviewImageUploadId AS PreviewImageBlobId,
+	                    cms.[Page].ImageUploadId AS ImageBlobId
+                    FROM
+	                    cms.[Page]
+                    INNER JOIN
+	                    @Pages Pages
+                    ON
+	                    cms.[Page].TenantId = @TenantId AND
+	                    cms.[Page].PageId = Pages.PageId
+                    ORDER BY
+	                    Pages.Level ASC
+
+                    SELECT
+                        cms.TagPage.PageId,
+                        cms.Tag.TagId,
+                        cms.Tag.Name
+                    FROM
+                        cms.Tag
+                    INNER JOIN
+                        cms.TagPage
+                    ON
+                        cms.Tag.TenantId = cms.TagPage.TenantId AND
+                        cms.Tag.TagId = cms.TagPage.TagId
+                    INNER JOIN
+                        @Pages Pages
+                    ON
+                        cms.TagPage.TenantId = @TenantId AND
+                        cms.TagPage.PageId = Pages.PageId
+                    ORDER BY
+                        cms.TagPage.PageId,
+                        cms.Tag.Name
+                ",
+                new
+                {
+                    TenantId = tenantId,
+                    PageId = pageId
+                }))
+                {
+                    IEnumerable<Page> pages = await gr.ReadAsync<Page>();
+                    IEnumerable<PageTag> pageTabs = await gr.ReadAsync<PageTag>();
+                    return PopulatePageTags(pages, pageTabs);
+                }
             }
         }
 
