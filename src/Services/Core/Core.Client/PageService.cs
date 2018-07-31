@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -74,12 +74,13 @@ namespace Riverside.Cms.Services.Core.Client
             }
         }
 
-        public async Task<PageListResult> ListPages(long tenantId, long? parentPageId, bool recursive, PageType pageType, SortBy sortBy, bool sortAsc, int pageIndex, int pageSize)
+        public async Task<PageListResult> ListPages(long tenantId, long? parentPageId, bool recursive, PageType pageType, IEnumerable<long> tagIds, SortBy sortBy, bool sortAsc, int pageIndex, int pageSize)
         {
             try
             {
                 string uri = $"{_options.Value.CoreApiBaseUrl}tenants/{tenantId}/pages?recursive={recursive.ToString().ToLower()}&pagetype={(int)pageType}&sortby={(int)sortBy}&sortasc={sortAsc.ToString().ToLower()}&pageindex={pageIndex}&pagesize={pageSize}" +
-                    (parentPageId.HasValue ? $"&parentpageid={parentPageId.Value}" : string.Empty);
+                    (parentPageId.HasValue ? $"&parentpageid={parentPageId.Value}" : string.Empty) +
+                    (tagIds != null && tagIds.Count() > 0 ? $"&tagids={string.Join(",", tagIds)}" : string.Empty);
                 using (HttpClient httpClient = new HttpClient())
                 {
                     string json = await httpClient.GetStringAsync(uri);

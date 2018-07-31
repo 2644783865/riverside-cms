@@ -55,9 +55,10 @@ namespace Core.API.Controllers
         [HttpGet]
         [Route("api/v1/core/tenants/{tenantId:int}/pages")]
         [ProducesResponseType(typeof(PageListResult), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ListPages(long tenantId, [FromQuery]long? parentPageId, [FromQuery]bool? recursive, [FromQuery]PageType? pageType, [FromQuery]SortBy? sortBy, [FromQuery]bool? sortAsc, [FromQuery]int? pageIndex, [FromQuery]int? pageSize)
+        public async Task<IActionResult> ListPages(long tenantId, [FromQuery]long? parentPageId, [FromQuery]bool? recursive, [FromQuery]PageType? pageType, [FromQuery]string tagIds, [FromQuery]SortBy? sortBy, [FromQuery]bool? sortAsc, [FromQuery]int? pageIndex, [FromQuery]int? pageSize)
         {
-            PageListResult pages = await _pageService.ListPages(tenantId, parentPageId, recursive ?? false, pageType ?? PageType.Document, sortBy ?? SortBy.Created, sortAsc ?? false, pageIndex ?? 0, pageSize ?? DefaultPageSize);
+            IEnumerable<long> tagIdCollection = !string.IsNullOrWhiteSpace(tagIds) ? tagIds.Split(",").Select(long.Parse) : null;
+            PageListResult pages = await _pageService.ListPages(tenantId, parentPageId, recursive ?? false, pageType ?? PageType.Document, tagIdCollection, sortBy ?? SortBy.Created, sortAsc ?? false, pageIndex ?? 0, pageSize ?? DefaultPageSize);
             return Ok(pages);
         }
 

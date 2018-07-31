@@ -24,9 +24,9 @@ namespace Riverside.Cms.Services.Core.Domain
             return await _pageRepository.ListPagesInHierarchyAsync(tenantId, pageId);
         }
 
-        public async Task<PageListResult> ListPages(long tenantId, long? parentPageId, bool recursive, PageType pageType, SortBy sortBy, bool sortAsc, int pageIndex, int pageSize)
+        public async Task<PageListResult> ListPages(long tenantId, long? parentPageId, bool recursive, PageType pageType, IEnumerable<long> tagIds, SortBy sortBy, bool sortAsc, int pageIndex, int pageSize)
         {
-            return await _pageRepository.ListPages(tenantId, parentPageId, recursive, pageType, sortBy, sortAsc, pageIndex, pageSize);
+            return await _pageRepository.ListPages(tenantId, parentPageId, recursive, pageType, tagIds, sortBy, sortAsc, pageIndex, pageSize);
         }
 
         public Task<Page> ReadPageAsync(long tenantId, long pageId)

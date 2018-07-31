@@ -682,15 +682,34 @@ namespace Riverside.Cms.Services.Core.Infrastructure
             ";
         }
 
-        public async Task<PageListResult> ListPages(long tenantId, long? parentPageId, bool recursive, PageType pageType, SortBy sortBy, bool sortAsc, int pageIndex, int pageSize)
+        private string GetListPagesSql(bool recursive, IEnumerable<long> tagIds)
         {
-            string sql = recursive ? GetListPagesRecursiveSql() : GetListPagesSql();
-            sql = recursive ? GetListTaggedPagesRecursiveSql() : GetListTaggedPagesSql();
+            string sql = null;
+            bool filterByTags = tagIds != null && tagIds.Count() > 0;
+            if (filterByTags)
+            {
+                if (recursive)
+                    sql = GetListTaggedPagesRecursiveSql();
+                else
+                    sql = GetListTaggedPagesSql();
+            }
+            else
+            {
+                if (recursive)
+                    sql = GetListPagesRecursiveSql();
+                else
+                    sql = GetListPagesSql();
+            }
+            return sql;
+        }
+
+        public async Task<PageListResult> ListPages(long tenantId, long? parentPageId, bool recursive, PageType pageType, IEnumerable<long> tagIds, SortBy sortBy, bool sortAsc, int pageIndex, int pageSize)
+        {
             using (SqlConnection connection = new SqlConnection(_options.Value.SqlConnectionString))
             {
                 connection.Open();
                 using (GridReader gr = await connection.QueryMultipleAsync(
-                    sql,
+                    GetListPagesSql(recursive, tagIds),
                     new
                     {
                         TenantId = tenantId,
@@ -700,7 +719,7 @@ namespace Riverside.Cms.Services.Core.Infrastructure
                         PageType = pageType,
                         PageIndex = pageIndex,
                         PageSize = pageSize,
-                        TagIds = new[] { 41 }
+                        TagIds = tagIds
                     }
                 ))
                 {

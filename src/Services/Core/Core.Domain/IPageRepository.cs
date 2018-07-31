@@ -10,7 +10,7 @@ namespace Riverside.Cms.Services.Core.Domain
         Task<Page> ReadPageAsync(long tenantId, long pageId);
 
         Task<IEnumerable<Page>> ListPagesInHierarchyAsync(long tenantId, long pageId);
-        Task<PageListResult> ListPages(long tenantId, long? parentPageId, bool recursive, PageType pageType, SortBy sortBy, bool sortAsc, int pageIndex, int pageSize);
+        Task<PageListResult> ListPages(long tenantId, long? parentPageId, bool recursive, PageType pageType, IEnumerable<long> tagIds, SortBy sortBy, bool sortAsc, int pageIndex, int pageSize);
 
         Task<IEnumerable<PageZone>> SearchPageZonesAsync(long tenantId, long pageId);
         Task<PageZone> ReadPageZoneAsync(long tenantId, long pageId, long pageZoneId);
