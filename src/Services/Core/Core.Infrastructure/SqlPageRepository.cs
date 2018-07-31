@@ -208,7 +208,7 @@ namespace Riverside.Cms.Services.Core.Infrastructure
             ";
         }
 
-        private string GetListPagesCteRecursiveSql()
+        private string GetListPagesFoldersSql()
         {
             return @"
                 DECLARE @Folders TABLE(
@@ -275,7 +275,12 @@ namespace Riverside.Cms.Services.Core.Infrastructure
 		            cms.[Page].TenantId = @TenantId AND
 		            cms.[Page].PageId = @ParentPageId AND
 		            cms.[MasterPage].PageType = 0 /* PageType.Folder */
+            ";
+        }
 
+        private string GetListPagesCteRecursiveSql()
+        {
+            return @"
                 -- Get pages into order so that we can extract the right pages according to the paging and sorting parameters
 
                 ;WITH [Pages] AS
@@ -439,15 +444,252 @@ namespace Riverside.Cms.Services.Core.Infrastructure
         {
             return $@"
                 {GetListPagesSetupSql()}
+                {GetListPagesFoldersSql()}
                 {GetListPagesCteRecursiveSql()}
                 {GetListPagesSelectSql()}
                 {GetListPagesTotalRecursiveSql()}
             ";
         }
 
+        private string GetListPagesTaggedPagesSql()
+        {
+            return @"
+                DECLARE @TaggedPages TABLE (
+                    PageId bigint NOT NULL PRIMARY KEY CLUSTERED
+                )
+                DECLARE @Tags TABLE (
+                    TagId bigint NOT NULL PRIMARY KEY CLUSTERED
+                )
+                INSERT INTO
+                    @Tags (TagId)
+                SELECT
+                    cms.Tag.TagId
+                FROM
+                    cms.Tag
+                WHERE
+                    cms.Tag.TenantId = @TenantId AND
+                    cms.Tag.TagId IN @TagIds
+
+                DECLARE @TagCount int
+                SELECT @TagCount = (SELECT COUNT(*) FROM @Tags)
+
+                INSERT INTO
+	                @TaggedPages (PageId)
+                SELECT
+	                cms.[Page].PageId
+                FROM
+	                cms.[Page]
+                INNER JOIN
+	                cms.TagPage
+                ON
+	                cms.[Page].TenantId = cms.TagPage.TenantId AND
+	                cms.[Page].PageId = cms.TagPage.PageId
+                INNER JOIN
+	                @Tags Tags
+                ON
+	                cms.TagPage.TagId = Tags.TagId
+                WHERE
+	                cms.[Page].TenantId = @TenantId AND
+                    cms.[Page].ParentPageId = @ParentPageId
+                GROUP BY
+	                cms.[Page].PageId
+                HAVING
+	                COUNT(Tags.TagId) = @TagCount
+            ";
+        }
+
+        private string GetListPagesTaggedPagesCteSql()
+        {
+            return @"
+                ;WITH [Pages] AS
+                (
+                    SELECT TOP (@RowNumberUpperBound)
+                        ROW_NUMBER() OVER (ORDER BY
+			                CASE WHEN @SortBy = 0 /* PageSortBy.Created  */ AND @SortAsc = 0 THEN cms.[Page].Created  END DESC,
+			                CASE WHEN @SortBy = 1 /* PageSortBy.Updated  */ AND @SortAsc = 0 THEN cms.[Page].Updated  END DESC,
+			                CASE WHEN @SortBy = 2 /* PageSortBy.Occurred */ AND @SortAsc = 0 THEN cms.[Page].Occurred END DESC,
+			                CASE WHEN @SortBy = 3 /* PageSortBy.Name     */ AND @SortAsc = 0 THEN cms.[Page].Name     END DESC,
+			                CASE WHEN @SortBy = 0 /* PageSortBy.Created  */ AND @SortAsc = 1 THEN cms.[Page].Created  END ASC,
+			                CASE WHEN @SortBy = 1 /* PageSortBy.Updated  */ AND @SortAsc = 1 THEN cms.[Page].Updated  END ASC,
+			                CASE WHEN @SortBy = 2 /* PageSortBy.Occurred */ AND @SortAsc = 1 THEN cms.[Page].Occurred END ASC,
+			                CASE WHEN @SortBy = 3 /* PageSortBy.Name     */ AND @SortAsc = 1 THEN cms.[Page].Name     END ASC) AS RowNumber,
+                        cms.[Page].TenantId,
+		                cms.[Page].PageId
+                    FROM
+                        @TaggedPages [TaggedPages]
+	                INNER JOIN
+		                cms.[Page]
+	                ON
+		                cms.[Page].TenantId = @TenantId AND
+		                cms.[Page].PageId = [TaggedPages].PageId
+	                INNER JOIN
+		                cms.[MasterPage]
+	                ON
+		                cms.[Page].TenantId = cms.MasterPage.TenantId AND
+		                cms.[Page].MasterPageId = cms.MasterPage.MasterPageId
+                    WHERE
+		                cms.MasterPage.PageType	= @PageType
+                )
+            ";
+        }
+
+        private string GetListPagesTaggedPagesTotalSql()
+        {
+            return @"
+                SELECT
+	                COUNT(*) AS Total
+                FROM
+	                cms.[Page]
+                INNER JOIN
+	                @TaggedPages [TaggedPages]
+                ON
+	                cms.[Page].TenantId = @TenantId AND
+	                cms.[Page].PageId = [TaggedPages].PageId
+                INNER JOIN
+	                cms.[MasterPage]
+                ON
+	                cms.[Page].TenantId = cms.MasterPage.TenantId AND
+	                cms.[Page].MasterPageId = cms.MasterPage.MasterPageId
+                WHERE
+	                cms.MasterPage.PageType	= @PageType
+            ";
+        }
+
+        private string GetListTaggedPagesSql()
+        {
+            return $@"
+                {GetListPagesSetupSql()}
+                {GetListPagesTaggedPagesSql()}
+                {GetListPagesTaggedPagesCteSql()}
+                {GetListPagesSelectSql()}
+                {GetListPagesTaggedPagesTotalSql()}
+            ";
+        }
+
+        private string GetListPagesTaggedPagesRecursiveSql()
+        {
+            return @"
+                DECLARE @TaggedPages TABLE (
+                    PageId bigint NOT NULL PRIMARY KEY CLUSTERED
+                )
+                DECLARE @Tags TABLE (
+                    TagId bigint NOT NULL PRIMARY KEY CLUSTERED
+                )
+                INSERT INTO
+                    @Tags (TagId)
+                SELECT
+                    cms.Tag.TagId
+                FROM
+                    cms.Tag
+                WHERE
+                    cms.Tag.TenantId = @TenantId AND
+                    cms.Tag.TagId IN @TagIds
+
+                DECLARE @TagCount int
+                SELECT @TagCount = (SELECT COUNT(*) FROM @Tags)
+
+                INSERT INTO
+	                @TaggedPages (PageId)
+                SELECT
+	                cms.[Page].PageId
+                FROM
+	                cms.[Page]
+                INNER JOIN
+	                @Folders [FoldersTable]
+                ON
+	                cms.[Page].TenantId = @TenantId AND
+                    cms.[Page].ParentPageId = [FoldersTable].PageId
+                INNER JOIN
+	                cms.TagPage
+                ON
+	                cms.[Page].TenantId = cms.TagPage.TenantId AND
+	                cms.[Page].PageId = cms.TagPage.PageId
+                INNER JOIN
+	                @Tags Tags
+                ON
+	                cms.TagPage.TagId = Tags.TagId
+                GROUP BY
+	                cms.[Page].PageId
+                HAVING
+	                COUNT(Tags.TagId) = @TagCount
+            ";
+        }
+
+        private string GetListPagesTaggedPagesCteRecursiveSql()
+        {
+            return @"
+                -- Get pages into order so that we can extract the right pages according to the paging and sorting parameters
+
+                ;WITH [Pages] AS
+                (
+                    SELECT TOP (@RowNumberUpperBound)
+                        ROW_NUMBER() OVER (ORDER BY
+			                CASE WHEN @SortBy = 0 /* PageSortBy.Created  */ AND @SortAsc = 0 THEN cms.[Page].Created  END DESC,
+			                CASE WHEN @SortBy = 1 /* PageSortBy.Updated  */ AND @SortAsc = 0 THEN cms.[Page].Updated  END DESC,
+			                CASE WHEN @SortBy = 2 /* PageSortBy.Occurred */ AND @SortAsc = 0 THEN cms.[Page].Occurred END DESC,
+			                CASE WHEN @SortBy = 3 /* PageSortBy.Name     */ AND @SortAsc = 0 THEN cms.[Page].Name     END DESC,
+			                CASE WHEN @SortBy = 0 /* PageSortBy.Created  */ AND @SortAsc = 1 THEN cms.[Page].Created  END ASC,
+			                CASE WHEN @SortBy = 1 /* PageSortBy.Updated  */ AND @SortAsc = 1 THEN cms.[Page].Updated  END ASC,
+			                CASE WHEN @SortBy = 2 /* PageSortBy.Occurred */ AND @SortAsc = 1 THEN cms.[Page].Occurred END ASC,
+			                CASE WHEN @SortBy = 3 /* PageSortBy.Name     */ AND @SortAsc = 1 THEN cms.[Page].Name     END ASC) AS RowNumber,
+                        cms.[Page].TenantId,
+		                cms.[Page].PageId
+                    FROM
+                        @TaggedPages [TaggedPages]
+	                INNER JOIN
+		                cms.[Page]
+	                ON
+		                cms.[Page].TenantId = @TenantId AND
+		                cms.[Page].PageId = [TaggedPages].PageId
+	                INNER JOIN
+		                cms.[MasterPage]
+	                ON
+		                cms.[Page].TenantId = cms.MasterPage.TenantId AND
+		                cms.[Page].MasterPageId = cms.MasterPage.MasterPageId
+                    WHERE
+		                cms.MasterPage.PageType	= @PageType
+                )
+            ";
+        }
+
+        private string GetListPagesTaggedPagesTotalRecursiveSql()
+        {
+            return @"
+                SELECT
+	                COUNT(*) AS Total
+                FROM
+	                cms.[Page]
+                INNER JOIN
+	                @TaggedPages [TaggedPages]
+                ON
+	                cms.[Page].TenantId = @TenantId AND
+	                cms.[Page].PageId = [TaggedPages].PageId
+                INNER JOIN
+	                cms.[MasterPage]
+                ON
+	                cms.[Page].TenantId = cms.MasterPage.TenantId AND
+	                cms.[Page].MasterPageId = cms.MasterPage.MasterPageId
+                WHERE
+	                cms.MasterPage.PageType	= @PageType
+            ";
+        }
+
+        private string GetListTaggedPagesRecursiveSql()
+        {
+            return $@"
+                {GetListPagesSetupSql()}
+                {GetListPagesFoldersSql()}
+                {GetListPagesTaggedPagesRecursiveSql()}
+                {GetListPagesTaggedPagesCteRecursiveSql()}
+                {GetListPagesSelectSql()}
+                {GetListPagesTaggedPagesTotalRecursiveSql()}
+            ";
+        }
+
         public async Task<PageListResult> ListPages(long tenantId, long? parentPageId, bool recursive, PageType pageType, SortBy sortBy, bool sortAsc, int pageIndex, int pageSize)
         {
             string sql = recursive ? GetListPagesRecursiveSql() : GetListPagesSql();
+            //sql = recursive ? GetListTaggedPagesRecursiveSql() : GetListTaggedPagesSql();
             using (SqlConnection connection = new SqlConnection(_options.Value.SqlConnectionString))
             {
                 connection.Open();
@@ -461,7 +703,8 @@ namespace Riverside.Cms.Services.Core.Infrastructure
                         SortAsc = sortAsc,
                         PageType = pageType,
                         PageIndex = pageIndex,
-                        PageSize = pageSize
+                        PageSize = pageSize //,
+                        //TagIds = new[] { 41 }
                     }
                 ))
                 {
