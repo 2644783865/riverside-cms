@@ -177,7 +177,7 @@ namespace Riverside.Cms.Services.Core.Infrastructure
             }
         }
 
-        private string GetPagesCteNonRecursiveSql()
+        private string GetListPagesCteSql()
         {
             return @"
                 ;WITH [Pages] AS
@@ -208,7 +208,7 @@ namespace Riverside.Cms.Services.Core.Infrastructure
             ";
         }
 
-        private string GetPagesCteRecursiveSql()
+        private string GetListPagesCteRecursiveSql()
         {
             return @"
                 DECLARE @Folders TABLE(
@@ -309,15 +309,7 @@ namespace Riverside.Cms.Services.Core.Infrastructure
             ";
         }
 
-        private string GetPagesCteSql(bool recursive)
-        {
-            if (recursive)
-                return GetPagesCteRecursiveSql();
-            else
-                return GetPagesCteNonRecursiveSql();
-        }
-
-        private string GetTotalNonRecursiveSql()
+        private string GetListPagesTotalSql()
         {
             return @"
                 SELECT
@@ -336,7 +328,7 @@ namespace Riverside.Cms.Services.Core.Infrastructure
             ";
         }
 
-        private string GetTotalRecursiveSql()
+        private string GetListPagesTotalRecursiveSql()
         {
             return @"
                 SELECT
@@ -358,99 +350,120 @@ namespace Riverside.Cms.Services.Core.Infrastructure
             ";
         }
 
-        private string GetTotalSql(bool recursive)
+        private string GetListPagesSetupSql()
         {
-            if (recursive)
-                return GetTotalRecursiveSql();
-            else
-                return GetTotalNonRecursiveSql();
+            return @"
+                DECLARE @Pages TABLE ([RowNumber] [int] NOT NULL PRIMARY KEY CLUSTERED, [PageId] [bigint] NOT NULL)
+                DECLARE @RowNumberLowerBound int
+                DECLARE @RowNumberUpperBound int
+                SET @RowNumberLowerBound = @PageSize * @PageIndex
+                SET @RowNumberUpperBound = @RowNumberLowerBound + @PageSize + 1;
+
+                IF (@ParentPageId IS NULL)
+	                SET @ParentPageId = (SELECT PageId FROM cms.[Page] WHERE cms.[Page].TenantId = @TenantId AND cms.[Page].ParentPageId IS NULL)
+            ";
+        }
+
+        private string GetListPagesSelectSql()
+        {
+            return @"
+                INSERT INTO
+                    @Pages (RowNumber, PageId)
+                SELECT
+                    [Pages].RowNumber,
+                    [Pages].PageId
+                FROM
+                    [Pages]
+                WHERE
+	                [Pages].RowNumber > @RowNumberLowerBound AND [Pages].RowNumber < @RowNumberUpperBound
+                ORDER BY
+                    [Pages].RowNumber ASC
+
+                SELECT
+	                cms.[Page].TenantId,
+	                cms.[Page].PageId,
+	                cms.[Page].ParentPageId,
+	                cms.[Page].MasterPageId,
+	                cms.[Page].Name,
+	                cms.[Page].[Description],
+	                cms.[Page].Created,
+	                cms.[Page].Updated,
+	                cms.[Page].Occurred,
+	                cms.[Page].ImageTenantId,
+	                cms.[Page].ThumbnailImageUploadId,
+	                cms.[Page].PreviewImageUploadId,
+	                cms.[Page].ImageUploadId
+                FROM
+	                @Pages Pages
+                INNER JOIN
+	                cms.[Page]
+                ON
+	                cms.[Page].TenantId = @TenantId AND
+	                cms.[Page].PageId = Pages.PageId
+                ORDER BY
+                    Pages.RowNumber ASC
+
+                SELECT
+                    cms.TagPage.PageId,
+                    cms.Tag.TagId,
+                    cms.Tag.Name
+                FROM
+                    cms.Tag
+                INNER JOIN
+                    cms.TagPage
+                ON
+                    cms.Tag.TenantId = cms.TagPage.TenantId AND
+                    cms.Tag.TagId = cms.TagPage.TagId
+                INNER JOIN
+                    @Pages Pages
+                ON
+                    cms.TagPage.TenantId = @TenantId AND
+                    cms.TagPage.PageId = Pages.PageId
+                ORDER BY
+                    cms.TagPage.PageId,
+                    cms.Tag.Name
+            ";
+        }
+
+        private string GetListPagesSql()
+        {
+            return $@"
+                {GetListPagesSetupSql()}
+                {GetListPagesCteSql()}
+                {GetListPagesSelectSql()}
+                {GetListPagesTotalSql()}
+            ";
+        }
+
+        private string GetListPagesRecursiveSql()
+        {
+            return $@"
+                {GetListPagesSetupSql()}
+                {GetListPagesCteRecursiveSql()}
+                {GetListPagesSelectSql()}
+                {GetListPagesTotalRecursiveSql()}
+            ";
         }
 
         public async Task<PageListResult> ListPages(long tenantId, long? parentPageId, bool recursive, PageType pageType, SortBy sortBy, bool sortAsc, int pageIndex, int pageSize)
         {
+            string sql = recursive ? GetListPagesRecursiveSql() : GetListPagesSql();
             using (SqlConnection connection = new SqlConnection(_options.Value.SqlConnectionString))
             {
                 connection.Open();
-                using (GridReader gr = await connection.QueryMultipleAsync($@"
-                    DECLARE @Pages TABLE ([RowNumber] [int] NOT NULL PRIMARY KEY CLUSTERED, [PageId] [bigint] NOT NULL)
-                    DECLARE @RowNumberLowerBound int
-                    DECLARE @RowNumberUpperBound int
-                    SET @RowNumberLowerBound = @PageSize * @PageIndex
-                    SET @RowNumberUpperBound = @RowNumberLowerBound + @PageSize + 1;
-
-                    IF (@ParentPageId IS NULL)
-	                    SET @ParentPageId = (SELECT PageId FROM cms.[Page] WHERE cms.[Page].TenantId = @TenantId AND cms.[Page].ParentPageId IS NULL)
-
-                    {GetPagesCteSql(recursive)}
-
-                    INSERT INTO
-                        @Pages (RowNumber, PageId)
-                    SELECT
-                        [Pages].RowNumber,
-                        [Pages].PageId
-                    FROM
-                        [Pages]
-                    WHERE
-	                    [Pages].RowNumber > @RowNumberLowerBound AND [Pages].RowNumber < @RowNumberUpperBound
-                    ORDER BY
-                        [Pages].RowNumber ASC
-
-                    SELECT
-	                    cms.[Page].TenantId,
-	                    cms.[Page].PageId,
-	                    cms.[Page].ParentPageId,
-	                    cms.[Page].MasterPageId,
-	                    cms.[Page].Name,
-	                    cms.[Page].[Description],
-	                    cms.[Page].Created,
-	                    cms.[Page].Updated,
-	                    cms.[Page].Occurred,
-	                    cms.[Page].ImageTenantId,
-	                    cms.[Page].ThumbnailImageUploadId,
-	                    cms.[Page].PreviewImageUploadId,
-	                    cms.[Page].ImageUploadId
-                    FROM
-	                    @Pages Pages
-                    INNER JOIN
-	                    cms.[Page]
-                    ON
-	                    cms.[Page].TenantId = @TenantId AND
-	                    cms.[Page].PageId = Pages.PageId
-                    ORDER BY
-                        Pages.RowNumber ASC
-
-                    SELECT
-                        cms.TagPage.PageId,
-                        cms.Tag.TagId,
-                        cms.Tag.Name
-                    FROM
-                        cms.Tag
-                    INNER JOIN
-                        cms.TagPage
-                    ON
-                        cms.Tag.TenantId = cms.TagPage.TenantId AND
-                        cms.Tag.TagId = cms.TagPage.TagId
-                    INNER JOIN
-                        @Pages Pages
-                    ON
-                        cms.TagPage.TenantId = @TenantId AND
-                        cms.TagPage.PageId = Pages.PageId
-                    ORDER BY
-                        cms.TagPage.PageId,
-                        cms.Tag.Name
-
-                    {GetTotalSql(recursive)}
-                ",
-                new
-                {
-                    TenantId = tenantId,
-                    ParentPageId = parentPageId,
-                    SortBy = sortBy,
-                    SortAsc = sortAsc,
-                    PageType = pageType,
-                    PageIndex = pageIndex,
-                    PageSize = pageSize
-                }))
+                using (GridReader gr = await connection.QueryMultipleAsync(
+                    sql,
+                    new
+                    {
+                        TenantId = tenantId,
+                        ParentPageId = parentPageId,
+                        SortBy = sortBy,
+                        SortAsc = sortAsc,
+                        PageType = pageType,
+                        PageIndex = pageIndex,
+                        PageSize = pageSize
+                    }
+                ))
                 {
                     IEnumerable<Page> pages = await gr.ReadAsync<Page>();
                     IEnumerable<PageTag> pageTabs = await gr.ReadAsync<PageTag>();
