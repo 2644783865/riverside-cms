@@ -451,12 +451,9 @@ namespace Riverside.Cms.Services.Core.Infrastructure
             ";
         }
 
-        private string GetListPagesTaggedPagesSql()
+        private string GetListPagesTagsSql()
         {
             return @"
-                DECLARE @TaggedPages TABLE (
-                    PageId bigint NOT NULL PRIMARY KEY CLUSTERED
-                )
                 DECLARE @Tags TABLE (
                     TagId bigint NOT NULL PRIMARY KEY CLUSTERED
                 )
@@ -469,6 +466,15 @@ namespace Riverside.Cms.Services.Core.Infrastructure
                 WHERE
                     cms.Tag.TenantId = @TenantId AND
                     cms.Tag.TagId IN @TagIds
+            ";
+        }
+
+        private string GetListPagesTaggedPagesSql()
+        {
+            return @"
+                DECLARE @TaggedPages TABLE (
+                    PageId bigint NOT NULL PRIMARY KEY CLUSTERED
+                )
 
                 DECLARE @TagCount int
                 SELECT @TagCount = (SELECT COUNT(*) FROM @Tags)
@@ -559,6 +565,7 @@ namespace Riverside.Cms.Services.Core.Infrastructure
         {
             return $@"
                 {GetListPagesSetupSql()}
+                {GetListPagesTagsSql()}
                 {GetListPagesTaggedPagesSql()}
                 {GetListPagesTaggedPagesCteSql()}
                 {GetListPagesSelectSql()}
@@ -572,18 +579,6 @@ namespace Riverside.Cms.Services.Core.Infrastructure
                 DECLARE @TaggedPages TABLE (
                     PageId bigint NOT NULL PRIMARY KEY CLUSTERED
                 )
-                DECLARE @Tags TABLE (
-                    TagId bigint NOT NULL PRIMARY KEY CLUSTERED
-                )
-                INSERT INTO
-                    @Tags (TagId)
-                SELECT
-                    cms.Tag.TagId
-                FROM
-                    cms.Tag
-                WHERE
-                    cms.Tag.TenantId = @TenantId AND
-                    cms.Tag.TagId IN @TagIds
 
                 DECLARE @TagCount int
                 SELECT @TagCount = (SELECT COUNT(*) FROM @Tags)
@@ -679,6 +674,7 @@ namespace Riverside.Cms.Services.Core.Infrastructure
             return $@"
                 {GetListPagesSetupSql()}
                 {GetListPagesFoldersSql()}
+                {GetListPagesTagsSql()}
                 {GetListPagesTaggedPagesRecursiveSql()}
                 {GetListPagesTaggedPagesCteRecursiveSql()}
                 {GetListPagesSelectSql()}
@@ -689,7 +685,7 @@ namespace Riverside.Cms.Services.Core.Infrastructure
         public async Task<PageListResult> ListPages(long tenantId, long? parentPageId, bool recursive, PageType pageType, SortBy sortBy, bool sortAsc, int pageIndex, int pageSize)
         {
             string sql = recursive ? GetListPagesRecursiveSql() : GetListPagesSql();
-            //sql = recursive ? GetListTaggedPagesRecursiveSql() : GetListTaggedPagesSql();
+            sql = recursive ? GetListTaggedPagesRecursiveSql() : GetListTaggedPagesSql();
             using (SqlConnection connection = new SqlConnection(_options.Value.SqlConnectionString))
             {
                 connection.Open();
@@ -703,8 +699,8 @@ namespace Riverside.Cms.Services.Core.Infrastructure
                         SortAsc = sortAsc,
                         PageType = pageType,
                         PageIndex = pageIndex,
-                        PageSize = pageSize //,
-                        //TagIds = new[] { 41 }
+                        PageSize = pageSize,
+                        TagIds = new[] { 41 }
                     }
                 ))
                 {
