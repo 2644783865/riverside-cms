@@ -1,10 +1,92 @@
 ﻿@using RiversideCms.Mvc.Extensions
+@using Riverside.Cms.Services.Core.Client
 @using Riverside.Cms.Services.Element.Client
 
 @model ElementView<PageListElementSettings, PageListElementContent>
 
 <div class="rcms-page-list">
 
-    <h2>Page list goes here</h2>
+    @if (Model.Content.DisplayName != null)
+    {
+        <h2>@Model.Content.DisplayName</h2>
+    }
+
+    @if (Model.Settings.Preamble != null)
+    {
+        <p class="rcms-preamble">@Html.FormatMultiline(Model.Settings.Preamble)</p>
+    }
+
+    @if (Model.Content.NoPagesMessage != null)
+    {
+        <div class="rcms-page-list-no-items">
+            <p>@Model.Content.NoPagesMessage</p>
+        </div>
+    }
+
+    @if (Model.Content.Pages.Any())
+    {
+        <div class="rcms-page-list-pages">
+            @foreach (PageListPage pageListPage in Model.Content.Pages)
+            {
+            <div class="rcms-page-list-item">
+                <h3>@Html.PageLink(pageListPage.Name, pageListPage.PageId, pageListPage.Name, pageListPage.Home)</h3>
+                @if (pageListPage.Description != null)
+                {
+                    @Html.MarkdownToHtml(pageListPage.Description)
+                }
+                @if (pageListPage.Created.HasValue || pageListPage.Updated.HasValue || pageListPage.Occurred.HasValue)
+                {
+                    <dl>
+                        @if (pageListPage.Created.HasValue)
+                        {
+                            <dt class="created">Posted</dt>
+                            <dd class="created">@Html.Date(pageListPage.Created.Value)</dd>
+                        }
+                        @if (pageListPage.Updated.HasValue)
+                        {
+                            <dt class="updated">Updated</dt>
+                            <dd class="updated">@Html.Date(pageListPage.Updated.Value)</dd>
+                        }
+                        @if (pageListPage.Occurred.HasValue)
+                        {
+                            <dt class="occurred">@if (pageListPage.OccursInFuture) {<text>Occurs</text>} else {<text>Occurred</text>}</dt>
+                            <dd class="occurred">@Html.Date(pageListPage.Occurred.Value)</dd>
+                        }
+                    </dl>
+                }
+                @if (pageListPage.Tags.Any())
+                {
+                    <ul class="tags">
+                        @foreach (Tag tag in pageListPage.Tags)
+                        {
+                            <li class="tag-available">@Html.PageLink(tag.Name, Model.Content.CurrentPageId, Model.Content.CurrentPageName, Model.Content.CurrentPageHome)</li>
+                        }
+                    </ul>
+                }
+            </div>
+            }
+        </div>
+    }
+
+    @if (Model.Content.Pager != null)
+    {
+        <div class="rcms-page-list-pager">
+            <div class="row">
+                <div class="pager-text">
+                    <p>Page @(Model.Content.Pager.PageIndex + 1) of @Model.Content.Pager.PageCount</p>
+                </div>
+                <div class="pager-pagination">
+                    <!-- TODO: Implement pagination helper -->
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (Model.Content.MoreMessage != null)
+    {
+        <div class="rcms-page-list-more">
+            <p>@Html.PageLink(Model.Content.MoreMessage, Model.Content.PageListPageId, Model.Content.PageListPageName, Model.Content.PageListPageHome)</p>
+        </div>
+    }
 
 </div>

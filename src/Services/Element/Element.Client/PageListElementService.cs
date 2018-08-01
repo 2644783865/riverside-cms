@@ -35,14 +35,38 @@ namespace Riverside.Cms.Services.Element.Client
 
     public class PageListPage
     {
+        public long PageId { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public bool Home { get; set; }
+        public DateTime? Created { get; set; }
+        public DateTime? Updated { get; set; }
+        public DateTime? Occurred { get; set; }
+        public bool OccursInFuture { get; set; }
+        public IEnumerable<Tag> Tags { get; set; }
+    }
+
+    public class PageListPager
+    {
+        public int PageIndex { get; set; }
+        public int PageSize { get; set; }
+        public int Total { get; set; }
+        public int PageCount { get; set; }
     }
 
     public class PageListElementContent : ElementContent
     {
+        public long CurrentPageId { get; set; }
+        public string CurrentPageName { get; set; }
+        public bool CurrentPageHome { get; set; }
+        public long PageListPageId { get; set; }
+        public string PageListPageName { get; set; }
+        public bool PageListPageHome { get; set; }
         public IEnumerable<PageListPage> Pages { get; set; }
-        public int PageIndex { get; set; }
-        public int PageSize { get; set; }
-        public int Total { get; set; }
+        public string DisplayName { get; set; }
+        public string MoreMessage { get; set; }
+        public string NoPagesMessage { get; set; }
+        public PageListPager Pager { get; set; }
     }
 
     public interface IPageListElementService : IElementSettingsService<PageListElementSettings>, IElementContentService<PageListElementContent>
