@@ -395,9 +395,9 @@ namespace Riverside.Cms.Services.Core.Infrastructure
 	                cms.[Page].Updated,
 	                cms.[Page].Occurred,
 	                cms.[Page].ImageTenantId,
-	                cms.[Page].ThumbnailImageUploadId,
-	                cms.[Page].PreviewImageUploadId,
-	                cms.[Page].ImageUploadId
+	                cms.[Page].ThumbnailImageUploadId AS ThumbnailImageBlobId,
+	                cms.[Page].PreviewImageUploadId AS PreviewImageBlobId,
+	                cms.[Page].ImageUploadId AS ImageBlobId
                 FROM
 	                @Pages Pages
                 INNER JOIN

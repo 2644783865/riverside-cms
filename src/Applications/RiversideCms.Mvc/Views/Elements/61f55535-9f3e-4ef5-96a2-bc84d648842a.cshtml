@@ -34,6 +34,18 @@
                 {
                     @Html.MarkdownToHtml(pageListPage.Description)
                 }
+                @if (pageListPage.Image != null)
+                {
+                    <a href="@Url.PageUrl(pageListPage.PageId, pageListPage.Name, pageListPage.Home)">
+                        <div class="media-object">
+                            <img 
+                                 src="@Url.RouteUrl("PageImage", new { pageid = pageListPage.Image.PageId, pageImageType = "thumbnail", description = Url.UrlFriendly(pageListPage.Name), t = pageListPage.Image.BlobId})" alt="@pageListPage.Name"
+                                 width="@pageListPage.Image.Width"
+                                 height="@pageListPage.Image.Height"
+                            />
+                        </div>
+                    </a>
+                }
                 @if (pageListPage.Created.HasValue || pageListPage.Updated.HasValue || pageListPage.Occurred.HasValue)
                 {
                     <dl>

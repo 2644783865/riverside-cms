@@ -54,9 +54,9 @@ namespace Riverside.Cms.Services.Storage.Infrastructure
             if (dto == null)
                 return blob;
             if (dto.BlobType == BlobType.Image)
-                blob = new BlobImage { Width = dto.Width.Value, Height = dto.Height.Value };
+                blob = new BlobImage { Width = dto.Width.Value, Height = dto.Height.Value, BlobType = BlobType.Image };
             else
-                blob = new Blob();
+                blob = new Blob { BlobType = BlobType.Document };
             List<string> pathSegments = GetPathSegmentsFromFolders(dto.Folder1, dto.Folder2, dto.Folder3);
             blob.TenantId = dto.TenantId;
             blob.BlobId = dto.BlobId;

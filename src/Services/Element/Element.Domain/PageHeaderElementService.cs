@@ -94,7 +94,7 @@ namespace Riverside.Cms.Services.Element.Domain
 
             if (elementSettings.ShowImage && page.ThumbnailImageBlobId.HasValue)
             {
-                BlobImage thumbnailImage = (BlobImage) await _storageService.ReadBlobAsync(tenantId, page.ThumbnailImageBlobId.Value);
+                BlobImage thumbnailImage = (BlobImage)await _storageService.ReadBlobAsync(tenantId, page.ThumbnailImageBlobId.Value);
                 elementContent.Image = new PageHeaderImage
                 {
                     BlobId = thumbnailImage.BlobId,

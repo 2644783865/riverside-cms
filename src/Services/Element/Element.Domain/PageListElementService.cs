@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Riverside.Cms.Services.Core.Client;
+using Riverside.Cms.Services.Storage.Client;
 
 namespace Riverside.Cms.Services.Element.Domain
 {
@@ -30,6 +31,14 @@ namespace Riverside.Cms.Services.Element.Domain
         public string Preamble { get; set; }
     }
 
+    public class PageListImage
+    {
+        public long BlobId { get; set; }
+        public long PageId { get; set; }
+        public int Width { get; set; }
+        public int Height { get; set; }
+    }
+
     public class PageListPage
     {
         public long PageId { get; set; }
@@ -40,6 +49,7 @@ namespace Riverside.Cms.Services.Element.Domain
         public DateTime? Updated { get; set; }
         public DateTime? Occurred { get; set; }
         public bool OccursInFuture { get; set; }
+        public PageListImage Image { get; set; }
         public IEnumerable<Tag> Tags { get; set; }
     }
 
@@ -74,11 +84,13 @@ namespace Riverside.Cms.Services.Element.Domain
     {
         private readonly IElementRepository<PageListElementSettings> _elementRepository;
         private readonly IPageService _pageService;
+        private readonly IStorageService _storageService;
 
-        public PageListElementService(IElementRepository<PageListElementSettings> elementRepository, IPageService pageService)
+        public PageListElementService(IElementRepository<PageListElementSettings> elementRepository, IPageService pageService, IStorageService storageService)
         {
             _elementRepository = elementRepository;
             _pageService = pageService;
+            _storageService = storageService;
         }
 
         public Task<PageListElementSettings> ReadElementSettingsAsync(long tenantId, long elementId)
@@ -109,6 +121,20 @@ namespace Riverside.Cms.Services.Element.Domain
             };
         }
 
+        private PageListImage GetImage(Page page, Dictionary<long, BlobImage> imagesById)
+        {
+            if (!page.ThumbnailImageBlobId.HasValue)
+                return null;
+            BlobImage thumbnailImage = imagesById[page.ThumbnailImageBlobId.Value];
+            return new PageListImage
+            {
+                BlobId = thumbnailImage.BlobId,
+                PageId = page.PageId,
+                Width = thumbnailImage.Width,
+                Height = thumbnailImage.Height
+            };
+        }
+
         public async Task<PageListElementContent> ReadElementContentAsync(long tenantId, long elementId, long pageId)
         {
             PageListElementSettings elementSettings = await _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
@@ -123,6 +149,16 @@ namespace Riverside.Cms.Services.Element.Domain
             Page pageListPage = await _pageService.ReadPageAsync(tenantId, pageListPageId);
 
             PageListResult result = await _pageService.ListPagesAsync(tenantId, pageListPageId, elementSettings.Recursive, elementSettings.PageType, tagIds, elementSettings.SortBy, elementSettings.SortAsc, pageIndex, elementSettings.PageSize);
+
+            Dictionary<long, BlobImage> imagesById = new Dictionary<long, BlobImage>();
+            if (elementSettings.ShowImage)
+            {
+                foreach (Page page in result.Pages)
+                {
+                    if (page.ThumbnailImageBlobId.HasValue)
+                        imagesById.Add(page.ThumbnailImageBlobId.Value, (BlobImage)await _storageService.ReadBlobAsync(tenantId, page.ThumbnailImageBlobId.Value));
+                }
+            }
 
             PageListElementContent elementContent = new PageListElementContent
             {
@@ -148,6 +184,7 @@ namespace Riverside.Cms.Services.Element.Domain
                     Updated = elementSettings.ShowUpdated && !(elementSettings.ShowCreated && (p.Created.Date == p.Updated.Date)) ? (DateTime?)p.Updated : null,
                     Occurred = elementSettings.ShowOccurred && p.Occurred.HasValue ? p.Occurred : null,
                     OccursInFuture = elementSettings.ShowOccurred && p.Occurred.HasValue ? p.Occurred.Value.Date > DateTime.UtcNow.Date : false,
+                    Image = GetImage(p, imagesById),
                     Tags = elementSettings.ShowTags ? p.Tags : new List<Tag>()
                 }),
                 Pager = GetPager(pageIndex, result, elementSettings)

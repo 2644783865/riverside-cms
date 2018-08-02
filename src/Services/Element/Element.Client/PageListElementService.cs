@@ -33,6 +33,14 @@ namespace Riverside.Cms.Services.Element.Client
         public string Preamble { get; set; }
     }
 
+    public class PageListImage
+    {
+        public long BlobId { get; set; }
+        public long PageId { get; set; }
+        public int Width { get; set; }
+        public int Height { get; set; }
+    }
+
     public class PageListPage
     {
         public long PageId { get; set; }
@@ -43,6 +51,7 @@ namespace Riverside.Cms.Services.Element.Client
         public DateTime? Updated { get; set; }
         public DateTime? Occurred { get; set; }
         public bool OccursInFuture { get; set; }
+        public PageListImage Image { get; set; }
         public IEnumerable<Tag> Tags { get; set; }
     }
 
