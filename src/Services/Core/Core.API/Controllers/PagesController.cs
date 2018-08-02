@@ -58,7 +58,7 @@ namespace Core.API.Controllers
         public async Task<IActionResult> ListPages(long tenantId, [FromQuery]long? parentPageId, [FromQuery]bool? recursive, [FromQuery]PageType? pageType, [FromQuery]string tagIds, [FromQuery]SortBy? sortBy, [FromQuery]bool? sortAsc, [FromQuery]int? pageIndex, [FromQuery]int? pageSize)
         {
             IEnumerable<long> tagIdCollection = !string.IsNullOrWhiteSpace(tagIds) ? tagIds.Split(",").Select(long.Parse) : null;
-            PageListResult pages = await _pageService.ListPages(tenantId, parentPageId, recursive ?? false, pageType ?? PageType.Document, tagIdCollection, sortBy ?? SortBy.Created, sortAsc ?? false, pageIndex ?? 0, pageSize ?? DefaultPageSize);
+            PageListResult pages = await _pageService.ListPagesAsync(tenantId, parentPageId, recursive ?? false, pageType ?? PageType.Document, tagIdCollection, sortBy ?? SortBy.Created, sortAsc ?? false, pageIndex ?? 0, pageSize ?? DefaultPageSize);
             return Ok(pages);
         }
 

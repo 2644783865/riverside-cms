@@ -122,7 +122,7 @@ namespace Riverside.Cms.Services.Element.Domain
             long pageListPageId = elementSettings.PageId ?? pageId;
             Page pageListPage = await _pageService.ReadPageAsync(tenantId, pageListPageId);
 
-            PageListResult result = await _pageService.ListPages(tenantId, pageListPageId, elementSettings.Recursive, elementSettings.PageType, tagIds, elementSettings.SortBy, elementSettings.SortAsc, pageIndex, elementSettings.PageSize);
+            PageListResult result = await _pageService.ListPagesAsync(tenantId, pageListPageId, elementSettings.Recursive, elementSettings.PageType, tagIds, elementSettings.SortBy, elementSettings.SortAsc, pageIndex, elementSettings.PageSize);
 
             PageListElementContent elementContent = new PageListElementContent
             {

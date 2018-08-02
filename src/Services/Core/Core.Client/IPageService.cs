@@ -12,7 +12,7 @@ namespace Riverside.Cms.Services.Core.Client
         Task<BlobContent> ReadPageImageAsync(long tenantId, long pageId, PageImageType pageImageType);
 
         Task<List<Page>> ListPagesInHierarchyAsync(long tenantId, long pageId);
-        Task<PageListResult> ListPages(long tenantId, long? parentPageId, bool recursive, PageType pageType, IEnumerable<long> tagIds, SortBy sortBy, bool sortAsc, int pageIndex, int pageSize);
+        Task<PageListResult> ListPagesAsync(long tenantId, long? parentPageId, bool recursive, PageType pageType, IEnumerable<long> tagIds, SortBy sortBy, bool sortAsc, int pageIndex, int pageSize);
 
         Task<List<PageZone>> SearchPageZonesAsync(long tenantId, long pageId);
         Task<PageZone> ReadPageZoneAsync(long tenantId, long pageId, long pageZoneId);

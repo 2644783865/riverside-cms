@@ -703,7 +703,7 @@ namespace Riverside.Cms.Services.Core.Infrastructure
             return sql;
         }
 
-        public async Task<PageListResult> ListPages(long tenantId, long? parentPageId, bool recursive, PageType pageType, IEnumerable<long> tagIds, SortBy sortBy, bool sortAsc, int pageIndex, int pageSize)
+        public async Task<PageListResult> ListPagesAsync(long tenantId, long? parentPageId, bool recursive, PageType pageType, IEnumerable<long> tagIds, SortBy sortBy, bool sortAsc, int pageIndex, int pageSize)
         {
             using (SqlConnection connection = new SqlConnection(_options.Value.SqlConnectionString))
             {
