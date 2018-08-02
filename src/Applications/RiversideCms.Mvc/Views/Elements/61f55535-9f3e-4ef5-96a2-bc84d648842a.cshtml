@@ -70,13 +70,25 @@
 
     @if (Model.Content.Pager != null)
     {
+        int rollingButtonCount = 2;
+        int beginPageIndex = Math.Max(Model.Content.Pager.PageIndex - rollingButtonCount, 0);
+        int endPageIndex = Math.Min(Model.Content.Pager.PageIndex + rollingButtonCount, Model.Content.Pager.PageCount);
         <div class="rcms-page-list-pager">
             <div class="row">
                 <div class="pager-text">
                     <p>Page @(Model.Content.Pager.PageIndex + 1) of @Model.Content.Pager.PageCount</p>
                 </div>
                 <div class="pager-pagination">
-                    <!-- TODO: Implement pagination helper -->
+                    <ul class="pagination">
+                        <li @if (Model.Content.Pager.PageIndex == 0) {<text>class="disabled"</text>}><a href="#"><i class="fa fa-fw fa-angle-double-left"></i> <span class="pager-button-label">First</span></a></li>
+                        <li @if (Model.Content.Pager.PageIndex == 0) {<text>class="disabled"</text>}><a href="#"><i class="fa fa-fw fa-angle-left"></i> <span class="pager-button-label">Previous</span></a></li>
+                        @for (int pageIndex = beginPageIndex; pageIndex <= endPageIndex; pageIndex++)
+                        {
+                            <li @if (Model.Content.Pager.PageIndex == pageIndex) {<text>class="active"</text>}><a href="#">@(pageIndex + 1)@if (Model.Content.Pager.PageIndex == pageIndex) {<text> <span class="sr-only">(current)</span></text>}</a></li>
+                        }
+                        <li @if (Model.Content.Pager.PageIndex == Model.Content.Pager.PageCount - 1) {<text>class="disabled"</text>}><a href="#"><i class="fa fa-fw fa-angle-right"></i> <span class="pager-button-label">Next</span></a></li>
+                        <li @if (Model.Content.Pager.PageIndex == Model.Content.Pager.PageCount - 1) {<text>class="disabled"</text>}><a href="#"><i class="fa fa-fw fa-angle-double-right"></i> <span class="pager-button-label">Last</span></a></li>
+                    </ul>
                 </div>
             </div>
         </div>
