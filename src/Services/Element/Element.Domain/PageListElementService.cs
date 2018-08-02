@@ -49,6 +49,7 @@ namespace Riverside.Cms.Services.Element.Domain
         public DateTime? Updated { get; set; }
         public DateTime? Occurred { get; set; }
         public bool OccursInFuture { get; set; }
+        public PageListImage BackgroundImage { get; set; }
         public PageListImage Image { get; set; }
         public IEnumerable<Tag> Tags { get; set; }
     }
@@ -151,7 +152,7 @@ namespace Riverside.Cms.Services.Element.Domain
             PageListResult result = await _pageService.ListPagesAsync(tenantId, pageListPageId, elementSettings.Recursive, elementSettings.PageType, tagIds, elementSettings.SortBy, elementSettings.SortAsc, pageIndex, elementSettings.PageSize);
 
             Dictionary<long, BlobImage> imagesById = new Dictionary<long, BlobImage>();
-            if (elementSettings.ShowImage)
+            if (elementSettings.ShowImage || elementSettings.ShowBackgroundImage)
             {
                 foreach (Page page in result.Pages)
                 {
@@ -184,7 +185,8 @@ namespace Riverside.Cms.Services.Element.Domain
                     Updated = elementSettings.ShowUpdated && !(elementSettings.ShowCreated && (p.Created.Date == p.Updated.Date)) ? (DateTime?)p.Updated : null,
                     Occurred = elementSettings.ShowOccurred && p.Occurred.HasValue ? p.Occurred : null,
                     OccursInFuture = elementSettings.ShowOccurred && p.Occurred.HasValue ? p.Occurred.Value.Date > DateTime.UtcNow.Date : false,
-                    Image = GetImage(p, imagesById),
+                    BackgroundImage = elementSettings.ShowBackgroundImage ? GetImage(p, imagesById) : null,
+                    Image = elementSettings.ShowImage ? GetImage(p, imagesById) : null,
                     Tags = elementSettings.ShowTags ? p.Tags : new List<Tag>()
                 }),
                 Pager = GetPager(pageIndex, result, elementSettings)

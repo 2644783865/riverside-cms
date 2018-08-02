@@ -51,6 +51,7 @@ namespace Riverside.Cms.Services.Element.Client
         public DateTime? Updated { get; set; }
         public DateTime? Occurred { get; set; }
         public bool OccursInFuture { get; set; }
+        public PageListImage BackgroundImage { get; set; }
         public PageListImage Image { get; set; }
         public IEnumerable<Tag> Tags { get; set; }
     }
