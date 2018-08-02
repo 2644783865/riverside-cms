@@ -56,6 +56,13 @@ namespace Riverside.Cms.Services.Element.Client
         public IEnumerable<Tag> Tags { get; set; }
     }
 
+    public class PageListPageLink
+    {
+        public bool Home { get; set; }
+        public long PageId { get; set; }
+        public string Name { get; set; }
+    }
+
     public class PageListPager
     {
         public int PageIndex { get; set; }
@@ -66,12 +73,8 @@ namespace Riverside.Cms.Services.Element.Client
 
     public class PageListElementContent : ElementContent
     {
-        public long CurrentPageId { get; set; }
-        public string CurrentPageName { get; set; }
-        public bool CurrentPageHome { get; set; }
-        public long PageListPageId { get; set; }
-        public string PageListPageName { get; set; }
-        public bool PageListPageHome { get; set; }
+        public PageListPageLink CurrentPage { get; set; }
+        public PageListPageLink MorePage { get; set; }
         public IEnumerable<PageListPage> Pages { get; set; }
         public string DisplayName { get; set; }
         public string MoreMessage { get; set; }

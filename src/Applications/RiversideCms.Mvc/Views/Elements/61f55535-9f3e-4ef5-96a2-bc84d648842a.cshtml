@@ -75,7 +75,7 @@
                     <ul class="tags">
                         @foreach (Tag tag in pageListPage.Tags)
                         {
-                            <li class="tag-available">@Html.PageLink(tag.Name, Model.Content.CurrentPageId, Model.Content.CurrentPageName, Model.Content.CurrentPageHome)</li>
+                            <li class="tag-available">@Html.PageLink(tag.Name, Model.Content.CurrentPage.PageId, Model.Content.CurrentPage.Name, Model.Content.CurrentPage.Home)</li>
                         }
                     </ul>
                 }
@@ -117,7 +117,7 @@
     @if (Model.Content.MoreMessage != null)
     {
         <div class="rcms-page-list-more">
-            <p>@Html.PageLink(Model.Content.MoreMessage, Model.Content.PageListPageId, Model.Content.PageListPageName, Model.Content.PageListPageHome)</p>
+            <p>@Html.PageLink(Model.Content.MoreMessage, Model.Content.MorePage.PageId, Model.Content.MorePage.Name, Model.Content.MorePage.Home)</p>
         </div>
     }
 

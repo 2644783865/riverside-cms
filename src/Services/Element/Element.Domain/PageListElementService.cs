@@ -54,6 +54,13 @@ namespace Riverside.Cms.Services.Element.Domain
         public IEnumerable<Tag> Tags { get; set; }
     }
 
+    public class PageListPageLink
+    {
+        public bool Home { get; set; }
+        public long PageId { get; set; }
+        public string Name { get; set; }
+    }
+
     public class PageListPager
     {
         public int PageIndex { get; set; }
@@ -64,12 +71,8 @@ namespace Riverside.Cms.Services.Element.Domain
 
     public class PageListElementContent : ElementContent
     {
-        public long CurrentPageId { get; set; }
-        public string CurrentPageName { get; set; }
-        public bool CurrentPageHome { get; set; }
-        public long PageListPageId { get; set; }
-        public string PageListPageName { get; set; }
-        public bool PageListPageHome { get; set; }
+        public PageListPageLink CurrentPage { get; set; }
+        public PageListPageLink MorePage { get; set; }
         public IEnumerable<PageListPage> Pages { get; set; }
         public string DisplayName { get; set; }
         public string MoreMessage { get; set; }
@@ -136,6 +139,17 @@ namespace Riverside.Cms.Services.Element.Domain
             };
         }
 
+        private async Task<PageListPageLink> GetPageListPageLinkAsync(long tenantId, long pageId)
+        {
+            Page page = await _pageService.ReadPageAsync(tenantId, pageId);
+            return new PageListPageLink
+            {
+                Home = !page.ParentPageId.HasValue,
+                Name = page.Name,
+                PageId = pageId
+            };
+        }
+
         public async Task<PageListElementContent> ReadElementContentAsync(long tenantId, long elementId, long pageId)
         {
             PageListElementSettings elementSettings = await _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
@@ -145,9 +159,15 @@ namespace Riverside.Cms.Services.Element.Domain
             tags = new List<Tag>();
             IEnumerable<long> tagIds = tags.Select(t => t.TagId);
 
-            Page currentPage = await _pageService.ReadPageAsync(tenantId, pageId);
+            PageListPageLink currentPageLink = null;
+            if (elementSettings.ShowTags)
+                currentPageLink = await GetPageListPageLinkAsync(tenantId, pageId);
+
+            PageListPageLink morePageLink = null;
             long pageListPageId = elementSettings.PageId ?? pageId;
-            Page pageListPage = await _pageService.ReadPageAsync(tenantId, pageListPageId);
+            bool displayMorePageLink = elementSettings.MoreMessage != null && pageId != pageListPageId;
+            if (displayMorePageLink)
+                morePageLink = await GetPageListPageLinkAsync(tenantId, pageListPageId);
 
             PageListResult result = await _pageService.ListPagesAsync(tenantId, pageListPageId, elementSettings.Recursive, elementSettings.PageType, tagIds, elementSettings.SortBy, elementSettings.SortAsc, pageIndex, elementSettings.PageSize);
 
@@ -165,15 +185,11 @@ namespace Riverside.Cms.Services.Element.Domain
             {
                 TenantId = elementSettings.TenantId,
                 ElementId = elementSettings.ElementId,
-                ElementTypeId = elementSettings.ElementTypeId,
-                CurrentPageId = pageId,
-                CurrentPageName = currentPage.Name,
-                CurrentPageHome = !currentPage.ParentPageId.HasValue,
-                PageListPageId = pageListPageId,
-                PageListPageName = pageListPage.Name,
-                PageListPageHome = !pageListPage.ParentPageId.HasValue,
+                ElementTypeId = elementSettings.ElementTypeId, 
+                CurrentPage = currentPageLink,
+                MorePage = morePageLink,
                 DisplayName = GetContentDisplayName(elementSettings.DisplayName, tags),
-                MoreMessage = elementSettings.MoreMessage != null && pageId != pageListPageId ? elementSettings.MoreMessage : null,
+                MoreMessage = displayMorePageLink ? elementSettings.MoreMessage : null,
                 NoPagesMessage = elementSettings.NoPagesMessage != null && !result.Pages.Any() ? elementSettings.NoPagesMessage : null,
                 Pages = result.Pages.Select(p => new PageListPage
                 {
