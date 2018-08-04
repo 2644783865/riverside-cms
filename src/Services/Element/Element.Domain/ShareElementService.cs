@@ -51,7 +51,7 @@ namespace Riverside.Cms.Services.Element.Domain
             return _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
         }
 
-        public async Task<ShareElementContent> ReadElementContentAsync(long tenantId, long elementId, long pageId)
+        public async Task<ShareElementContent> ReadElementContentAsync(long tenantId, long elementId, long pageId, IEnumerable<long> tagIds)
         {
             ShareElementSettings elementSettings = await _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
 

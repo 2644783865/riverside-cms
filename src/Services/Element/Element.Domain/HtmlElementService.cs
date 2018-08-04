@@ -38,7 +38,7 @@ namespace Riverside.Cms.Services.Element.Domain
             return html.Replace("%YEAR%", DateTime.UtcNow.Year.ToString());
         }
 
-        public async Task<HtmlElementContent> ReadElementContentAsync(long tenantId, long elementId, long pageId)
+        public async Task<HtmlElementContent> ReadElementContentAsync(long tenantId, long elementId, long pageId, IEnumerable<long> tagIds)
         {
             HtmlElementSettings elementSettings = await _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
             return new HtmlElementContent

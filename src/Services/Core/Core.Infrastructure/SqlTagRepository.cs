@@ -63,5 +63,28 @@ namespace Riverside.Cms.Services.Core.Infrastructure
                 );
             }
         }
+
+        public async Task<IEnumerable<Tag>> ListTagsAsync(long tenantId, IEnumerable<string> tagNames)
+        {
+            using (SqlConnection connection = new SqlConnection(_options.Value.SqlConnectionString))
+            {
+                connection.Open();
+                return await connection.QueryAsync<Tag>(@"
+                    SELECT
+                        cms.Tag.TagId,
+                        cms.Tag.Name
+                    FROM
+                        cms.Tag
+                    WHERE
+                        TenantId = @TenantId AND
+                        Name IN @TagNames",
+                    new
+                    {
+                        TenantId = tenantId,
+                        TagNames = tagNames
+                    }
+                );
+            }
+        }
     }
 }

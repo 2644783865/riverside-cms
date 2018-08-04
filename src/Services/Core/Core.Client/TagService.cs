@@ -51,5 +51,23 @@ namespace Riverside.Cms.Services.Core.Client
                 throw new CoreClientException("Core API failed", ex);
             }
         }
+
+        public async Task<IEnumerable<Tag>> ListTagsAsync(long tenantId, IEnumerable<string> tagNames)
+        {
+            try
+            {
+                string uri = $"{_options.Value.CoreApiBaseUrl}tenants/{tenantId}/tags" +
+                    (tagNames != null && tagNames.Count() > 0 ? $"?&tagnames={string.Join(",", tagNames)}" : string.Empty);
+                using (HttpClient httpClient = new HttpClient())
+                {
+                    string json = await httpClient.GetStringAsync(uri);
+                    return JsonConvert.DeserializeObject<IEnumerable<Tag>>(json);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new CoreClientException("Core API failed", ex);
+            }
+        }
     }
 }

@@ -152,7 +152,7 @@ namespace Riverside.Cms.Services.Element.Domain
             };
         }
 
-        private async Task<PageListElementContent> ReadElementContentAsync(long tenantId, long elementId, long pageId, IEnumerable<long> tagIds)
+        public async Task<PageListElementContent> ReadElementContentAsync(long tenantId, long elementId, long pageId, IEnumerable<long> tagIds)
         {
             PageListElementSettings elementSettings = await _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
 
@@ -211,11 +211,6 @@ namespace Riverside.Cms.Services.Element.Domain
             };
 
             return elementContent;
-        }
-
-        public Task<PageListElementContent> ReadElementContentAsync(long tenantId, long elementId, long pageId)
-        {
-            return ReadElementContentAsync(tenantId, elementId, pageId, null);
         }
     }
 }

@@ -89,7 +89,7 @@ namespace Riverside.Cms.Services.Element.Domain
             return tabs;
         }
 
-        public async Task<NavigationBarElementContent> ReadElementContentAsync(long tenantId, long elementId, long pageId)
+        public async Task<NavigationBarElementContent> ReadElementContentAsync(long tenantId, long elementId, long pageId, IEnumerable<long> tagIds)
         {
             NavigationBarElementSettings elementSettings = await _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
 

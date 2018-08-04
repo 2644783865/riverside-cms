@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
@@ -69,7 +70,7 @@ namespace Riverside.Cms.Services.Element.Client
             }
         }
 
-        public async Task<ElementContent> ReadElementContentAsync(long tenantId, long elementId, long pageId)
+        public async Task<ElementContent> ReadElementContentAsync(long tenantId, long elementId, long pageId, IEnumerable<long> tagIds)
         {
             try
             {

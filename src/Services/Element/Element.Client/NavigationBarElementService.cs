@@ -66,7 +66,7 @@ namespace Riverside.Cms.Services.Element.Client
             }
         }
 
-        public async Task<NavigationBarElementContent> ReadElementContentAsync(long tenantId, long elementId, long pageId)
+        public async Task<NavigationBarElementContent> ReadElementContentAsync(long tenantId, long elementId, long pageId, IEnumerable<long> tagIds)
         {
             try
             {

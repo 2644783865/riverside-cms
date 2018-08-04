@@ -27,6 +27,7 @@ namespace RiversideCms.Mvc
             // Core services
             services.AddTransient<IPageService, PageService>();
             services.AddTransient<IPageViewService, PageViewService>();
+            services.AddTransient<ITagService, TagService>();
 
             // Element services
             services.AddTransient<ICodeSnippetElementService, CodeSnippetElementService>();

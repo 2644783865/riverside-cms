@@ -16,19 +16,21 @@ namespace RiversideCms.Mvc.Controllers
         private readonly IElementServiceFactory _elementServiceFactory;
         private readonly IPageService _pageService;
         private readonly IPageViewService _pageViewService;
+        private readonly ITagService _tagService;
 
         private const long TenantId = 6;
 
-        public PagesController(IElementServiceFactory elementServiceFactory, IPageService pageService, IPageViewService pageViewService)
+        public PagesController(IElementServiceFactory elementServiceFactory, IPageService pageService, IPageViewService pageViewService, ITagService tagService)
         {
             _elementServiceFactory = elementServiceFactory;
             _pageService = pageService;
             _pageViewService = pageViewService;
+            _tagService = tagService;
         }
 
-        private async Task<ElementRender> GetElementRender(long tenantId, Guid elementTypeId, long elementId, long pageId)
+        private async Task<ElementRender> GetElementRender(long tenantId, Guid elementTypeId, long elementId, long pageId, IEnumerable<long> tagIds)
         {
-            IElementView elementView = await _elementServiceFactory.GetElementViewAsync(tenantId, elementTypeId, elementId, pageId);
+            IElementView elementView = await _elementServiceFactory.GetElementViewAsync(tenantId, elementTypeId, elementId, pageId, tagIds);
             if (elementView == null)
                 return new ElementRender { PartialViewName = "~/Views/Elements/NotFound.cshtml" };
 
@@ -39,10 +41,21 @@ namespace RiversideCms.Mvc.Controllers
             };
         }
 
+        private async Task<IEnumerable<long>> GetTagIds(long tenantId, string tagNames)
+        {
+            if (string.IsNullOrWhiteSpace(tagNames))
+                return null;
+            IEnumerable<string> tagNameCollection = tagNames.Split(",").Select(t => t.Trim()).Distinct().Where(t => t != string.Empty);
+            IEnumerable<Tag> tags = await _tagService.ListTagsAsync(tenantId, tagNameCollection);
+            return tags.Select(t => t.TagId);
+        }
+
         [HttpGet]
-        public async Task<IActionResult> Read(long pageId)
+        public async Task<IActionResult> Read(long pageId, string tags)
         {
             long tenantId = TenantId;
+
+            IEnumerable<long> tagIds = await GetTagIds(tenantId, tags);
 
             PageView pageView = await _pageViewService.ReadPageViewAsync(tenantId, pageId);
             pageView.PageViewZones = await _pageViewService.SearchPageViewZonesAsync(tenantId, pageId);
@@ -55,7 +68,7 @@ namespace RiversideCms.Mvc.Controllers
                 foreach (PageViewZoneElement pageViewZoneElement in pageViewZone.PageViewZoneElements)
                 {
                     if (!elements.ContainsKey(pageViewZoneElement.ElementId))
-                        elements.Add(pageViewZoneElement.ElementId, await GetElementRender(tenantId, pageViewZoneElement.ElementTypeId, pageViewZoneElement.ElementId, pageId));
+                        elements.Add(pageViewZoneElement.ElementId, await GetElementRender(tenantId, pageViewZoneElement.ElementTypeId, pageViewZoneElement.ElementId, pageId, tagIds));
                 }
             }
 

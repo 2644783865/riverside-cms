@@ -50,7 +50,7 @@ namespace Riverside.Cms.Services.Element.Client
             }
         }
 
-        public async Task<FooterElementContent> ReadElementContentAsync(long tenantId, long elementId, long pageId)
+        public async Task<FooterElementContent> ReadElementContentAsync(long tenantId, long elementId, long pageId, IEnumerable<long> tagIds)
         {
             try
             {

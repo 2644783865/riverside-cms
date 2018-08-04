@@ -9,5 +9,6 @@ namespace Riverside.Cms.Services.Core.Client
     {
         Task<Tag> ReadTagAsync(long tenantId, long tagId);
         Task<IEnumerable<Tag>> ListTagsAsync(long tenantId, IEnumerable<long> tagIds);
+        Task<IEnumerable<Tag>> ListTagsAsync(long tenantId, IEnumerable<string> tagNames);
     }
 }

@@ -7,6 +7,6 @@ namespace Riverside.Cms.Services.Element.Client
 {
     public interface IElementContentService<T> where T : IElementContent
     {
-        Task<T> ReadElementContentAsync(long tenantId, long elementId, long pageId);
+        Task<T> ReadElementContentAsync(long tenantId, long elementId, long pageId, IEnumerable<long> tagIds);
     }
 }

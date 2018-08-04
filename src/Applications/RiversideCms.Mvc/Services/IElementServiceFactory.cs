@@ -9,6 +9,6 @@ namespace RiversideCms.Mvc.Services
 {
     public interface IElementServiceFactory
     {
-        Task<IElementView> GetElementViewAsync(long tenantId, Guid elementTypeId, long elementId, long pageId);
+        Task<IElementView> GetElementViewAsync(long tenantId, Guid elementTypeId, long elementId, long pageId, IEnumerable<long> tagIds);
     }
 }
