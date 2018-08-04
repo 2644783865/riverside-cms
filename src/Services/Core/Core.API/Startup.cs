@@ -31,8 +31,10 @@ namespace Core.API
             services.AddTransient<IPageService, PageService>();
             services.AddTransient<IPageViewService, PageViewService>();
             services.AddTransient<IMasterPageService, MasterPageService>();
+            services.AddTransient<ITagService, TagService>();
             services.AddTransient<IPageRepository, SqlPageRepository>();
             services.AddTransient<IMasterPageRepository, SqlMasterPageRepository>();
+            services.AddTransient<ITagRepository, SqlTagRepository>();
         }
 
         private void ConfigureOptionServices(IServiceCollection services)

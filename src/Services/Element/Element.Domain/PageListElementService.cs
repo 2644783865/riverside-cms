@@ -89,12 +89,14 @@ namespace Riverside.Cms.Services.Element.Domain
         private readonly IElementRepository<PageListElementSettings> _elementRepository;
         private readonly IPageService _pageService;
         private readonly IStorageService _storageService;
+        private readonly ITagService _tagService;
 
-        public PageListElementService(IElementRepository<PageListElementSettings> elementRepository, IPageService pageService, IStorageService storageService)
+        public PageListElementService(IElementRepository<PageListElementSettings> elementRepository, IPageService pageService, IStorageService storageService, ITagService tagService)
         {
             _elementRepository = elementRepository;
             _pageService = pageService;
             _storageService = storageService;
+            _tagService = tagService;
         }
 
         public Task<PageListElementSettings> ReadElementSettingsAsync(long tenantId, long elementId)
@@ -150,14 +152,14 @@ namespace Riverside.Cms.Services.Element.Domain
             };
         }
 
-        public async Task<PageListElementContent> ReadElementContentAsync(long tenantId, long elementId, long pageId)
+        private async Task<PageListElementContent> ReadElementContentAsync(long tenantId, long elementId, long pageId, IEnumerable<long> tagIds)
         {
             PageListElementSettings elementSettings = await _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
 
             int pageIndex = 0;
-            IEnumerable<Tag> tags = new[] { new Tag { Name = "bmw", TagId = 400 } };
-            tags = new List<Tag>();
-            IEnumerable<long> tagIds = tags.Select(t => t.TagId);
+            IEnumerable<Tag> tags = null;
+            if (tagIds != null)
+                tags = await _tagService.ListTagsAsync(tenantId, tagIds);
 
             PageListPageLink currentPageLink = null;
             if (elementSettings.ShowTags)
@@ -209,6 +211,11 @@ namespace Riverside.Cms.Services.Element.Domain
             };
 
             return elementContent;
+        }
+
+        public Task<PageListElementContent> ReadElementContentAsync(long tenantId, long elementId, long pageId)
+        {
+            return ReadElementContentAsync(tenantId, elementId, pageId, null);
         }
     }
 }

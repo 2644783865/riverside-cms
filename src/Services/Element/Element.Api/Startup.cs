@@ -28,8 +28,8 @@ namespace Element.Api
         private void ConfigureDependencyInjectionServices(IServiceCollection services)
         {
             services.AddTransient<IPageService, PageService>();
-
             services.AddTransient<IStorageService, StorageService>();
+            services.AddTransient<ITagService, TagService>();
 
             services.AddTransient<ICodeSnippetElementService, CodeSnippetElementService>();
             services.AddTransient<IFooterElementService, FooterElementService>();
