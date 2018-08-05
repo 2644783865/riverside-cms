@@ -186,7 +186,7 @@ namespace Element.Api.Controllers
         public async Task<IActionResult> ReadPageListElementContent(long tenantId, long elementId, [FromQuery]long pageId, [FromQuery]string tagIds, [FromQuery]string page)
         {
             IEnumerable<long> tagIdCollection = !string.IsNullOrWhiteSpace(tagIds) ? tagIds.Split(",").Select(long.Parse) : null;
-            IDictionary<string, string> parameters = new Dictionary<string, string> { { "page", page } };
+            IDictionary<string, string> parameters = page != null ? new Dictionary<string, string> { { "page", page } } : null;
             PageContext context = new PageContext { PageId = pageId, Parameters = parameters, TagIds = tagIdCollection };
             PageListElementContent elementContent = await _pageListElementService.ReadElementContentAsync(tenantId, elementId, context);
             if (elementContent == null)

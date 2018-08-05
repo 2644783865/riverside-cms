@@ -157,7 +157,7 @@ namespace Riverside.Cms.Services.Element.Domain
             PageListElementSettings elementSettings = await _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
 
             int pageIndex = 1;
-            if (context.Parameters.ContainsKey("page"))
+            if (context.Parameters != null && context.Parameters.ContainsKey("page"))
                 Int32.TryParse(context.Parameters["page"], out pageIndex);
             pageIndex = pageIndex - 1;
 

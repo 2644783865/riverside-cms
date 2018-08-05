@@ -25,5 +25,13 @@ namespace RiversideCms.Mvc.Extensions
             else
                 return htmlHelper.RouteLink(linkText, "Page", new { pageId = pageId, description = UrlUtils.UrlFriendly(pageName) });
         }
+
+        public static IHtmlContent PageTaggedLink(this IHtmlHelper htmlHelper, string linkText, long pageId, string pageName, bool home, string tag)
+        {
+            if (home)
+                return htmlHelper.RouteLink(linkText, "HomeTagged", new { tags = tag });
+            else
+                return htmlHelper.RouteLink(linkText, "PageTagged", new { pageId = pageId, description = UrlUtils.UrlFriendly(pageName), tags = tag });
+        }
     }
 }
