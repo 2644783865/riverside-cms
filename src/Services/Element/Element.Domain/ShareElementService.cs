@@ -51,7 +51,7 @@ namespace Riverside.Cms.Services.Element.Domain
             return _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
         }
 
-        public async Task<ShareElementContent> ReadElementContentAsync(long tenantId, long elementId, long pageId, IEnumerable<long> tagIds)
+        public async Task<ShareElementContent> ReadElementContentAsync(long tenantId, long elementId, PageContext context)
         {
             ShareElementSettings elementSettings = await _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
 
@@ -62,7 +62,7 @@ namespace Riverside.Cms.Services.Element.Domain
                 ElementTypeId = elementSettings.ElementTypeId
             };
 
-            Page page = await _pageService.ReadPageAsync(tenantId, pageId);
+            Page page = await _pageService.ReadPageAsync(tenantId, context.PageId);
 
             elementContent.Description = page.Description ?? string.Empty;
             elementContent.Hashtags = string.Empty;

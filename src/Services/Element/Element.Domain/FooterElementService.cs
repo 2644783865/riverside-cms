@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Riverside.Cms.Services.Core.Client;
 
 namespace Riverside.Cms.Services.Element.Domain
 {
@@ -42,7 +43,7 @@ namespace Riverside.Cms.Services.Element.Domain
             return message.Replace("%YEAR%", DateTime.UtcNow.Year.ToString());
         }
 
-        public async Task<FooterElementContent> ReadElementContentAsync(long tenantId, long elementId, long pageId, IEnumerable<long> tagIds)
+        public async Task<FooterElementContent> ReadElementContentAsync(long tenantId, long elementId, PageContext context)
         {
             FooterElementSettings elementSettings = await _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
             return new FooterElementContent

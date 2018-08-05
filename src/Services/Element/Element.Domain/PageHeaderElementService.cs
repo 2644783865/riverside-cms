@@ -72,11 +72,11 @@ namespace Riverside.Cms.Services.Element.Domain
             return _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
         }
 
-        public async Task<PageHeaderElementContent> ReadElementContentAsync(long tenantId, long elementId, long pageId, IEnumerable<long> tagIds)
+        public async Task<PageHeaderElementContent> ReadElementContentAsync(long tenantId, long elementId, PageContext context)
         {
             PageHeaderElementSettings elementSettings = await _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
 
-            Page page = await _pageService.ReadPageAsync(tenantId, pageId);
+            Page page = await _pageService.ReadPageAsync(tenantId, context.PageId);
 
             PageHeaderElementContent elementContent = new PageHeaderElementContent
             {
@@ -106,7 +106,7 @@ namespace Riverside.Cms.Services.Element.Domain
 
             if (elementSettings.ShowBreadcrumbs)
             {
-                IEnumerable<Page> pages = await _pageService.ListPagesInHierarchyAsync(tenantId, pageId);
+                IEnumerable<Page> pages = await _pageService.ListPagesInHierarchyAsync(tenantId, context.PageId);
                 elementContent.Breadcrumbs = pages.Reverse().Select(p => new PageHeaderBreadcrumb
                 {
                     Home = p.ParentPageId == null,

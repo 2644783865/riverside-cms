@@ -117,7 +117,8 @@ namespace Riverside.Cms.Services.Element.Client
             try
             {
                 string uri = $"{_options.Value.ElementApiBaseUrl}tenants/{tenantId}/elementtypes/61f55535-9f3e-4ef5-96a2-bc84d648842a/elements/{elementId}/content?pageid={context.PageId}" +
-                    (context.TagIds != null && context.TagIds.Count() > 0 ? $"&tagids={string.Join(",", context.TagIds)}" : string.Empty);
+                    (context.TagIds != null && context.TagIds.Count() > 0 ? $"&tagids={string.Join(",", context.TagIds)}" : string.Empty) +
+                    (context.Parameters.ContainsKey("page") ? $"&page={context.Parameters["page"]}" : string.Empty);
                 using (HttpClient httpClient = new HttpClient())
                 {
                     string json = await httpClient.GetStringAsync(uri);

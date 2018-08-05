@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Riverside.Cms.Services.Core.Client;
 
 namespace Riverside.Cms.Services.Element.Domain
 {
@@ -56,7 +57,7 @@ namespace Riverside.Cms.Services.Element.Domain
             return _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
         }
 
-        public async Task<ElementContent> ReadElementContentAsync(long tenantId, long elementId, long pageId, IEnumerable<long> tagIds)
+        public async Task<ElementContent> ReadElementContentAsync(long tenantId, long elementId, PageContext context)
         {
             CodeSnippetElementSettings elementSettings = await _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
             return new ElementContent

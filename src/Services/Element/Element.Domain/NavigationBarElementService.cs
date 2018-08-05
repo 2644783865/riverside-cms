@@ -89,7 +89,7 @@ namespace Riverside.Cms.Services.Element.Domain
             return tabs;
         }
 
-        public async Task<NavigationBarElementContent> ReadElementContentAsync(long tenantId, long elementId, long pageId, IEnumerable<long> tagIds)
+        public async Task<NavigationBarElementContent> ReadElementContentAsync(long tenantId, long elementId, PageContext context)
         {
             NavigationBarElementSettings elementSettings = await _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
 
@@ -98,7 +98,7 @@ namespace Riverside.Cms.Services.Element.Domain
                 TenantId = tenantId,
                 ElementId = elementId,
                 ElementTypeId = elementSettings.ElementTypeId,
-                Tabs = await GetContentTabs(elementSettings, pageId)
+                Tabs = await GetContentTabs(elementSettings, context.PageId)
             };
         }
     }

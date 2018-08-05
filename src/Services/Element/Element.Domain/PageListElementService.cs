@@ -152,26 +152,30 @@ namespace Riverside.Cms.Services.Element.Domain
             };
         }
 
-        public async Task<PageListElementContent> ReadElementContentAsync(long tenantId, long elementId, long pageId, IEnumerable<long> tagIds)
+        public async Task<PageListElementContent> ReadElementContentAsync(long tenantId, long elementId, PageContext context)
         {
             PageListElementSettings elementSettings = await _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
 
-            int pageIndex = 0;
+            int pageIndex = 1;
+            if (context.Parameters.ContainsKey("page"))
+                Int32.TryParse(context.Parameters["page"], out pageIndex);
+            pageIndex = pageIndex - 1;
+
             IEnumerable<Tag> tags = null;
-            if (tagIds != null)
-                tags = await _tagService.ListTagsAsync(tenantId, tagIds);
+            if (context.TagIds != null)
+                tags = await _tagService.ListTagsAsync(tenantId, context.TagIds);
 
             PageListPageLink currentPageLink = null;
             if (elementSettings.ShowTags)
-                currentPageLink = await GetPageListPageLinkAsync(tenantId, pageId);
+                currentPageLink = await GetPageListPageLinkAsync(tenantId, context.PageId);
 
             PageListPageLink morePageLink = null;
-            long pageListPageId = elementSettings.PageId ?? pageId;
-            bool displayMorePageLink = elementSettings.MoreMessage != null && pageId != pageListPageId;
+            long pageListPageId = elementSettings.PageId ?? context.PageId;
+            bool displayMorePageLink = elementSettings.MoreMessage != null && context.PageId != pageListPageId;
             if (displayMorePageLink)
                 morePageLink = await GetPageListPageLinkAsync(tenantId, pageListPageId);
 
-            PageListResult result = await _pageService.ListPagesAsync(tenantId, pageListPageId, elementSettings.Recursive, elementSettings.PageType, tagIds, elementSettings.SortBy, elementSettings.SortAsc, pageIndex, elementSettings.PageSize);
+            PageListResult result = await _pageService.ListPagesAsync(tenantId, pageListPageId, elementSettings.Recursive, elementSettings.PageType, context.TagIds, elementSettings.SortBy, elementSettings.SortAsc, pageIndex, elementSettings.PageSize);
 
             Dictionary<long, BlobImage> imagesById = new Dictionary<long, BlobImage>();
             if (elementSettings.ShowImage || elementSettings.ShowBackgroundImage)
