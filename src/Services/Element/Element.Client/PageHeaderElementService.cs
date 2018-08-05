@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using Riverside.Cms.Services.Core.Client;
 
 namespace Riverside.Cms.Services.Element.Client
 {
@@ -79,11 +80,11 @@ namespace Riverside.Cms.Services.Element.Client
             }
         }
 
-        public async Task<PageHeaderElementContent> ReadElementContentAsync(long tenantId, long elementId, long pageId, IEnumerable<long> tagIds)
+        public async Task<PageHeaderElementContent> ReadElementContentAsync(long tenantId, long elementId, PageContext context)
         {
             try
             {
-                string uri = $"{_options.Value.ElementApiBaseUrl}tenants/{tenantId}/elementtypes/1cbac30c-5deb-404e-8ea8-aabc20c82aa8/elements/{elementId}/content?pageid={pageId}";
+                string uri = $"{_options.Value.ElementApiBaseUrl}tenants/{tenantId}/elementtypes/1cbac30c-5deb-404e-8ea8-aabc20c82aa8/elements/{elementId}/content?pageid={context.PageId}";
                 using (HttpClient httpClient = new HttpClient())
                 {
                     string json = await httpClient.GetStringAsync(uri);

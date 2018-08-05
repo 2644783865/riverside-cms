@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
 using Riverside.Cms.Services.Core.Client;
 using Riverside.Cms.Services.Element.Client;
 using Riverside.Cms.Services.Storage.Client;
@@ -28,9 +29,9 @@ namespace RiversideCms.Mvc.Controllers
             _tagService = tagService;
         }
 
-        private async Task<ElementRender> GetElementRender(long tenantId, Guid elementTypeId, long elementId, long pageId, IEnumerable<long> tagIds)
+        private async Task<ElementRender> GetElementRender(long tenantId, Guid elementTypeId, long elementId, PageContext context)
         {
-            IElementView elementView = await _elementServiceFactory.GetElementViewAsync(tenantId, elementTypeId, elementId, pageId, tagIds);
+            IElementView elementView = await _elementServiceFactory.GetElementViewAsync(tenantId, elementTypeId, elementId, context);
             if (elementView == null)
                 return new ElementRender { PartialViewName = "~/Views/Elements/NotFound.cshtml" };
 
@@ -50,12 +51,22 @@ namespace RiversideCms.Mvc.Controllers
             return tags.Select(t => t.TagId);
         }
 
+        private async Task<PageContext> GetPageContext(long tenantId, long pageId, string tags)
+        {
+            return new PageContext
+            {
+                PageId = pageId,
+                Parameters = HttpContext.Request.Query.ToDictionary(q => q.Key, q => q.Value.First()),
+                TagIds = await GetTagIds(tenantId, tags)
+            };
+        }
+
         [HttpGet]
         public async Task<IActionResult> ReadTagged(long pageId, string tags)
         {
             long tenantId = TenantId;
 
-            IEnumerable<long> tagIds = await GetTagIds(tenantId, tags);
+            PageContext context = await GetPageContext(tenantId, pageId, tags);
 
             PageView pageView = await _pageViewService.ReadPageViewAsync(tenantId, pageId);
             pageView.PageViewZones = await _pageViewService.SearchPageViewZonesAsync(tenantId, pageId);
@@ -68,7 +79,7 @@ namespace RiversideCms.Mvc.Controllers
                 foreach (PageViewZoneElement pageViewZoneElement in pageViewZone.PageViewZoneElements)
                 {
                     if (!elements.ContainsKey(pageViewZoneElement.ElementId))
-                        elements.Add(pageViewZoneElement.ElementId, await GetElementRender(tenantId, pageViewZoneElement.ElementTypeId, pageViewZoneElement.ElementId, pageId, tagIds));
+                        elements.Add(pageViewZoneElement.ElementId, await GetElementRender(tenantId, pageViewZoneElement.ElementTypeId, pageViewZoneElement.ElementId, context));
                 }
             }
 
