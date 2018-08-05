@@ -39,7 +39,7 @@ namespace Riverside.Cms.Services.Core.Client
             try
             {
                 string uri = $"{_options.Value.CoreApiBaseUrl}tenants/{tenantId}/tags" +
-                    (tagIds != null && tagIds.Count() > 0 ? $"?&tagids={string.Join(",", tagIds)}" : string.Empty);
+                    (tagIds != null && tagIds.Count() > 0 ? $"?tagids={string.Join(",", tagIds)}" : string.Empty);
                 using (HttpClient httpClient = new HttpClient())
                 {
                     string json = await httpClient.GetStringAsync(uri);
@@ -57,7 +57,7 @@ namespace Riverside.Cms.Services.Core.Client
             try
             {
                 string uri = $"{_options.Value.CoreApiBaseUrl}tenants/{tenantId}/tags" +
-                    (tagNames != null && tagNames.Count() > 0 ? $"?&tagnames={string.Join(",", tagNames)}" : string.Empty);
+                    (tagNames != null && tagNames.Count() > 0 ? $"?tagnames={string.Join(",", tagNames)}" : string.Empty);
                 using (HttpClient httpClient = new HttpClient())
                 {
                     string json = await httpClient.GetStringAsync(uri);

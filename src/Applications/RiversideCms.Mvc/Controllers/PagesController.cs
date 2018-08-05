@@ -45,13 +45,13 @@ namespace RiversideCms.Mvc.Controllers
         {
             if (string.IsNullOrWhiteSpace(tagNames))
                 return null;
-            IEnumerable<string> tagNameCollection = tagNames.Split(",").Select(t => t.Trim()).Distinct().Where(t => t != string.Empty);
+            IEnumerable<string> tagNameCollection = tagNames.Split("+").Select(t => t.Trim()).Distinct().Where(t => t != string.Empty);
             IEnumerable<Tag> tags = await _tagService.ListTagsAsync(tenantId, tagNameCollection);
             return tags.Select(t => t.TagId);
         }
 
         [HttpGet]
-        public async Task<IActionResult> Read(long pageId, string tags)
+        public async Task<IActionResult> ReadTagged(long pageId, string tags)
         {
             long tenantId = TenantId;
 
@@ -79,6 +79,12 @@ namespace RiversideCms.Mvc.Controllers
             };
 
             return View("Read", pageRender);
+        }
+
+        [HttpGet]
+        public Task<IActionResult> Read(long pageId)
+        {
+            return ReadTagged(pageId, null);
         }
 
         [HttpGet]
