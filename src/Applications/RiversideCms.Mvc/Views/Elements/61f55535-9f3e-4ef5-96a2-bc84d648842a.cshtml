@@ -40,7 +40,7 @@
                 }
                 @if (pageListPage.Image != null)
                 {
-                    <a href="@Url.PageUrl(pageListPage.PageId, pageListPage.Name, pageListPage.Home)">
+                    <a href="@Url.PageUrl(pageListPage.PageId, pageListPage.Name, pageListPage.Home, null, null)">
                         <div class="media-object">
                             <img 
                                  src="@Url.RouteUrl("PageImage", new { pageid = pageListPage.Image.PageId, pageImageType = "thumbnail", description = Url.UrlFriendly(pageListPage.Name), t = pageListPage.Image.BlobId})" alt="@pageListPage.Name"
@@ -101,14 +101,14 @@
                 </div>
                 <div class="pager-pagination">
                     <ul class="pagination">
-                        <li @if (Model.Content.Pager.PageIndex == 0) {<text>class="disabled"</text>}><a href="@Url.PageTaggedUrl(Model.Content.CurrentPage.PageId, Model.Content.CurrentPage.Name, Model.Content.CurrentPage.Home, tagNames, null)"><i class="fa fa-fw fa-angle-double-left"></i> <span class="pager-button-label">First</span></a></li>
-                        <li @if (Model.Content.Pager.PageIndex == 0) {<text>class="disabled"</text>}><a href="@Url.PageTaggedUrl(Model.Content.CurrentPage.PageId, Model.Content.CurrentPage.Name, Model.Content.CurrentPage.Home, tagNames, Model.Content.Pager.PageIndex > 1 ? new { page = Model.Content.Pager.PageIndex } : null)"><i class="fa fa-fw fa-angle-left"></i> <span class="pager-button-label">Previous</span></a></li>
+                        <li @if (Model.Content.Pager.PageIndex == 0) {<text>class="disabled"</text>}><a href="@Url.PageUrl(Model.Content.CurrentPage.PageId, Model.Content.CurrentPage.Name, Model.Content.CurrentPage.Home, tagNames, null)"><i class="fa fa-fw fa-angle-double-left"></i> <span class="pager-button-label">First</span></a></li>
+                        <li @if (Model.Content.Pager.PageIndex == 0) {<text>class="disabled"</text>}><a href="@Url.PageUrl(Model.Content.CurrentPage.PageId, Model.Content.CurrentPage.Name, Model.Content.CurrentPage.Home, tagNames, Model.Content.Pager.PageIndex > 1 ? new { page = Model.Content.Pager.PageIndex } : null)"><i class="fa fa-fw fa-angle-left"></i> <span class="pager-button-label">Previous</span></a></li>
                         @for (int pageIndex = beginPageIndex; pageIndex <= endPageIndex; pageIndex++)
                         {
-                            <li @if (Model.Content.Pager.PageIndex == pageIndex) {<text>class="active"</text>}><a href="@Url.PageTaggedUrl(Model.Content.CurrentPage.PageId, Model.Content.CurrentPage.Name, Model.Content.CurrentPage.Home, tagNames, pageIndex != 0 ? new { page = pageIndex + 1 } : null)">@(pageIndex + 1)@if (Model.Content.Pager.PageIndex == pageIndex) {<text> <span class="sr-only">(current)</span></text>}</a></li>
+                            <li @if (Model.Content.Pager.PageIndex == pageIndex) {<text>class="active"</text>}><a href="@Url.PageUrl(Model.Content.CurrentPage.PageId, Model.Content.CurrentPage.Name, Model.Content.CurrentPage.Home, tagNames, pageIndex != 0 ? new { page = pageIndex + 1 } : null)">@(pageIndex + 1)@if (Model.Content.Pager.PageIndex == pageIndex) {<text> <span class="sr-only">(current)</span></text>}</a></li>
                         }
-                        <li @if (Model.Content.Pager.PageIndex == Model.Content.Pager.PageCount - 1) {<text>class="disabled"</text>}><a href="@Url.PageTaggedUrl(Model.Content.CurrentPage.PageId, Model.Content.CurrentPage.Name, Model.Content.CurrentPage.Home, tagNames, new { page = Math.Min(Model.Content.Pager.PageIndex + 2, Model.Content.Pager.PageCount) })"><i class="fa fa-fw fa-angle-right"></i> <span class="pager-button-label">Next</span></a></li>
-                        <li @if (Model.Content.Pager.PageIndex == Model.Content.Pager.PageCount - 1) {<text>class="disabled"</text>}><a href="@Url.PageTaggedUrl(Model.Content.CurrentPage.PageId, Model.Content.CurrentPage.Name, Model.Content.CurrentPage.Home, tagNames, new { page = Model.Content.Pager.PageCount })"><i class="fa fa-fw fa-angle-double-right"></i> <span class="pager-button-label">Last</span></a></li>
+                        <li @if (Model.Content.Pager.PageIndex == Model.Content.Pager.PageCount - 1) {<text>class="disabled"</text>}><a href="@Url.PageUrl(Model.Content.CurrentPage.PageId, Model.Content.CurrentPage.Name, Model.Content.CurrentPage.Home, tagNames, new { page = Math.Min(Model.Content.Pager.PageIndex + 2, Model.Content.Pager.PageCount) })"><i class="fa fa-fw fa-angle-right"></i> <span class="pager-button-label">Next</span></a></li>
+                        <li @if (Model.Content.Pager.PageIndex == Model.Content.Pager.PageCount - 1) {<text>class="disabled"</text>}><a href="@Url.PageUrl(Model.Content.CurrentPage.PageId, Model.Content.CurrentPage.Name, Model.Content.CurrentPage.Home, tagNames, new { page = Model.Content.Pager.PageCount })"><i class="fa fa-fw fa-angle-double-right"></i> <span class="pager-button-label">Last</span></a></li>
                     </ul>
                 </div>
             </div>
