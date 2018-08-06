@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Riverside.Cms.Services.Core.Client;
-using RiversideCms.Mvc.Models;
+using Riverside.Cms.Services.Element.Client;
 
 namespace RiversideCms.Mvc.Services
 {

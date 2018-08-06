@@ -1,7 +1,7 @@
 ﻿@using RiversideCms.Mvc.Extensions
 @using Riverside.Cms.Services.Element.Client
 
-@model ElementView<FooterElementSettings, FooterElementContent>
+@model IElementView<FooterElementSettings, FooterElementContent>
 
 @{ 
     bool userLoggedOn = User.Identity.IsAuthenticated;

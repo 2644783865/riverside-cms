@@ -2,7 +2,7 @@
 @using Riverside.Cms.Services.Core.Client
 @using Riverside.Cms.Services.Element.Client
 
-@model ElementView<NavigationBarElementSettings, NavigationBarElementContent>
+@model IElementView<NavigationBarElementSettings, NavigationBarElementContent>
 
 @{
     bool userLoggedOn = User.Identity.IsAuthenticated;

@@ -1,7 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Http.Extensions
 @using Riverside.Cms.Services.Element.Client
 
-@model ElementView<ShareElementSettings, ShareElementContent>
+@model IElementView<ShareElementSettings, ShareElementContent>
 
 @{
     string url = Context.Request.GetDisplayUrl();

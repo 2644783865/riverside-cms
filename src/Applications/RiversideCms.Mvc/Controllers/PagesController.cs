@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Primitives;
 using Riverside.Cms.Services.Core.Client;
 using Riverside.Cms.Services.Element.Client;
 using Riverside.Cms.Services.Storage.Client;
