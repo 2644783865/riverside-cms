@@ -76,6 +76,7 @@ namespace Riverside.Cms.Services.Element.Client
         public PageListPageLink CurrentPage { get; set; }
         public PageListPageLink MorePage { get; set; }
         public IEnumerable<PageListPage> Pages { get; set; }
+        public IEnumerable<Tag> Tags { get; set; }
         public string DisplayName { get; set; }
         public string MoreMessage { get; set; }
         public string NoPagesMessage { get; set; }

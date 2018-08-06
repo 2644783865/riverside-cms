@@ -74,6 +74,7 @@ namespace Riverside.Cms.Services.Element.Domain
         public PageListPageLink CurrentPage { get; set; }
         public PageListPageLink MorePage { get; set; }
         public IEnumerable<PageListPage> Pages { get; set; }
+        public IEnumerable<Tag> Tags { get; set; }
         public string DisplayName { get; set; }
         public string MoreMessage { get; set; }
         public string NoPagesMessage { get; set; }
@@ -211,7 +212,8 @@ namespace Riverside.Cms.Services.Element.Domain
                     Image = elementSettings.ShowImage ? GetImage(p, imagesById) : null,
                     Tags = elementSettings.ShowTags ? p.Tags : new List<Tag>()
                 }),
-                Pager = GetPager(pageIndex, result, elementSettings)
+                Pager = GetPager(pageIndex, result, elementSettings),
+                Tags = tags
             };
 
             return elementContent;

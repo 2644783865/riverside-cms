@@ -25,11 +25,35 @@ namespace RiversideCms.Mvc.Extensions
             }
             else
             {
-                RouteValueDictionary combinedValues = new RouteValueDictionary(values);
-                combinedValues.Add("pageid", pageId);
-                combinedValues.Add("description", UrlUtils.UrlFriendly(pageName));
-                return urlHelper.RouteUrl("Page", combinedValues);
+                RouteValueDictionary newValues = new RouteValueDictionary(values);
+                newValues.Add("pageid", pageId);
+                newValues.Add("description", UrlUtils.UrlFriendly(pageName));
+                return urlHelper.RouteUrl("Page", newValues);
             }
+        }
+
+        public static string PageTaggedUrl(this IUrlHelper urlHelper, long pageId, string pageName, bool home, IEnumerable<string> tagNames, object values)
+        {
+            RouteValueDictionary newValues = new RouteValueDictionary(values);
+            if (tagNames != null)
+            {
+                string tags = string.Join('+', tagNames);
+                newValues.Add("tags", tags);
+            }
+
+            string url = null;
+            if (home)
+            {
+                url = urlHelper.RouteUrl("HomeTagged", newValues);
+            }
+            else
+            {
+                newValues.Add("pageid", pageId);
+                newValues.Add("description", UrlUtils.UrlFriendly(pageName));
+                url = urlHelper.RouteUrl("PageTagged", newValues);
+            }
+
+            return url.Replace("%2B", "+");
         }
     }
 }
