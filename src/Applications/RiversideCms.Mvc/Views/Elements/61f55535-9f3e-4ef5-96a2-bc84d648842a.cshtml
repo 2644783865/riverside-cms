@@ -33,7 +33,7 @@
                 {
                     @Html.Raw("<div class=\"rcms-page-list-item-content\">")
                 }
-                <h3>@Html.PageLink(pageListPage.Name, pageListPage.PageId, pageListPage.Name, pageListPage.Home)</h3>
+                <h3>@Html.PageLink(pageListPage.Name, pageListPage.PageId, pageListPage.Name, pageListPage.Home, null, null)</h3>
                 @if (pageListPage.Description != null)
                 {
                     @Html.MarkdownToHtml(pageListPage.Description)
@@ -75,7 +75,7 @@
                     <ul class="tags">
                         @foreach (Tag tag in pageListPage.Tags)
                         {
-                            <li class="tag-available">@Html.PageTaggedLink(tag.Name, Model.Content.CurrentPage.PageId, Model.Content.CurrentPage.Name, Model.Content.CurrentPage.Home, tag.Name)</li>
+                            <li class="tag-available">@Html.PageLink(tag.Name, Model.Content.CurrentPage.PageId, Model.Content.CurrentPage.Name, Model.Content.CurrentPage.Home, new[] { tag.Name }, null)</li>
                         }
                     </ul>
                 }
@@ -118,7 +118,7 @@
     @if (Model.Content.MoreMessage != null)
     {
         <div class="rcms-page-list-more">
-            <p>@Html.PageLink(Model.Content.MoreMessage, Model.Content.MorePage.PageId, Model.Content.MorePage.Name, Model.Content.MorePage.Home)</p>
+            <p>@Html.PageLink(Model.Content.MoreMessage, Model.Content.MorePage.PageId, Model.Content.MorePage.Name, Model.Content.MorePage.Home, null, null)</p>
         </div>
     }
 

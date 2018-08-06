@@ -52,7 +52,7 @@
         <ol class="breadcrumb">
             @foreach (PageHeaderBreadcrumb breadcrumb in Model.Content.Breadcrumbs)
             {
-                <li>@Html.PageLink(breadcrumb.Home ? "Home" : breadcrumb.Name, breadcrumb.PageId, breadcrumb.PageName, breadcrumb.Home)</li>
+                <li>@Html.PageLink(breadcrumb.Home ? "Home" : breadcrumb.Name, breadcrumb.PageId, breadcrumb.PageName, breadcrumb.Home, null, null)</li>
             }
         </ol>
     }

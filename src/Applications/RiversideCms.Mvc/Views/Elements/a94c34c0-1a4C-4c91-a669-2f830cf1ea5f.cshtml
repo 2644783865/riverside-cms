@@ -38,7 +38,7 @@
                         <ul class="nav navbar-nav">
                             @foreach (NavigationBarContentTab tab in Model.Content.Tabs)
                             {
-                                <li class="@if (tab.Active) {<text>active</text>}">@Html.PageLink(tab.Name, tab.PageId, tab.PageName, tab.Home)</li>
+                                <li class="@if (tab.Active) {<text>active</text>}">@Html.PageLink(tab.Name, tab.PageId, tab.PageName, tab.Home, null, null)</li>
                             }
                         </ul>
                     }

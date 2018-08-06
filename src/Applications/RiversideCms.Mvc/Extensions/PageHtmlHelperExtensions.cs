@@ -4,34 +4,42 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Riverside.Cms.Services.Core.Client;
+using Microsoft.AspNetCore.Routing;
 
 namespace RiversideCms.Mvc.Extensions
 {
     public static class PageHtmlHelperExtensions
     {
-        public static IHtmlContent PageLink(this IHtmlHelper htmlHelper, Page page)
+        private static void AddTagNames(RouteValueDictionary routeValueDictionary, IEnumerable<string> tagNames)
         {
-            if (page.ParentPageId == null)
-                return htmlHelper.RouteLink(page.Name, "Home");
-            else
-                return htmlHelper.RouteLink(page.Name, "Page", new { pageId = page.PageId, description = UrlUtils.UrlFriendly(page.Name) });
+            if (tagNames != null)
+                routeValueDictionary.Add("tags", string.Join('+', tagNames));
         }
 
-        public static IHtmlContent PageLink(this IHtmlHelper htmlHelper, string linkText, long pageId, string pageName, bool home)
+        private static void AddPageDetails(RouteValueDictionary routeValueDictionary, long pageId, string pageName, bool home)
         {
-            if (home)
-                return htmlHelper.RouteLink(linkText, "Home");
-            else
-                return htmlHelper.RouteLink(linkText, "Page", new { pageId = pageId, description = UrlUtils.UrlFriendly(pageName) });
+            if (!home)
+            {
+                routeValueDictionary.Add("pageid", pageId);
+                routeValueDictionary.Add("description", UrlUtils.UrlFriendly(pageName));
+            }
         }
 
-        public static IHtmlContent PageTaggedLink(this IHtmlHelper htmlHelper, string linkText, long pageId, string pageName, bool home, string tag)
+        private static string GetRouteName(bool home, IEnumerable<string> tagNames)
         {
-            if (home)
-                return htmlHelper.RouteLink(linkText, "HomeTagged", new { tags = tag });
-            else
-                return htmlHelper.RouteLink(linkText, "PageTagged", new { pageId = pageId, description = UrlUtils.UrlFriendly(pageName), tags = tag });
+            string routeName = home ? "Home" : "Page";
+            if (tagNames != null)
+                routeName += "Tagged";
+            return routeName;
+        }
+
+        public static IHtmlContent PageLink(this IHtmlHelper htmlHelper, string linkText, long pageId, string pageName, bool home, IEnumerable<string> tagNames, object values)
+        {
+            RouteValueDictionary routeValueDictionary = new RouteValueDictionary(values);
+            AddTagNames(routeValueDictionary, tagNames);
+            AddPageDetails(routeValueDictionary, pageId, pageName, home);
+            string routeName = GetRouteName(home, tagNames);
+            return htmlHelper.RouteLink(linkText, routeName, routeValueDictionary);
         }
     }
 }
