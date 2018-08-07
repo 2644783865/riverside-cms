@@ -58,9 +58,18 @@ namespace Storage.API.Controllers
         [HttpGet]
         [Route("api/v1/storage/tenants/{tenantId:int}/blobs")]
         [ProducesResponseType(typeof(IEnumerable<Blob>), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> SearchBlobs(long tenantId, [FromQuery]string path)
+        public async Task<IActionResult> ListBlobs(long tenantId, [FromQuery]string blobIds, [FromQuery]string path)
         {
-            IEnumerable<Blob> blobs = await _storageService.SearchBlobsAsync(tenantId, path);
+            IEnumerable<Blob> blobs = null;
+            if (blobIds != null)
+            {
+                IEnumerable<long> blobIdIdCollection = !string.IsNullOrWhiteSpace(blobIds) ? blobIds.Split(",").Select(long.Parse) : null;
+                blobs = await _storageService.ListBlobsAsync(tenantId, blobIdIdCollection);
+            }
+            else
+            {
+                blobs = await _storageService.SearchBlobsAsync(tenantId, path);
+            }
             return Ok(blobs);
         }
 

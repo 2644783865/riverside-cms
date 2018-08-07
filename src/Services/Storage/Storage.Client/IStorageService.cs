@@ -9,5 +9,6 @@ namespace Riverside.Cms.Services.Storage.Client
     {
         Task<Blob> ReadBlobAsync(long tenantId, long blobId);
         Task<BlobContent> ReadBlobContentAsync(long tenantId, long blobId, string path);
+        Task<IEnumerable<Blob>> ListBlobsAsync(long tenantId, IEnumerable<long> blobIds);
     }
 }

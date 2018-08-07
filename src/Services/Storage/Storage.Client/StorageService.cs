@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -58,6 +57,45 @@ namespace Riverside.Cms.Services.Storage.Client
                         Type = response.Content.Headers.ContentType.MediaType,
                         Stream = await response.Content.ReadAsStreamAsync()
                     };
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new StorageClientException("Storage API failed", ex);
+            }
+        }
+
+        private Blob GetBlobFromModel(BlobModel model)
+        {
+            Blob blob = null;
+            if (model == null)
+                return blob;
+            if (model.BlobType == BlobType.Image)
+                blob = new BlobImage { Width = model.Width.Value, Height = model.Height.Value, BlobType = BlobType.Image };
+            else
+                blob = new Blob { BlobType = BlobType.Document };
+            blob.TenantId = model.TenantId;
+            blob.BlobId = model.BlobId;
+            blob.Size = model.Size;
+            blob.ContentType = model.ContentType;
+            blob.Path = model.Path;
+            blob.Name = model.Name;
+            blob.Created = model.Created;
+            blob.Updated = model.Updated;
+            return blob;
+        }
+
+        public async Task<IEnumerable<Blob>> ListBlobsAsync(long tenantId, IEnumerable<long> blobIds)
+        {
+            try
+            {
+                string uri = $"{_options.Value.StorageApiBaseUrl}tenants/{tenantId}/blobs/" +
+                    (blobIds != null && blobIds.Count() > 0 ? $"?blobids={string.Join(",", blobIds)}" : string.Empty);
+                using (HttpClient httpClient = new HttpClient())
+                {
+                    string json = await httpClient.GetStringAsync(uri);
+                    IEnumerable<BlobModel> blobModels = JsonConvert.DeserializeObject<IEnumerable<BlobModel>>(json);
+                    return blobModels.Select(b => GetBlobFromModel(b));
                 }
             }
             catch (Exception ex)

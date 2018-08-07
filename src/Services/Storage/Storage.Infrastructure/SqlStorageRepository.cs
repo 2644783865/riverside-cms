@@ -139,37 +139,44 @@ namespace Riverside.Cms.Services.Storage.Infrastructure
             }
         }
 
+        private string GetSelectBlobSql()
+        {
+            return @"
+                SELECT
+                    cms.Upload.TenantId,
+                    cms.Upload.UploadId AS BlobId,
+                    cms.Upload.Size,
+                    cms.Upload.UploadType AS BlobType,
+                    CASE cms.Upload.UploadType
+                        WHEN 0 THEN 'application/octet-stream'
+                        WHEN 1 THEN 'image/xyz'
+                    END AS ContentType,
+                    cms.Upload.Name,
+                    NULL AS Folder1,
+                    NULL AS Folder2,
+                    NULL AS Folder3,
+                    cms.Image.Width,
+                    cms.Image.Height,
+                    cms.Upload.Created,
+                    cms.Upload.Updated
+                FROM
+                    cms.Upload
+                LEFT JOIN
+                    cms.Image
+                ON
+                    cms.Upload.TenantId = cms.Image.TenantId AND
+	                cms.Upload.UploadId = cms.Image.UploadId
+            ";
+        }
+
         public async Task<Blob> ReadBlobAsync(long tenantId, long blobId)
         {
             using (SqlConnection connection = new SqlConnection(_options.Value.SqlConnectionString))
             {
                 connection.Open();
 
-                BlobDto dto = await connection.QueryFirstOrDefaultAsync<BlobDto>(@"
-                    SELECT
-                        cms.Upload.TenantId,
-                        cms.Upload.UploadId AS BlobId,
-                        cms.Upload.Size,
-                        cms.Upload.UploadType AS BlobType,
-                        CASE cms.Upload.UploadType
-                            WHEN 0 THEN 'application/octet-stream'
-                            WHEN 1 THEN 'image/xyz'
-                        END AS ContentType,
-                        cms.Upload.Name,
-                        NULL AS Folder1,
-                        NULL AS Folder2,
-                        NULL AS Folder3,
-                        cms.Image.Width,
-                        cms.Image.Height,
-                        cms.Upload.Created,
-                        cms.Upload.Updated
-                    FROM
-                        cms.Upload
-                    LEFT JOIN
-                        cms.Image
-                    ON
-                        cms.Upload.TenantId = cms.Image.TenantId AND
-	                    cms.Upload.UploadId = cms.Image.UploadId
+                BlobDto dto = await connection.QueryFirstOrDefaultAsync<BlobDto>($@"
+                    {GetSelectBlobSql()}
                     WHERE
                         cms.Upload.TenantId = @TenantId AND
                         cms.Upload.UploadId = @BlobId", 
@@ -190,6 +197,26 @@ namespace Riverside.Cms.Services.Storage.Infrastructure
                     @"DELETE FROM Blob WHERE TenantId = @TenantId AND BlobId = @BlobId",
                     new { TenantId = tenantId, BlobId = blobId }
                 );
+            }
+        }
+
+        public async Task<IEnumerable<Blob>> ListBlobsAsync(long tenantId, IEnumerable<long> blobIds)
+        {
+            using (SqlConnection connection = new SqlConnection(_options.Value.SqlConnectionString))
+            {
+                connection.Open();
+                IEnumerable<BlobDto> dtos = await connection.QueryAsync<BlobDto>($@"
+                    {GetSelectBlobSql()}
+                    WHERE
+                        cms.Upload.TenantId = @TenantId AND
+                        cms.Upload.UploadId IN @BlobIds",
+                    new
+                    {
+                        TenantId = tenantId,
+                        BlobIds = blobIds
+                    }
+                );
+                return dtos.Select(dto => GetBlobFromDto(dto));
             }
         }
     }
