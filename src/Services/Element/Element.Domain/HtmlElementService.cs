@@ -11,7 +11,7 @@ namespace Riverside.Cms.Services.Element.Domain
         public string Html { get; set; }
     }
 
-    public class HtmlElementContent : ElementContent
+    public class HtmlElementContent
     {
         public string FormattedHtml { get; set; }
     }
@@ -47,9 +47,6 @@ namespace Riverside.Cms.Services.Element.Domain
 
             HtmlElementContent content = new HtmlElementContent
             {
-                TenantId = tenantId,
-                ElementId = elementId,
-                ElementTypeId = settings.ElementTypeId,
                 FormattedHtml = FormatHtml(settings.Html)
             };
 

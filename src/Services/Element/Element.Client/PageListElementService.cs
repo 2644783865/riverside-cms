@@ -71,7 +71,7 @@ namespace Riverside.Cms.Services.Element.Client
         public int PageCount { get; set; }
     }
 
-    public class PageListElementContent : ElementContent
+    public class PageListElementContent
     {
         public PageListPageLink CurrentPage { get; set; }
         public PageListPageLink MorePage { get; set; }

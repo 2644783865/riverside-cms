@@ -14,7 +14,7 @@ namespace Riverside.Cms.Services.Element.Client
         public string Html { get; set; }
     }
 
-    public class HtmlElementContent : ElementContent
+    public class HtmlElementContent
     {
         public string FormattedHtml { get; set; }
     }

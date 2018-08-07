@@ -36,7 +36,7 @@ namespace Riverside.Cms.Services.Element.Domain
         public int Height { get; set; }
     }
 
-    public class PageHeaderElementContent : ElementContent
+    public class PageHeaderElementContent
     {
         public DateTime? Created { get; set; }
         public DateTime? Updated { get; set; }
@@ -80,12 +80,7 @@ namespace Riverside.Cms.Services.Element.Domain
 
             Page page = await _pageService.ReadPageAsync(tenantId, context.PageId);
 
-            PageHeaderElementContent content = new PageHeaderElementContent
-            {
-                TenantId = tenantId,
-                ElementId = elementId,
-                ElementTypeId = settings.ElementTypeId
-            };
+            PageHeaderElementContent content = new PageHeaderElementContent();
 
             content.Created = settings.ShowCreated ? (DateTime?)page.Created : null;
             content.Updated = settings.ShowUpdated && !(settings.ShowCreated && (page.Created.Date == page.Updated.Date)) ? (DateTime?)page.Updated : null;

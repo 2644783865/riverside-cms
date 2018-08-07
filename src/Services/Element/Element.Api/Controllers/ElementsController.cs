@@ -47,11 +47,11 @@ namespace Element.Api.Controllers
         [HttpGet]
         [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/5401977d-865f-4a7a-b416-0a26305615de/elements/{elementId:int}/view")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(IElementView<CodeSnippetElementSettings, ElementContent>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IElementView<CodeSnippetElementSettings, object>), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> ReadCodeSnippetElementView(long tenantId, long elementId, [FromQuery]long pageId)
         {
             PageContext context = new PageContext { PageId = pageId };
-            IElementView<CodeSnippetElementSettings, ElementContent> view = await _codeSnippetElementService.ReadElementViewAsync(tenantId, elementId, context);
+            IElementView<CodeSnippetElementSettings, object> view = await _codeSnippetElementService.ReadElementViewAsync(tenantId, elementId, context);
             if (view == null)
                 return NotFound();
             return Ok(view);

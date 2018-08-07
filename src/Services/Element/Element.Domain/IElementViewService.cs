@@ -6,7 +6,7 @@ using Riverside.Cms.Services.Core.Client;
 
 namespace Riverside.Cms.Services.Element.Domain
 {
-    public interface IElementViewService<TSettings, TContent> where TSettings : IElementSettings where TContent : IElementContent
+    public interface IElementViewService<TSettings, TContent> where TSettings : IElementSettings
     {
         Task<IElementView<TSettings, TContent>> ReadElementViewAsync(long tenantId, long elementId, PageContext context);
     }

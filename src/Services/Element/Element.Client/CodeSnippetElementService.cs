@@ -41,7 +41,7 @@ namespace Riverside.Cms.Services.Element.Client
         public Language Language { get; set; }
     }
 
-    public interface ICodeSnippetElementService : IElementSettingsService<CodeSnippetElementSettings>, IElementViewService<CodeSnippetElementSettings, ElementContent>
+    public interface ICodeSnippetElementService : IElementSettingsService<CodeSnippetElementSettings>, IElementViewService<CodeSnippetElementSettings, object>
     {
     }
 
@@ -71,7 +71,7 @@ namespace Riverside.Cms.Services.Element.Client
             }
         }
 
-        public async Task<IElementView<CodeSnippetElementSettings, ElementContent>> ReadElementViewAsync(long tenantId, long elementId, PageContext context)
+        public async Task<IElementView<CodeSnippetElementSettings, object>> ReadElementViewAsync(long tenantId, long elementId, PageContext context)
         {
             try
             {
@@ -79,7 +79,7 @@ namespace Riverside.Cms.Services.Element.Client
                 using (HttpClient httpClient = new HttpClient())
                 {
                     string json = await httpClient.GetStringAsync(uri);
-                    return JsonConvert.DeserializeObject<ElementView<CodeSnippetElementSettings, ElementContent>>(json);
+                    return JsonConvert.DeserializeObject<ElementView<CodeSnippetElementSettings, object>>(json);
                 }
             }
             catch (Exception ex)

@@ -32,7 +32,7 @@ namespace Riverside.Cms.Services.Element.Client
         public IEnumerable<NavigationBarTab> Tabs { get; set; }
     }
 
-    public class NavigationBarElementContent : ElementContent
+    public class NavigationBarElementContent
     {
         public IEnumerable<NavigationBarContentTab> Tabs { get; set; }
     }

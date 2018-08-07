@@ -20,7 +20,7 @@ namespace Riverside.Cms.Services.Element.Domain
         public bool ShareOnTwitter { get; set; }
     }
 
-    public class ShareElementContent : ElementContent
+    public class ShareElementContent
     {
         public string Title { get; set; }
         public string Url { get; set; }
@@ -57,12 +57,7 @@ namespace Riverside.Cms.Services.Element.Domain
             if (settings == null)
                 return null;
 
-            ShareElementContent content = new ShareElementContent
-            {
-                TenantId = tenantId,
-                ElementId = elementId,
-                ElementTypeId = settings.ElementTypeId
-            };
+            ShareElementContent content = new ShareElementContent();
 
             Page page = await _pageService.ReadPageAsync(tenantId, context.PageId);
 

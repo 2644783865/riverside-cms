@@ -69,7 +69,7 @@ namespace Riverside.Cms.Services.Element.Domain
         public int PageCount { get; set; }
     }
 
-    public class PageListElementContent : ElementContent
+    public class PageListElementContent
     {
         public PageListPageLink CurrentPage { get; set; }
         public PageListPageLink MorePage { get; set; }
@@ -190,9 +190,6 @@ namespace Riverside.Cms.Services.Element.Domain
 
             PageListElementContent content = new PageListElementContent
             {
-                TenantId = settings.TenantId,
-                ElementId = settings.ElementId,
-                ElementTypeId = settings.ElementTypeId, 
                 CurrentPage = currentPageLink,
                 MorePage = morePageLink,
                 DisplayName = GetContentDisplayName(settings.DisplayName, tags),

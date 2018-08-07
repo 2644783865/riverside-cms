@@ -7,10 +7,10 @@ namespace Riverside.Cms.Services.Element.Client
     public class ElementView : IElementView
     {
         public IElementSettings Settings { get; set; }
-        public IElementContent Content { get; set; }
+        public object Content { get; set; }
     }
 
-    public class ElementView<TSettings, TContent> : ElementView, IElementView<TSettings, TContent> where TSettings : IElementSettings where TContent : IElementContent
+    public class ElementView<TSettings, TContent> : ElementView, IElementView<TSettings, TContent> where TSettings : IElementSettings
     {
         /// <summary>
         /// Credit: Constructor required so that Json.NET does not throw the error "type is an interface or abstract class and cannot be instantiated"

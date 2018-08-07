@@ -23,7 +23,7 @@ namespace Riverside.Cms.Services.Element.Client
         public bool ShareOnTwitter { get; set; }
     }
 
-    public class ShareElementContent : ElementContent
+    public class ShareElementContent
     {
         public string Title { get; set; }
         public string Description { get; set; }
