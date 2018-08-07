@@ -128,7 +128,7 @@ namespace Riverside.Cms.Services.Element.Domain
             };
         }
 
-        private PageListImage GetImage(Page page, Dictionary<long, BlobImage> imagesById)
+        private PageListImage GetImage(Page page, IDictionary<long, BlobImage> imagesById)
         {
             if (!page.ThumbnailImageBlobId.HasValue)
                 return null;
@@ -180,14 +180,12 @@ namespace Riverside.Cms.Services.Element.Domain
 
             PageListResult result = await _pageService.ListPagesAsync(tenantId, pageListPageId, settings.Recursive, settings.PageType, context.TagIds, settings.SortBy, settings.SortAsc, pageIndex, settings.PageSize);
 
-            Dictionary<long, BlobImage> imagesById = new Dictionary<long, BlobImage>();
+            IDictionary<long, BlobImage> blobsById = null;
             if (settings.ShowImage || settings.ShowBackgroundImage)
             {
-                foreach (Page page in result.Pages)
-                {
-                    if (page.ThumbnailImageBlobId.HasValue)
-                        imagesById.Add(page.ThumbnailImageBlobId.Value, (BlobImage)await _storageService.ReadBlobAsync(tenantId, page.ThumbnailImageBlobId.Value));
-                }
+                IEnumerable<long> blobIds = result.Pages.Where(p => p.ThumbnailImageBlobId.HasValue).Select(p => p.ThumbnailImageBlobId.Value);
+                IEnumerable<Blob> blobs = await _storageService.ListBlobsAsync(tenantId, blobIds);
+                blobsById = blobs.ToDictionary(b => b.BlobId, b => (BlobImage)b);
             }
 
             PageListElementContent content = new PageListElementContent
@@ -210,8 +208,8 @@ namespace Riverside.Cms.Services.Element.Domain
                     Updated = settings.ShowUpdated && !(settings.ShowCreated && (p.Created.Date == p.Updated.Date)) ? (DateTime?)p.Updated : null,
                     Occurred = settings.ShowOccurred && p.Occurred.HasValue ? p.Occurred : null,
                     OccursInFuture = settings.ShowOccurred && p.Occurred.HasValue ? p.Occurred.Value.Date > DateTime.UtcNow.Date : false,
-                    BackgroundImage = settings.ShowBackgroundImage ? GetImage(p, imagesById) : null,
-                    Image = settings.ShowImage ? GetImage(p, imagesById) : null,
+                    BackgroundImage = settings.ShowBackgroundImage ? GetImage(p, blobsById) : null,
+                    Image = settings.ShowImage ? GetImage(p, blobsById) : null,
                     Tags = settings.ShowTags ? p.Tags : new List<Tag>()
                 }),
                 Pager = GetPager(pageIndex, result, settings),
