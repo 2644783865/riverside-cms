@@ -21,7 +21,7 @@ namespace Riverside.Cms.Services.Element.Client
         public string FormattedMessage { get; set; }
     }
 
-    public interface IFooterElementService : IElementSettingsService<FooterElementSettings>, IElementContentService<FooterElementContent>
+    public interface IFooterElementService : IElementSettingsService<FooterElementSettings>, IElementViewService<FooterElementSettings, FooterElementContent>
     {
     }
 
@@ -51,15 +51,15 @@ namespace Riverside.Cms.Services.Element.Client
             }
         }
 
-        public async Task<FooterElementContent> ReadElementContentAsync(long tenantId, long elementId, PageContext context)
+        public async Task<IElementView<FooterElementSettings, FooterElementContent>> ReadElementViewAsync(long tenantId, long elementId, PageContext context)
         {
             try
             {
-                string uri = $"{_options.Value.ElementApiBaseUrl}tenants/{tenantId}/elementtypes/f1c2b384-4909-47c8-ada7-cd3cc7f32620/elements/{elementId}/content?pageid={context.PageId}";
+                string uri = $"{_options.Value.ElementApiBaseUrl}tenants/{tenantId}/elementtypes/f1c2b384-4909-47c8-ada7-cd3cc7f32620/elements/{elementId}/view?pageid={context.PageId}";
                 using (HttpClient httpClient = new HttpClient())
                 {
                     string json = await httpClient.GetStringAsync(uri);
-                    return JsonConvert.DeserializeObject<FooterElementContent>(json);
+                    return JsonConvert.DeserializeObject<ElementView<FooterElementSettings, FooterElementContent>>(json);
                 }
             }
             catch (Exception ex)

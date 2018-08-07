@@ -39,7 +39,7 @@ namespace Riverside.Cms.Services.Element.Domain
         public Language Language { get; set; }
     }
 
-    public interface ICodeSnippetElementService : IElementSettingsService<CodeSnippetElementSettings>, IElementContentService<ElementContent>, IElementViewService<CodeSnippetElementSettings, ElementContent>
+    public interface ICodeSnippetElementService : IElementSettingsService<CodeSnippetElementSettings>, IElementViewService<CodeSnippetElementSettings, ElementContent>
     {
     }
 
@@ -57,26 +57,23 @@ namespace Riverside.Cms.Services.Element.Domain
             return _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
         }
 
-        public async Task<ElementContent> ReadElementContentAsync(long tenantId, long elementId, PageContext context)
-        {
-            CodeSnippetElementSettings elementSettings = await _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
-            return new ElementContent
-            {
-                TenantId = tenantId,
-                ElementId = elementId,
-                ElementTypeId = elementSettings.ElementTypeId
-            };
-        }
-
         public async Task<IElementView<CodeSnippetElementSettings, ElementContent>> ReadElementViewAsync(long tenantId, long elementId, PageContext context)
         {
             CodeSnippetElementSettings settings = await _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
             if (settings == null)
                 return null;
+
+            ElementContent content = new ElementContent
+            {
+                TenantId = tenantId,
+                ElementId = elementId,
+                ElementTypeId = settings.ElementTypeId
+            };
+
             return new ElementView<CodeSnippetElementSettings, ElementContent>
             {
                 Settings = settings,
-                Content = new ElementContent { TenantId = tenantId, ElementId = elementId, ElementTypeId = settings.ElementTypeId }
+                Content = content
             };
         }
     }

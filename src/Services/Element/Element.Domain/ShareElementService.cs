@@ -31,7 +31,7 @@ namespace Riverside.Cms.Services.Element.Domain
         public string IsVideo { get; set; }
     }
 
-    public interface IShareElementService : IElementSettingsService<ShareElementSettings>, IElementContentService<ShareElementContent>
+    public interface IShareElementService : IElementSettingsService<ShareElementSettings>, IElementViewService<ShareElementSettings, ShareElementContent>
     {
     }
 
@@ -51,26 +51,32 @@ namespace Riverside.Cms.Services.Element.Domain
             return _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
         }
 
-        public async Task<ShareElementContent> ReadElementContentAsync(long tenantId, long elementId, PageContext context)
+        public async Task<IElementView<ShareElementSettings, ShareElementContent>> ReadElementViewAsync(long tenantId, long elementId, PageContext context)
         {
-            ShareElementSettings elementSettings = await _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
+            ShareElementSettings settings = await _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
+            if (settings == null)
+                return null;
 
-            ShareElementContent elementContent = new ShareElementContent
+            ShareElementContent content = new ShareElementContent
             {
                 TenantId = tenantId,
                 ElementId = elementId,
-                ElementTypeId = elementSettings.ElementTypeId
+                ElementTypeId = settings.ElementTypeId
             };
 
             Page page = await _pageService.ReadPageAsync(tenantId, context.PageId);
 
-            elementContent.Description = page.Description ?? string.Empty;
-            elementContent.Hashtags = string.Empty;
-            elementContent.Image = string.Empty;
-            elementContent.IsVideo = string.Empty;
-            elementContent.Title = page.Name;
+            content.Description = page.Description ?? string.Empty;
+            content.Hashtags = string.Empty;
+            content.Image = string.Empty;
+            content.IsVideo = string.Empty;
+            content.Title = page.Name;
 
-            return elementContent;
+            return new ElementView<ShareElementSettings, ShareElementContent>
+            {
+                Settings = settings,
+                Content = content
+            };
         }
     }
 }

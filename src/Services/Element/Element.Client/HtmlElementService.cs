@@ -19,7 +19,7 @@ namespace Riverside.Cms.Services.Element.Client
         public string FormattedHtml { get; set; }
     }
 
-    public interface IHtmlElementService : IElementSettingsService<HtmlElementSettings>, IElementContentService<HtmlElementContent>
+    public interface IHtmlElementService : IElementSettingsService<HtmlElementSettings>, IElementViewService<HtmlElementSettings, HtmlElementContent>
     {
     }
 
@@ -49,15 +49,15 @@ namespace Riverside.Cms.Services.Element.Client
             }
         }
 
-        public async Task<HtmlElementContent> ReadElementContentAsync(long tenantId, long elementId, PageContext context)
+        public async Task<IElementView<HtmlElementSettings, HtmlElementContent>> ReadElementViewAsync(long tenantId, long elementId, PageContext context)
         {
             try
             {
-                string uri = $"{_options.Value.ElementApiBaseUrl}tenants/{tenantId}/elementtypes/c92ee4c4-b133-44cc-8322-640e99c334dc/elements/{elementId}/content?pageid={context.PageId}";
+                string uri = $"{_options.Value.ElementApiBaseUrl}tenants/{tenantId}/elementtypes/c92ee4c4-b133-44cc-8322-640e99c334dc/elements/{elementId}/view?pageid={context.PageId}";
                 using (HttpClient httpClient = new HttpClient())
                 {
                     string json = await httpClient.GetStringAsync(uri);
-                    return JsonConvert.DeserializeObject<HtmlElementContent>(json);
+                    return JsonConvert.DeserializeObject<ElementView<HtmlElementSettings, HtmlElementContent>>(json);
                 }
             }
             catch (Exception ex)

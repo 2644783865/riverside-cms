@@ -50,7 +50,7 @@ namespace Riverside.Cms.Services.Element.Client
         public IEnumerable<PageHeaderBreadcrumb> Breadcrumbs { get; set; }
     }
 
-    public interface IPageHeaderElementService : IElementSettingsService<PageHeaderElementSettings>, IElementContentService<PageHeaderElementContent>
+    public interface IPageHeaderElementService : IElementSettingsService<PageHeaderElementSettings>, IElementViewService<PageHeaderElementSettings, PageHeaderElementContent>
     {
     }
 
@@ -80,15 +80,15 @@ namespace Riverside.Cms.Services.Element.Client
             }
         }
 
-        public async Task<PageHeaderElementContent> ReadElementContentAsync(long tenantId, long elementId, PageContext context)
+        public async Task<IElementView<PageHeaderElementSettings, PageHeaderElementContent>> ReadElementViewAsync(long tenantId, long elementId, PageContext context)
         {
             try
             {
-                string uri = $"{_options.Value.ElementApiBaseUrl}tenants/{tenantId}/elementtypes/1cbac30c-5deb-404e-8ea8-aabc20c82aa8/elements/{elementId}/content?pageid={context.PageId}";
+                string uri = $"{_options.Value.ElementApiBaseUrl}tenants/{tenantId}/elementtypes/1cbac30c-5deb-404e-8ea8-aabc20c82aa8/elements/{elementId}/view?pageid={context.PageId}";
                 using (HttpClient httpClient = new HttpClient())
                 {
                     string json = await httpClient.GetStringAsync(uri);
-                    return JsonConvert.DeserializeObject<PageHeaderElementContent>(json);
+                    return JsonConvert.DeserializeObject<ElementView<PageHeaderElementSettings, PageHeaderElementContent>>(json);
                 }
             }
             catch (Exception ex)

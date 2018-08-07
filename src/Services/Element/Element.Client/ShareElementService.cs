@@ -33,7 +33,7 @@ namespace Riverside.Cms.Services.Element.Client
         public string IsVideo { get; set; }
     }
 
-    public interface IShareElementService : IElementSettingsService<ShareElementSettings>, IElementContentService<ShareElementContent>
+    public interface IShareElementService : IElementSettingsService<ShareElementSettings>, IElementViewService<ShareElementSettings, ShareElementContent>
     {
     }
 
@@ -63,15 +63,15 @@ namespace Riverside.Cms.Services.Element.Client
             }
         }
 
-        public async Task<ShareElementContent> ReadElementContentAsync(long tenantId, long elementId, PageContext context)
+        public async Task<IElementView<ShareElementSettings, ShareElementContent>> ReadElementViewAsync(long tenantId, long elementId, PageContext context)
         {
             try
             {
-                string uri = $"{_options.Value.ElementApiBaseUrl}tenants/{tenantId}/elementtypes/cf0d7834-54fb-4a6e-86db-0f238f8b1ac1/elements/{elementId}/content?pageid={context.PageId}";
+                string uri = $"{_options.Value.ElementApiBaseUrl}tenants/{tenantId}/elementtypes/cf0d7834-54fb-4a6e-86db-0f238f8b1ac1/elements/{elementId}/view?pageid={context.PageId}";
                 using (HttpClient httpClient = new HttpClient())
                 {
                     string json = await httpClient.GetStringAsync(uri);
-                    return JsonConvert.DeserializeObject<ShareElementContent>(json);
+                    return JsonConvert.DeserializeObject<ElementView<ShareElementSettings, ShareElementContent>>(json);
                 }
             }
             catch (Exception ex)

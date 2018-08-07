@@ -50,7 +50,7 @@ namespace Riverside.Cms.Services.Element.Domain
         public IEnumerable<PageHeaderBreadcrumb> Breadcrumbs { get; set; }
     }
 
-    public interface IPageHeaderElementService : IElementSettingsService<PageHeaderElementSettings>, IElementContentService<PageHeaderElementContent>
+    public interface IPageHeaderElementService : IElementSettingsService<PageHeaderElementSettings>, IElementViewService<PageHeaderElementSettings, PageHeaderElementContent>
     {
     }
 
@@ -72,30 +72,32 @@ namespace Riverside.Cms.Services.Element.Domain
             return _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
         }
 
-        public async Task<PageHeaderElementContent> ReadElementContentAsync(long tenantId, long elementId, PageContext context)
+        public async Task<IElementView<PageHeaderElementSettings, PageHeaderElementContent>> ReadElementViewAsync(long tenantId, long elementId, PageContext context)
         {
-            PageHeaderElementSettings elementSettings = await _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
+            PageHeaderElementSettings settings = await _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
+            if (settings == null)
+                return null;
 
             Page page = await _pageService.ReadPageAsync(tenantId, context.PageId);
 
-            PageHeaderElementContent elementContent = new PageHeaderElementContent
+            PageHeaderElementContent content = new PageHeaderElementContent
             {
                 TenantId = tenantId,
                 ElementId = elementId,
-                ElementTypeId = elementSettings.ElementTypeId
+                ElementTypeId = settings.ElementTypeId
             };
 
-            elementContent.Created = elementSettings.ShowCreated ? (DateTime?)page.Created : null;
-            elementContent.Updated = elementSettings.ShowUpdated && !(elementSettings.ShowCreated && (page.Created.Date == page.Updated.Date)) ? (DateTime?)page.Updated : null;
-            elementContent.Occurred = elementSettings.ShowOccurred && page.Occurred.HasValue ? page.Occurred : null;
-            elementContent.OccursInFuture = elementContent.Occurred.HasValue && (page.Occurred.Value.Date > DateTime.UtcNow.Date);
-            elementContent.Name = elementSettings.ShowName ? page.Name : null;
-            elementContent.Description = elementSettings.ShowDescription ? page.Description : null;
+            content.Created = settings.ShowCreated ? (DateTime?)page.Created : null;
+            content.Updated = settings.ShowUpdated && !(settings.ShowCreated && (page.Created.Date == page.Updated.Date)) ? (DateTime?)page.Updated : null;
+            content.Occurred = settings.ShowOccurred && page.Occurred.HasValue ? page.Occurred : null;
+            content.OccursInFuture = content.Occurred.HasValue && (page.Occurred.Value.Date > DateTime.UtcNow.Date);
+            content.Name = settings.ShowName ? page.Name : null;
+            content.Description = settings.ShowDescription ? page.Description : null;
 
-            if (elementSettings.ShowImage && page.ThumbnailImageBlobId.HasValue)
+            if (settings.ShowImage && page.ThumbnailImageBlobId.HasValue)
             {
                 BlobImage thumbnailImage = (BlobImage)await _storageService.ReadBlobAsync(tenantId, page.ThumbnailImageBlobId.Value);
-                elementContent.Image = new PageHeaderImage
+                content.Image = new PageHeaderImage
                 {
                     BlobId = thumbnailImage.BlobId,
                     PageId = page.PageId,
@@ -104,10 +106,10 @@ namespace Riverside.Cms.Services.Element.Domain
                 };
             }
 
-            if (elementSettings.ShowBreadcrumbs)
+            if (settings.ShowBreadcrumbs)
             {
                 IEnumerable<Page> pages = await _pageService.ListPagesInHierarchyAsync(tenantId, context.PageId);
-                elementContent.Breadcrumbs = pages.Reverse().Select(p => new PageHeaderBreadcrumb
+                content.Breadcrumbs = pages.Reverse().Select(p => new PageHeaderBreadcrumb
                 {
                     Home = p.ParentPageId == null,
                     Name = p.Name,
@@ -116,7 +118,11 @@ namespace Riverside.Cms.Services.Element.Domain
                 });
             }
 
-            return elementContent;
+            return new ElementView<PageHeaderElementSettings, PageHeaderElementContent>
+            {
+                Settings = settings,
+                Content = content
+            };
         }
     }
 }

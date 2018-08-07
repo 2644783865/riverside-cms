@@ -18,7 +18,7 @@ namespace Riverside.Cms.Services.Element.Domain
         public string FormattedMessage { get; set; }
     }
 
-    public interface IFooterElementService : IElementSettingsService<FooterElementSettings>, IElementContentService<FooterElementContent>
+    public interface IFooterElementService : IElementSettingsService<FooterElementSettings>, IElementViewService<FooterElementSettings, FooterElementContent>
     {
     }
 
@@ -43,15 +43,24 @@ namespace Riverside.Cms.Services.Element.Domain
             return message.Replace("%YEAR%", DateTime.UtcNow.Year.ToString());
         }
 
-        public async Task<FooterElementContent> ReadElementContentAsync(long tenantId, long elementId, PageContext context)
+        public async Task<IElementView<FooterElementSettings, FooterElementContent>> ReadElementViewAsync(long tenantId, long elementId, PageContext context)
         {
-            FooterElementSettings elementSettings = await _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
-            return new FooterElementContent
+            FooterElementSettings settings = await _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
+            if (settings == null)
+                return null;
+
+            FooterElementContent content = new FooterElementContent
             {
                 TenantId = tenantId,
                 ElementId = elementId,
-                ElementTypeId = elementSettings.ElementTypeId,
-                FormattedMessage = FormatMessage(elementSettings.Message)
+                ElementTypeId = settings.ElementTypeId,
+                FormattedMessage = FormatMessage(settings.Message)
+            };
+
+            return new ElementView<FooterElementSettings, FooterElementContent>
+            {
+                Settings = settings,
+                Content = content
             };
         }
     }

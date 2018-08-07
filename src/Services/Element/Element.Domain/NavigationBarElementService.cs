@@ -33,7 +33,7 @@ namespace Riverside.Cms.Services.Element.Domain
         public IEnumerable<NavigationBarContentTab> Tabs { get; set; }
     }
 
-    public interface INavigationBarElementService : IElementSettingsService<NavigationBarElementSettings>, IElementContentService<NavigationBarElementContent>
+    public interface INavigationBarElementService : IElementSettingsService<NavigationBarElementSettings>, IElementViewService<NavigationBarElementSettings, NavigationBarElementContent>
     {
     }
 
@@ -89,16 +89,24 @@ namespace Riverside.Cms.Services.Element.Domain
             return tabs;
         }
 
-        public async Task<NavigationBarElementContent> ReadElementContentAsync(long tenantId, long elementId, PageContext context)
+        public async Task<IElementView<NavigationBarElementSettings, NavigationBarElementContent>> ReadElementViewAsync(long tenantId, long elementId, PageContext context)
         {
-            NavigationBarElementSettings elementSettings = await _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
+            NavigationBarElementSettings settings = await _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
+            if (settings == null)
+                return null;
 
-            return new NavigationBarElementContent
+            NavigationBarElementContent content = new NavigationBarElementContent
             {
                 TenantId = tenantId,
                 ElementId = elementId,
-                ElementTypeId = elementSettings.ElementTypeId,
-                Tabs = await GetContentTabs(elementSettings, context.PageId)
+                ElementTypeId = settings.ElementTypeId,
+                Tabs = await GetContentTabs(settings, context.PageId)
+            };
+
+            return new ElementView<NavigationBarElementSettings, NavigationBarElementContent>
+            {
+                Settings = settings,
+                Content = content
             };
         }
     }

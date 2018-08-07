@@ -81,7 +81,7 @@ namespace Riverside.Cms.Services.Element.Domain
         public PageListPager Pager { get; set; }
     }
 
-    public interface IPageListElementService : IElementSettingsService<PageListElementSettings>, IElementContentService<PageListElementContent>
+    public interface IPageListElementService : IElementSettingsService<PageListElementSettings>, IElementViewService<PageListElementSettings, PageListElementContent>
     {
     }
 
@@ -153,9 +153,11 @@ namespace Riverside.Cms.Services.Element.Domain
             };
         }
 
-        public async Task<PageListElementContent> ReadElementContentAsync(long tenantId, long elementId, PageContext context)
+        public async Task<IElementView<PageListElementSettings, PageListElementContent>> ReadElementViewAsync(long tenantId, long elementId, PageContext context)
         {
-            PageListElementSettings elementSettings = await _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
+            PageListElementSettings settings = await _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
+            if (settings == null)
+                return null;
 
             int pageIndex = 1;
             if (context.Parameters != null && context.Parameters.ContainsKey("page"))
@@ -167,19 +169,19 @@ namespace Riverside.Cms.Services.Element.Domain
                 tags = await _tagService.ListTagsAsync(tenantId, context.TagIds);
 
             PageListPageLink currentPageLink = null;
-            if (elementSettings.ShowTags)
+            if (settings.ShowTags)
                 currentPageLink = await GetPageListPageLinkAsync(tenantId, context.PageId);
 
             PageListPageLink morePageLink = null;
-            long pageListPageId = elementSettings.PageId ?? context.PageId;
-            bool displayMorePageLink = elementSettings.MoreMessage != null && context.PageId != pageListPageId;
+            long pageListPageId = settings.PageId ?? context.PageId;
+            bool displayMorePageLink = settings.MoreMessage != null && context.PageId != pageListPageId;
             if (displayMorePageLink)
                 morePageLink = await GetPageListPageLinkAsync(tenantId, pageListPageId);
 
-            PageListResult result = await _pageService.ListPagesAsync(tenantId, pageListPageId, elementSettings.Recursive, elementSettings.PageType, context.TagIds, elementSettings.SortBy, elementSettings.SortAsc, pageIndex, elementSettings.PageSize);
+            PageListResult result = await _pageService.ListPagesAsync(tenantId, pageListPageId, settings.Recursive, settings.PageType, context.TagIds, settings.SortBy, settings.SortAsc, pageIndex, settings.PageSize);
 
             Dictionary<long, BlobImage> imagesById = new Dictionary<long, BlobImage>();
-            if (elementSettings.ShowImage || elementSettings.ShowBackgroundImage)
+            if (settings.ShowImage || settings.ShowBackgroundImage)
             {
                 foreach (Page page in result.Pages)
                 {
@@ -188,35 +190,39 @@ namespace Riverside.Cms.Services.Element.Domain
                 }
             }
 
-            PageListElementContent elementContent = new PageListElementContent
+            PageListElementContent content = new PageListElementContent
             {
-                TenantId = elementSettings.TenantId,
-                ElementId = elementSettings.ElementId,
-                ElementTypeId = elementSettings.ElementTypeId, 
+                TenantId = settings.TenantId,
+                ElementId = settings.ElementId,
+                ElementTypeId = settings.ElementTypeId, 
                 CurrentPage = currentPageLink,
                 MorePage = morePageLink,
-                DisplayName = GetContentDisplayName(elementSettings.DisplayName, tags),
-                MoreMessage = displayMorePageLink ? elementSettings.MoreMessage : null,
-                NoPagesMessage = elementSettings.NoPagesMessage != null && !result.Pages.Any() ? elementSettings.NoPagesMessage : null,
+                DisplayName = GetContentDisplayName(settings.DisplayName, tags),
+                MoreMessage = displayMorePageLink ? settings.MoreMessage : null,
+                NoPagesMessage = settings.NoPagesMessage != null && !result.Pages.Any() ? settings.NoPagesMessage : null,
                 Pages = result.Pages.Select(p => new PageListPage
                 {
                     Name = p.Name,
                     PageId = p.PageId,
                     Home = !p.ParentPageId.HasValue,
-                    Description = elementSettings.ShowDescription ? p.Description : null,
-                    Created = elementSettings.ShowCreated ? (DateTime?)p.Created : null,
-                    Updated = elementSettings.ShowUpdated && !(elementSettings.ShowCreated && (p.Created.Date == p.Updated.Date)) ? (DateTime?)p.Updated : null,
-                    Occurred = elementSettings.ShowOccurred && p.Occurred.HasValue ? p.Occurred : null,
-                    OccursInFuture = elementSettings.ShowOccurred && p.Occurred.HasValue ? p.Occurred.Value.Date > DateTime.UtcNow.Date : false,
-                    BackgroundImage = elementSettings.ShowBackgroundImage ? GetImage(p, imagesById) : null,
-                    Image = elementSettings.ShowImage ? GetImage(p, imagesById) : null,
-                    Tags = elementSettings.ShowTags ? p.Tags : new List<Tag>()
+                    Description = settings.ShowDescription ? p.Description : null,
+                    Created = settings.ShowCreated ? (DateTime?)p.Created : null,
+                    Updated = settings.ShowUpdated && !(settings.ShowCreated && (p.Created.Date == p.Updated.Date)) ? (DateTime?)p.Updated : null,
+                    Occurred = settings.ShowOccurred && p.Occurred.HasValue ? p.Occurred : null,
+                    OccursInFuture = settings.ShowOccurred && p.Occurred.HasValue ? p.Occurred.Value.Date > DateTime.UtcNow.Date : false,
+                    BackgroundImage = settings.ShowBackgroundImage ? GetImage(p, imagesById) : null,
+                    Image = settings.ShowImage ? GetImage(p, imagesById) : null,
+                    Tags = settings.ShowTags ? p.Tags : new List<Tag>()
                 }),
-                Pager = GetPager(pageIndex, result, elementSettings),
+                Pager = GetPager(pageIndex, result, settings),
                 Tags = tags
             };
 
-            return elementContent;
+            return new ElementView<PageListElementSettings, PageListElementContent>
+            {
+                Settings = settings,
+                Content = content
+            };
         }
     }
 }

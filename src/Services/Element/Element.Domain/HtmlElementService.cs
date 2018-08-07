@@ -16,7 +16,7 @@ namespace Riverside.Cms.Services.Element.Domain
         public string FormattedHtml { get; set; }
     }
 
-    public interface IHtmlElementService : IElementSettingsService<HtmlElementSettings>, IElementContentService<HtmlElementContent>
+    public interface IHtmlElementService : IElementSettingsService<HtmlElementSettings>, IElementViewService<HtmlElementSettings, HtmlElementContent>
     {
     }
 
@@ -39,15 +39,24 @@ namespace Riverside.Cms.Services.Element.Domain
             return html.Replace("%YEAR%", DateTime.UtcNow.Year.ToString());
         }
 
-        public async Task<HtmlElementContent> ReadElementContentAsync(long tenantId, long elementId, PageContext context)
+        public async Task<IElementView<HtmlElementSettings, HtmlElementContent>> ReadElementViewAsync(long tenantId, long elementId, PageContext context)
         {
-            HtmlElementSettings elementSettings = await _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
-            return new HtmlElementContent
+            HtmlElementSettings settings = await _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
+            if (settings == null)
+                return null;
+
+            HtmlElementContent content = new HtmlElementContent
             {
                 TenantId = tenantId,
                 ElementId = elementId,
-                ElementTypeId = elementSettings.ElementTypeId,
-                FormattedHtml = FormatHtml(elementSettings.Html)
+                ElementTypeId = settings.ElementTypeId,
+                FormattedHtml = FormatHtml(settings.Html)
+            };
+
+            return new ElementView<HtmlElementSettings, HtmlElementContent>
+            {
+                Settings = settings,
+                Content = content
             };
         }
     }

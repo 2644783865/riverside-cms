@@ -37,7 +37,7 @@ namespace Riverside.Cms.Services.Element.Client
         public IEnumerable<NavigationBarContentTab> Tabs { get; set; }
     }
 
-    public interface INavigationBarElementService : IElementSettingsService<NavigationBarElementSettings>, IElementContentService<NavigationBarElementContent>
+    public interface INavigationBarElementService : IElementSettingsService<NavigationBarElementSettings>, IElementViewService<NavigationBarElementSettings, NavigationBarElementContent>
     {
     }
 
@@ -67,15 +67,15 @@ namespace Riverside.Cms.Services.Element.Client
             }
         }
 
-        public async Task<NavigationBarElementContent> ReadElementContentAsync(long tenantId, long elementId, PageContext context)
+        public async Task<IElementView<NavigationBarElementSettings, NavigationBarElementContent>> ReadElementViewAsync(long tenantId, long elementId, PageContext context)
         {
             try
             {
-                string uri = $"{_options.Value.ElementApiBaseUrl}tenants/{tenantId}/elementtypes/a94c34c0-1a4c-4c91-a669-2f830cf1ea5f/elements/{elementId}/content?pageid={context.PageId}";
+                string uri = $"{_options.Value.ElementApiBaseUrl}tenants/{tenantId}/elementtypes/a94c34c0-1a4c-4c91-a669-2f830cf1ea5f/elements/{elementId}/view?pageid={context.PageId}";
                 using (HttpClient httpClient = new HttpClient())
                 {
                     string json = await httpClient.GetStringAsync(uri);
-                    return JsonConvert.DeserializeObject<NavigationBarElementContent>(json);
+                    return JsonConvert.DeserializeObject<ElementView<NavigationBarElementSettings, NavigationBarElementContent>>(json);
                 }
             }
             catch (Exception ex)

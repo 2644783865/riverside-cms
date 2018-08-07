@@ -38,23 +38,10 @@ namespace Element.Api.Controllers
         [ProducesResponseType(typeof(CodeSnippetElementSettings), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> ReadCodeSnippetElementSettings(long tenantId, long elementId)
         {
-            CodeSnippetElementSettings elementSettings = await _codeSnippetElementService.ReadElementSettingsAsync(tenantId, elementId);
-            if (elementSettings == null)
+            CodeSnippetElementSettings settings = await _codeSnippetElementService.ReadElementSettingsAsync(tenantId, elementId);
+            if (settings == null)
                 return NotFound();
-            return Ok(elementSettings);
-        }
-
-        [HttpGet]
-        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/5401977d-865f-4a7a-b416-0a26305615de/elements/{elementId:int}/content")]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(ElementContent), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ReadCodeSnippetElementContent(long tenantId, long elementId, [FromQuery]long pageId)
-        {
-            PageContext context = new PageContext { PageId = pageId };
-            ElementContent elementContent = await _codeSnippetElementService.ReadElementContentAsync(tenantId, elementId, context);
-            if (elementContent == null)
-                return NotFound();
-            return Ok(elementContent);
+            return Ok(settings);
         }
 
         [HttpGet]
@@ -78,23 +65,23 @@ namespace Element.Api.Controllers
         [ProducesResponseType(typeof(FooterElementSettings), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> ReadFooterElementSettings(long tenantId, long elementId)
         {
-            FooterElementSettings elementSettings = await _footerElementService.ReadElementSettingsAsync(tenantId, elementId);
-            if (elementSettings == null)
+            FooterElementSettings settings = await _footerElementService.ReadElementSettingsAsync(tenantId, elementId);
+            if (settings == null)
                 return NotFound();
-            return Ok(elementSettings);
+            return Ok(settings);
         }
 
         [HttpGet]
-        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/f1c2b384-4909-47c8-ada7-cd3cc7f32620/elements/{elementId:int}/content")]
+        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/f1c2b384-4909-47c8-ada7-cd3cc7f32620/elements/{elementId:int}/view")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(FooterElementContent), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ReadFooterElementContent(long tenantId, long elementId, [FromQuery]long pageId)
+        [ProducesResponseType(typeof(IElementView<FooterElementSettings, FooterElementContent>), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> ReadFooterElementView(long tenantId, long elementId, [FromQuery]long pageId)
         {
             PageContext context = new PageContext { PageId = pageId };
-            FooterElementContent elementContent = await _footerElementService.ReadElementContentAsync(tenantId, elementId, context);
-            if (elementContent == null)
+            IElementView<FooterElementSettings, FooterElementContent> view = await _footerElementService.ReadElementViewAsync(tenantId, elementId, context);
+            if (view == null)
                 return NotFound();
-            return Ok(elementContent);
+            return Ok(view);
         }
 
         // HTML
@@ -105,23 +92,23 @@ namespace Element.Api.Controllers
         [ProducesResponseType(typeof(HtmlElementSettings), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> ReadHtmlElementSettings(long tenantId, long elementId, [FromQuery]long pageId)
         {
-            HtmlElementSettings elementSettings = await _htmlElementService.ReadElementSettingsAsync(tenantId, elementId);
-            if (elementSettings == null)
+            HtmlElementSettings settings = await _htmlElementService.ReadElementSettingsAsync(tenantId, elementId);
+            if (settings == null)
                 return NotFound();
-            return Ok(elementSettings);
+            return Ok(settings);
         }
 
         [HttpGet]
-        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/c92ee4c4-b133-44cc-8322-640e99c334dc/elements/{elementId:int}/content")]
+        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/c92ee4c4-b133-44cc-8322-640e99c334dc/elements/{elementId:int}/view")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(HtmlElementContent), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ReadHtmlElementContent(long tenantId, long elementId, [FromQuery]long pageId)
+        [ProducesResponseType(typeof(IElementView<HtmlElementSettings, HtmlElementContent>), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> ReadHtmlElementView(long tenantId, long elementId, [FromQuery]long pageId)
         {
             PageContext context = new PageContext { PageId = pageId };
-            HtmlElementContent elementContent = await _htmlElementService.ReadElementContentAsync(tenantId, elementId, context);
-            if (elementContent == null)
+            IElementView<HtmlElementSettings, HtmlElementContent> view = await _htmlElementService.ReadElementViewAsync(tenantId, elementId, context);
+            if (view == null)
                 return NotFound();
-            return Ok(elementContent);
+            return Ok(view);
         }
 
         // NAVIGATION BAR
@@ -132,23 +119,23 @@ namespace Element.Api.Controllers
         [ProducesResponseType(typeof(NavigationBarElementSettings), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> ReadNavigationBarElementSettings(long tenantId, long elementId)
         {
-            NavigationBarElementSettings elementSettings = await _navigationBarElementService.ReadElementSettingsAsync(tenantId, elementId);
-            if (elementSettings == null)
+            NavigationBarElementSettings settings = await _navigationBarElementService.ReadElementSettingsAsync(tenantId, elementId);
+            if (settings == null)
                 return NotFound();
-            return Ok(elementSettings);
+            return Ok(settings);
         }
 
         [HttpGet]
-        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/a94c34c0-1a4c-4c91-a669-2f830cf1ea5f/elements/{elementId:int}/content")]
+        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/a94c34c0-1a4c-4c91-a669-2f830cf1ea5f/elements/{elementId:int}/view")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(NavigationBarElementContent), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ReadNavigationBarElementContent(long tenantId, long elementId, [FromQuery]long pageId)
+        [ProducesResponseType(typeof(IElementView<NavigationBarElementSettings, NavigationBarElementContent>), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> ReadNavigationBarElementView(long tenantId, long elementId, [FromQuery]long pageId)
         {
             PageContext context = new PageContext { PageId = pageId };
-            NavigationBarElementContent elementContent = await _navigationBarElementService.ReadElementContentAsync(tenantId, elementId, context);
-            if (elementContent == null)
+            IElementView<NavigationBarElementSettings, NavigationBarElementContent> view = await _navigationBarElementService.ReadElementViewAsync(tenantId, elementId, context);
+            if (view == null)
                 return NotFound();
-            return Ok(elementContent);
+            return Ok(view);
         }
 
         // PAGE HEADER
@@ -159,23 +146,23 @@ namespace Element.Api.Controllers
         [ProducesResponseType(typeof(PageHeaderElementSettings), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> ReadPageHeaderElementSettings(long tenantId, long elementId)
         {
-            PageHeaderElementSettings elementSettings = await _pageHeaderElementService.ReadElementSettingsAsync(tenantId, elementId);
-            if (elementSettings == null)
+            PageHeaderElementSettings settings = await _pageHeaderElementService.ReadElementSettingsAsync(tenantId, elementId);
+            if (settings == null)
                 return NotFound();
-            return Ok(elementSettings);
+            return Ok(settings);
         }
 
         [HttpGet]
-        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/1cbac30c-5deb-404e-8ea8-aabc20c82aa8/elements/{elementId:int}/content")]
+        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/1cbac30c-5deb-404e-8ea8-aabc20c82aa8/elements/{elementId:int}/view")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(PageHeaderElementContent), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ReadPageHeaderElementContent(long tenantId, long elementId, [FromQuery]long pageId)
+        [ProducesResponseType(typeof(IElementView<PageHeaderElementSettings, PageHeaderElementContent>), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> ReadPageHeaderElementView(long tenantId, long elementId, [FromQuery]long pageId)
         {
             PageContext context = new PageContext { PageId = pageId };
-            PageHeaderElementContent elementContent = await _pageHeaderElementService.ReadElementContentAsync(tenantId, elementId, context);
-            if (elementContent == null)
+            IElementView<PageHeaderElementSettings, PageHeaderElementContent> view = await _pageHeaderElementService.ReadElementViewAsync(tenantId, elementId, context);
+            if (view == null)
                 return NotFound();
-            return Ok(elementContent);
+            return Ok(view);
         }
 
         // PAGE LIST
@@ -186,25 +173,25 @@ namespace Element.Api.Controllers
         [ProducesResponseType(typeof(PageListElementSettings), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> ReadPageListElementSettings(long tenantId, long elementId)
         {
-            PageListElementSettings elementSettings = await _pageListElementService.ReadElementSettingsAsync(tenantId, elementId);
-            if (elementSettings == null)
+            PageListElementSettings settings = await _pageListElementService.ReadElementSettingsAsync(tenantId, elementId);
+            if (settings == null)
                 return NotFound();
-            return Ok(elementSettings);
+            return Ok(settings);
         }
 
         [HttpGet]
-        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/61f55535-9f3e-4ef5-96a2-bc84d648842a/elements/{elementId:int}/content")]
+        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/61f55535-9f3e-4ef5-96a2-bc84d648842a/elements/{elementId:int}/view")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(PageListElementContent), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ReadPageListElementContent(long tenantId, long elementId, [FromQuery]long pageId, [FromQuery]string tagIds, [FromQuery]string page)
+        [ProducesResponseType(typeof(IElementView<PageListElementSettings, PageListElementContent>), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> ReadPageListElementView(long tenantId, long elementId, [FromQuery]long pageId, [FromQuery]string tagIds, [FromQuery]string page)
         {
             IEnumerable<long> tagIdCollection = !string.IsNullOrWhiteSpace(tagIds) ? tagIds.Split(",").Select(long.Parse) : null;
             IDictionary<string, string> parameters = page != null ? new Dictionary<string, string> { { "page", page } } : null;
             PageContext context = new PageContext { PageId = pageId, Parameters = parameters, TagIds = tagIdCollection };
-            PageListElementContent elementContent = await _pageListElementService.ReadElementContentAsync(tenantId, elementId, context);
-            if (elementContent == null)
+            IElementView<PageListElementSettings, PageListElementContent> view = await _pageListElementService.ReadElementViewAsync(tenantId, elementId, context);
+            if (view == null)
                 return NotFound();
-            return Ok(elementContent);
+            return Ok(view);
         }
 
         // SHARE
@@ -215,23 +202,23 @@ namespace Element.Api.Controllers
         [ProducesResponseType(typeof(ShareElementSettings), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> ReadShareElementSettings(long tenantId, long elementId)
         {
-            ShareElementSettings elementSettings = await _shareElementService.ReadElementSettingsAsync(tenantId, elementId);
-            if (elementSettings == null)
+            ShareElementSettings settings = await _shareElementService.ReadElementSettingsAsync(tenantId, elementId);
+            if (settings == null)
                 return NotFound();
-            return Ok(elementSettings);
+            return Ok(settings);
         }
 
         [HttpGet]
-        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/cf0d7834-54fb-4a6e-86db-0f238f8b1ac1/elements/{elementId:int}/content")]
+        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/cf0d7834-54fb-4a6e-86db-0f238f8b1ac1/elements/{elementId:int}/view")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(ShareElementContent), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ReadShareElementContent(long tenantId, long elementId, [FromQuery]long pageId)
+        [ProducesResponseType(typeof(IElementView<ShareElementSettings, ShareElementContent>), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> ReadShareElementView(long tenantId, long elementId, [FromQuery]long pageId)
         {
             PageContext context = new PageContext { PageId = pageId };
-            ShareElementContent elementContent = await _shareElementService.ReadElementContentAsync(tenantId, elementId, context);
-            if (elementContent == null)
+            IElementView<ShareElementSettings, ShareElementContent> view = await _shareElementService.ReadElementViewAsync(tenantId, elementId, context);
+            if (view == null)
                 return NotFound();
-            return Ok(elementContent);
+            return Ok(view);
         }
     }
 }
