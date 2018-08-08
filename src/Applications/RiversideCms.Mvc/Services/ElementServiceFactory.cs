@@ -14,8 +14,9 @@ namespace RiversideCms.Mvc.Services
         private readonly IPageHeaderElementService _pageHeaderElementService;
         private readonly IPageListElementService _pageListElementService;
         private readonly IShareElementService _shareElementService;
+        private readonly ITagCloudElementService _tagCloudElementService;
 
-        public ElementServiceFactory(ICodeSnippetElementService codeSnippetElementService, IFooterElementService footerElementService, IHtmlElementService htmlElementService, INavigationBarElementService navigationBarElementService, IPageHeaderElementService pageHeaderElementService, IPageListElementService pageListElementService, IShareElementService shareElementService)
+        public ElementServiceFactory(ICodeSnippetElementService codeSnippetElementService, IFooterElementService footerElementService, IHtmlElementService htmlElementService, INavigationBarElementService navigationBarElementService, IPageHeaderElementService pageHeaderElementService, IPageListElementService pageListElementService, IShareElementService shareElementService, ITagCloudElementService tagCloudElementService)
         {
             _codeSnippetElementService = codeSnippetElementService;
             _footerElementService = footerElementService;
@@ -24,6 +25,7 @@ namespace RiversideCms.Mvc.Services
             _pageHeaderElementService = pageHeaderElementService;
             _pageListElementService = pageListElementService;
             _shareElementService = shareElementService;
+            _tagCloudElementService = tagCloudElementService;
         }
 
         public async Task<IElementView> GetElementViewAsync(long tenantId, Guid elementTypeId, long elementId, PageContext context)
@@ -50,6 +52,9 @@ namespace RiversideCms.Mvc.Services
 
                 case "cf0d7834-54fb-4a6e-86db-0f238f8b1ac1":
                     return await _shareElementService.ReadElementViewAsync(tenantId, elementId, context);
+
+                case "b910c231-7dbd-4cad-92ef-775981e895b4":
+                    return await _tagCloudElementService.ReadElementViewAsync(tenantId, elementId, context);
 
                 default:
                     return null;

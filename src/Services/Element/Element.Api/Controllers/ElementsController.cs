@@ -18,8 +18,9 @@ namespace Element.Api.Controllers
         private readonly IPageHeaderElementService _pageHeaderElementService;
         private readonly IPageListElementService _pageListElementService;
         private readonly IShareElementService _shareElementService;
+        private readonly ITagCloudElementService _tagCloudElementService;
 
-        public ElementsController(ICodeSnippetElementService codeSnippetElementService, IFooterElementService footerElementService, IHtmlElementService htmlElementService, INavigationBarElementService navigationBarElementService, IPageHeaderElementService pageHeaderElementService, IPageListElementService pageListElementService, IShareElementService shareElementService)
+        public ElementsController(ICodeSnippetElementService codeSnippetElementService, IFooterElementService footerElementService, IHtmlElementService htmlElementService, INavigationBarElementService navigationBarElementService, IPageHeaderElementService pageHeaderElementService, IPageListElementService pageListElementService, IShareElementService shareElementService, ITagCloudElementService tagCloudElementService)
         {
             _codeSnippetElementService = codeSnippetElementService;
             _footerElementService = footerElementService;
@@ -28,6 +29,7 @@ namespace Element.Api.Controllers
             _pageHeaderElementService = pageHeaderElementService;
             _pageListElementService = pageListElementService;
             _shareElementService = shareElementService;
+            _tagCloudElementService = tagCloudElementService;
         }
 
         // CODE SNIPPET
@@ -216,6 +218,34 @@ namespace Element.Api.Controllers
         {
             PageContext context = new PageContext { PageId = pageId };
             IElementView<ShareElementSettings, ShareElementContent> view = await _shareElementService.ReadElementViewAsync(tenantId, elementId, context);
+            if (view == null)
+                return NotFound();
+            return Ok(view);
+        }
+
+        // TAG CLOUD
+
+        [HttpGet]
+        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/b910c231-7dbd-4cad-92ef-775981e895b4/elements/{elementId:int}")]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(TagCloudElementSettings), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> ReadTagCloudElementSettings(long tenantId, long elementId)
+        {
+            TagCloudElementSettings settings = await _tagCloudElementService.ReadElementSettingsAsync(tenantId, elementId);
+            if (settings == null)
+                return NotFound();
+            return Ok(settings);
+        }
+
+        [HttpGet]
+        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/b910c231-7dbd-4cad-92ef-775981e895b4/elements/{elementId:int}/view")]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(IElementView<TagCloudElementSettings, TagCloudElementContent>), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> ReadTagCloudElementView(long tenantId, long elementId, [FromQuery]long pageId, [FromQuery]string tagIds)
+        {
+            IEnumerable<long> tagIdCollection = !string.IsNullOrWhiteSpace(tagIds) ? tagIds.Split(",").Select(long.Parse) : null;
+            PageContext context = new PageContext { PageId = pageId, TagIds = tagIdCollection };
+            IElementView<TagCloudElementSettings, TagCloudElementContent> view = await _tagCloudElementService.ReadElementViewAsync(tenantId, elementId, context);
             if (view == null)
                 return NotFound();
             return Ok(view);

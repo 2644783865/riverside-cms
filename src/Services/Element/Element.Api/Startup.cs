@@ -38,6 +38,7 @@ namespace Element.Api
             services.AddTransient<IPageHeaderElementService, PageHeaderElementService>();
             services.AddTransient<IPageListElementService, PageListElementService>();
             services.AddTransient<IShareElementService, ShareElementService>();
+            services.AddTransient<ITagCloudElementService, TagCloudElementService>();
 
             services.AddTransient<IElementRepository<CodeSnippetElementSettings>, SqlCodeSnippetElementRepository>();
             services.AddTransient<IElementRepository<FooterElementSettings>, SqlFooterElementRepository>();
@@ -46,6 +47,7 @@ namespace Element.Api
             services.AddTransient<IElementRepository<PageHeaderElementSettings>, SqlPageHeaderElementRepository>();
             services.AddTransient<IElementRepository<PageListElementSettings>, SqlPageListElementRepository>();
             services.AddTransient<IElementRepository<ShareElementSettings>, SqlShareElementRepository>();
+            services.AddTransient<IElementRepository<TagCloudElementSettings>, SqlTagCloudElementRepository>();
         }
 
         private void ConfigureOptionServices(IServiceCollection services)
