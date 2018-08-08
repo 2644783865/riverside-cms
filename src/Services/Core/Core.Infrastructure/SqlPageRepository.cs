@@ -803,5 +803,128 @@ namespace Riverside.Cms.Services.Core.Infrastructure
                 return pageZoneElement;
             }
         }
+
+        private string GetListTagsSetupSql()
+        {
+            return @"
+                IF (@ParentPageId IS NULL)
+	                SET @ParentPageId = (SELECT PageId FROM cms.[Page] WHERE cms.[Page].TenantId = @TenantId AND cms.[Page].ParentPageId IS NULL)
+            ";
+        }
+
+        private string GetListTagsSelectSql()
+        {
+            return @"
+                SELECT
+	                COUNT(cms.Tag.TagId) AS Count,
+	                cms.Tag.TagId,
+	                cms.Tag.Name
+                FROM
+	                cms.[Page]
+                INNER JOIN
+	                cms.[MasterPage]
+                ON
+	                cms.[Page].TenantId = cms.MasterPage.TenantId AND
+	                cms.[Page].MasterPageId = cms.MasterPage.MasterPageId
+                INNER JOIN
+	                cms.TagPage
+                ON
+	                cms.[Page].TenantId = cms.TagPage.TenantId AND
+	                cms.[Page].PageId = cms.TagPage.PageId
+                INNER JOIN
+	                cms.Tag
+                ON
+	                cms.TagPage.TenantId = cms.Tag.TenantId AND
+	                cms.TagPage.TagId = cms.Tag.TagId
+                WHERE
+	                cms.[Page].TenantId = @TenantId AND
+                    cms.[Page].ParentPageId = @ParentPageId AND
+	                cms.MasterPage.PageType = 1 /* PageType.Document */
+                GROUP BY
+	                cms.Tag.TagId,
+	                cms.Tag.Name
+                ORDER BY
+	                cms.Tag.Name";
+        }
+
+        private string GetListPagesSelectRecursiveSql()
+        {
+            return @"
+                SELECT
+	                COUNT(cms.Tag.TagId) AS Count,
+	                cms.Tag.TagId,
+	                cms.Tag.Name
+                FROM
+	                @Folders [FoldersTable]
+                INNER JOIN
+	                cms.[Page]
+                ON
+	                cms.[Page].TenantId = @TenantId AND
+                    cms.[Page].ParentPageId = @ParentPageId
+                INNER JOIN
+	                cms.[MasterPage]
+                ON
+	                cms.[Page].TenantId = cms.MasterPage.TenantId AND
+	                cms.[Page].MasterPageId = cms.MasterPage.MasterPageId
+                INNER JOIN
+	                cms.TagPage 
+                ON
+	                cms.[Page].TenantId = cms.TagPage.TenantId AND
+	                cms.[Page].PageId = cms.TagPage.PageId
+                INNER JOIN
+	                cms.Tag
+                ON
+	                cms.TagPage.TenantId = cms.Tag.TenantId AND
+	                cms.TagPage.TagId = cms.Tag.TagId
+                WHERE
+	                cms.MasterPage.PageType	= 1 /* PageType.Document */
+                GROUP BY
+	                cms.Tag.TagId,
+	                cms.Tag.Name
+                ORDER BY
+	                cms.Tag.Name
+            ";
+        }
+
+        private string GetListTagsRecursiveSql()
+        {
+            return $@"
+                {GetListTagsSetupSql()}
+                {GetListPagesFoldersSql()}
+                {GetListPagesSelectRecursiveSql()}
+            ";
+        }
+
+        private string GetListTagsSql()
+        {
+            return $@"
+                {GetListTagsSetupSql()}
+                {GetListTagsSelectSql()}
+            ";
+        }
+
+        private string GetListTagsSql(bool recursive)
+        {
+            if (recursive)
+                return GetListTagsRecursiveSql();
+            else
+                return GetListTagsSql();
+        }
+
+        public async Task<IEnumerable<TagCount>> ListTags(long tenantId, long? parentPageId, bool recursive)
+        {
+            using (SqlConnection connection = new SqlConnection(_options.Value.SqlConnectionString))
+            {
+                connection.Open();
+                return await connection.QueryAsync<TagCount>(
+                    GetListTagsSql(recursive),
+                    new
+                    {
+                        TenantId = tenantId,
+                        ParentPageId = parentPageId
+                    }
+                );
+            }
+        }
     }
 }
