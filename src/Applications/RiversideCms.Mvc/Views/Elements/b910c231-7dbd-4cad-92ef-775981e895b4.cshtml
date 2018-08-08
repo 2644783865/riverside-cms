@@ -1,7 +1,33 @@
-﻿@using Riverside.Cms.Services.Element.Client
+﻿@using RiversideCms.Mvc.Extensions
+@using Riverside.Cms.Services.Element.Client
 
 @model IElementView<TagCloudElementSettings, TagCloudElementContent>
 
 <div class="rcms-tag-cloud">
+
+    @if (Model.Settings.DisplayName != null)
+    {
+        <h2>@Model.Settings.DisplayName</h2>
+    }
+
+    @if (!Model.Content.TagsToDisplay)
+    {
+        <p>@Model.Settings.NoTagsMessage</p>
+    }
+
+    @if (Model.Content.TagsToDisplay)
+    {
+        <ul class="tags">
+            @foreach (TagCloudTag tag in Model.Content.SelectedTags)
+            {
+                <li class="tag-tagged">
+                    <a href="@Url.PageUrl(Model.Content.Page.PageId, Model.Content.Page.Name, Model.Content.Page.Home, tag.ActionTags.Select(t => t.Name), null)">
+                        @tag.Tag.Name
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                    </a>
+                </li>
+            }
+        </ul>
+    }
 
 </div>

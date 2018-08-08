@@ -31,7 +31,7 @@ namespace RiversideCms.Mvc.Extensions
         private static string GetRouteName(bool home, IEnumerable<string> tagNames)
         {
             string routeName = home ? "Home" : "Page";
-            if (tagNames != null)
+            if (tagNames != null && tagNames.Any())
                 routeName += "Tagged";
             return routeName;
         }
