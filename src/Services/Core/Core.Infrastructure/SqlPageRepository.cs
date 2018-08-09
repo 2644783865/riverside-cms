@@ -847,7 +847,7 @@ namespace Riverside.Cms.Services.Core.Infrastructure
 	                cms.Tag.Name";
         }
 
-        private string GetListPagesSelectRecursiveSql()
+        private string GetListTagsSelectRecursiveSql()
         {
             return @"
                 SELECT
@@ -860,7 +860,7 @@ namespace Riverside.Cms.Services.Core.Infrastructure
 	                cms.[Page]
                 ON
 	                cms.[Page].TenantId = @TenantId AND
-                    cms.[Page].ParentPageId = @ParentPageId
+                    cms.[Page].ParentPageId = [FoldersTable].PageId
                 INNER JOIN
 	                cms.[MasterPage]
                 ON
@@ -891,7 +891,7 @@ namespace Riverside.Cms.Services.Core.Infrastructure
             return $@"
                 {GetListTagsSetupSql()}
                 {GetListPagesFoldersSql()}
-                {GetListPagesSelectRecursiveSql()}
+                {GetListTagsSelectRecursiveSql()}
             ";
         }
 
