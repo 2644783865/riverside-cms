@@ -1,4 +1,5 @@
 ﻿@using RiversideCms.Mvc.Extensions
+@using Riverside.Cms.Services.Core.Client
 @using Riverside.Cms.Services.Element.Client
 
 @model IElementView<TagCloudElementSettings, TagCloudElementContent>
@@ -18,6 +19,12 @@
     @if (Model.Content.TagsToDisplay)
     {
         <ul class="tags">
+            @foreach (TagCount tag in Model.Content.AvailableTags)
+            {
+                <li class="tag-available">
+                    <a class="tag@(tag.Count)" href="@Url.PageUrl(Model.Content.Page.PageId, Model.Content.Page.Name, Model.Content.Page.Home, new[] { tag.Name }, null)">@tag.Name</a>
+                </li>
+            }
             @foreach (TagCloudTag tag in Model.Content.SelectedTags)
             {
                 <li class="tag-tagged">

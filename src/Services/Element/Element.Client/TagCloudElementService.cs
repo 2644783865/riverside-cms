@@ -34,6 +34,7 @@ namespace Riverside.Cms.Services.Element.Client
     {
         public bool TagsToDisplay { get; set; }
         public IEnumerable<TagCloudTag> SelectedTags { get; set; }
+        public IEnumerable<TagCount> AvailableTags { get; set; }
         public TagCloudPageLink Page { get; set; }
     }
 

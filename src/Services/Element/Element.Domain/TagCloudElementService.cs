@@ -31,6 +31,7 @@ namespace Riverside.Cms.Services.Element.Domain
     {
         public bool TagsToDisplay { get; set; }
         public IEnumerable<TagCloudTag> SelectedTags { get; set; }
+        public IEnumerable<TagCount> AvailableTags { get; set; }
         public TagCloudPageLink Page { get; set; }
     }
 
@@ -76,15 +77,21 @@ namespace Riverside.Cms.Services.Element.Domain
             long tagCloudPageId = settings.PageId ?? context.PageId;
             content.Page = await GetPageLinkAsync(tenantId, tagCloudPageId);
 
+            // Get selected tags
             IEnumerable<Tag> tags = null;
             if (context.TagIds != null)
                 tags = await _tagService.ListTagsAsync(tenantId, context.TagIds);
             else
                 tags = new List<Tag>();
-
             content.SelectedTags = tags.Select(t => new TagCloudTag { Tag = t, ActionTags = tags.Where(t2 => t2.Name != t.Name) });
 
-            content.TagsToDisplay = content.SelectedTags.Any(); // || Model.Content.TaggedList.Count > 0 || Model.Content.RelatedTagList.Count > 0;
+            // When no tags selected, get list of available tags and their counts
+            if (!content.SelectedTags.Any())
+                content.AvailableTags = await _tagService.ListTagCountsAsync(tenantId, tagCloudPageId, settings.Recursive);
+            else
+                content.AvailableTags = new List<TagCount>();
+
+            content.TagsToDisplay = content.SelectedTags.Any() || content.AvailableTags.Any(); // || Model.Content.RelatedTagList.Count > 0;
 
             return new ElementView<TagCloudElementSettings, TagCloudElementContent>
             {
