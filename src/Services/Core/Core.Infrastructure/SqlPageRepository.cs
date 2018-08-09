@@ -208,7 +208,7 @@ namespace Riverside.Cms.Services.Core.Infrastructure
             ";
         }
 
-        private string GetListPagesFoldersSql()
+        private string GetFoldersRecursiveSql()
         {
             return @"
                 DECLARE @Folders TABLE(
@@ -257,6 +257,33 @@ namespace Riverside.Cms.Services.Core.Infrastructure
 	                [Folders].PageId
                 FROM
 	                [Folders]
+
+                -- Record the page that is passed to this stored procedure
+
+	            INSERT INTO
+		            @Folders (PageId)
+	            SELECT
+		            cms.[Page].PageId
+	            FROM
+		            cms.[Page]
+	            INNER JOIN
+		            cms.[MasterPage]
+	            ON
+		            cms.[Page].TenantId = cms.[MasterPage].TenantId AND
+		            cms.[Page].MasterPageId = cms.[MasterPage].MasterPageId
+	            WHERE
+		            cms.[Page].TenantId = @TenantId AND
+		            cms.[Page].PageId = @ParentPageId AND
+		            cms.[MasterPage].PageType = 0 /* PageType.Folder */
+            ";
+        }
+
+        private string GetFoldersSql()
+        {
+            return @"
+                DECLARE @Folders TABLE(
+                    PageId [bigint] NOT NULL PRIMARY KEY CLUSTERED
+                )
 
                 -- Record the page that is passed to this stored procedure
 
@@ -444,7 +471,7 @@ namespace Riverside.Cms.Services.Core.Infrastructure
         {
             return $@"
                 {GetListPagesSetupSql()}
-                {GetListPagesFoldersSql()}
+                {GetFoldersRecursiveSql()}
                 {GetListPagesCteRecursiveSql()}
                 {GetListPagesSelectSql()}
                 {GetListPagesTotalRecursiveSql()}
@@ -673,7 +700,7 @@ namespace Riverside.Cms.Services.Core.Infrastructure
         {
             return $@"
                 {GetListPagesSetupSql()}
-                {GetListPagesFoldersSql()}
+                {GetFoldersRecursiveSql()}
                 {GetListPagesTagsSql()}
                 {GetListPagesTaggedPagesRecursiveSql()}
                 {GetListPagesTaggedPagesCteRecursiveSql()}
@@ -820,41 +847,6 @@ namespace Riverside.Cms.Services.Core.Infrastructure
 	                cms.Tag.TagId,
 	                cms.Tag.Name
                 FROM
-	                cms.[Page]
-                INNER JOIN
-	                cms.[MasterPage]
-                ON
-	                cms.[Page].TenantId = cms.MasterPage.TenantId AND
-	                cms.[Page].MasterPageId = cms.MasterPage.MasterPageId
-                INNER JOIN
-	                cms.TagPage
-                ON
-	                cms.[Page].TenantId = cms.TagPage.TenantId AND
-	                cms.[Page].PageId = cms.TagPage.PageId
-                INNER JOIN
-	                cms.Tag
-                ON
-	                cms.TagPage.TenantId = cms.Tag.TenantId AND
-	                cms.TagPage.TagId = cms.Tag.TagId
-                WHERE
-	                cms.[Page].TenantId = @TenantId AND
-                    cms.[Page].ParentPageId = @ParentPageId AND
-	                cms.MasterPage.PageType = 1 /* PageType.Document */
-                GROUP BY
-	                cms.Tag.TagId,
-	                cms.Tag.Name
-                ORDER BY
-	                cms.Tag.Name";
-        }
-
-        private string GetListTagsSelectRecursiveSql()
-        {
-            return @"
-                SELECT
-	                COUNT(cms.Tag.TagId) AS Count,
-	                cms.Tag.TagId,
-	                cms.Tag.Name
-                FROM
 	                @Folders [FoldersTable]
                 INNER JOIN
 	                cms.[Page]
@@ -890,8 +882,8 @@ namespace Riverside.Cms.Services.Core.Infrastructure
         {
             return $@"
                 {GetListTagsSetupSql()}
-                {GetListPagesFoldersSql()}
-                {GetListTagsSelectRecursiveSql()}
+                {GetFoldersRecursiveSql()}
+                {GetListTagsSelectSql()}
             ";
         }
 
@@ -899,6 +891,7 @@ namespace Riverside.Cms.Services.Core.Infrastructure
         {
             return $@"
                 {GetListTagsSetupSql()}
+                {GetFoldersSql()}
                 {GetListTagsSelectSql()}
             ";
         }
