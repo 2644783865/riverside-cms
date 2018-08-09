@@ -82,10 +82,5 @@ namespace Riverside.Cms.Services.Core.Domain
         {
             return _pageRepository.ReadPageZoneElementAsync(tenantId, pageId, pageZoneId, pageZoneElementId);
         }
-
-        public Task<IEnumerable<TagCount>> ListTags(long tenantId, long? parentPageId, bool recursive)
-        {
-            return _pageRepository.ListTags(tenantId, parentPageId, recursive);
-        }
     }
 }

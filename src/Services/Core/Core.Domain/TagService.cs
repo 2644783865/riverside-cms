@@ -28,5 +28,10 @@ namespace Riverside.Cms.Services.Core.Domain
         {
             return _tagRepository.ListTagsAsync(tenantId, tagNames);
         }
+
+        public Task<IEnumerable<TagCount>> ListTagCountsAsync(long tenantId, long? parentPageId, bool recursive)
+        {
+            return _tagRepository.ListTagCountsAsync(tenantId, parentPageId, recursive);
+        }
     }
 }

@@ -19,7 +19,5 @@ namespace Riverside.Cms.Services.Core.Domain
 
         Task<IEnumerable<PageZoneElement>> SearchPageZoneElementsAsync(long tenantId, long pageId, long pageZoneId);
         Task<PageZoneElement> ReadPageZoneElementAsync(long tenantId, long pageId, long pageZoneId, long pageZoneElementId);
-
-        Task<IEnumerable<TagCount>> ListTags(long tenantId, long? parentPageId, bool recursive);
     }
 }

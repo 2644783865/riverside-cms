@@ -45,6 +45,19 @@ namespace Core.API.Controllers
                 IEnumerable<string> tagNameCollection = tagNames.Split(",").Select(t => t.Trim()).Distinct().Where(t => t != string.Empty);
                 tags = await _tagService.ListTagsAsync(tenantId, tagNameCollection);
             }
+            else
+            {
+
+            }
+            return Ok(tags);
+        }
+
+        [HttpGet]
+        [Route("api/v1/core/tenants/{tenantId:int}/tags/counts")]
+        [ProducesResponseType(typeof(IEnumerable<TagCount>), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> ListTagCounts(long tenantId, [FromQuery]long? parentPageId, [FromQuery]bool? recursive)
+        {
+            IEnumerable<TagCount> tags = await _tagService.ListTagCountsAsync(tenantId, parentPageId, recursive ?? false);
             return Ok(tags);
         }
     }

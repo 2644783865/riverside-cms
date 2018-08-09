@@ -208,103 +208,6 @@ namespace Riverside.Cms.Services.Core.Infrastructure
             ";
         }
 
-        private string GetFoldersRecursiveSql()
-        {
-            return @"
-                DECLARE @Folders TABLE(
-                    PageId [bigint] NOT NULL PRIMARY KEY CLUSTERED
-                )
-
-                -- Record all child folders under page that is passed to this stored procedure
-
-                ;WITH [Folders] AS
-                (
-                    SELECT
-		                cms.[Page].PageId
-                    FROM
-                        cms.[Page]
-	                INNER JOIN
-		                cms.[MasterPage]
-	                ON
-		                cms.[Page].TenantId = cms.[MasterPage].TenantId AND
-		                cms.[Page].MasterPageId = cms.[MasterPage].MasterPageId
-                    WHERE
-		                cms.[Page].TenantId = @TenantId AND
-                        cms.[Page].ParentPageId = @ParentPageId AND
-		                cms.[MasterPage].PageType = 0 /* PageType.Folder */
-	                UNION ALL
-	                SELECT
-		                ChildPage.PageId
-	                FROM
-		                cms.[Page] ChildPage
-	                INNER JOIN
-		                cms.[MasterPage] ChildMasterPage
-	                ON
-		                ChildPage.TenantId = ChildMasterPage.TenantId AND
-		                ChildPage.MasterPageId = ChildMasterPage.MasterPageId
-	                INNER JOIN
-		                [Folders]
-	                ON
-		                ChildPage.TenantId = @TenantId AND
-		                ChildPage.ParentPageId = [Folders].PageId
-	                WHERE
-		                ChildMasterPage.PageType = 0 /* PageType.Folder */
-                )
-
-                INSERT INTO
-	                @Folders (PageId)
-                SELECT
-	                [Folders].PageId
-                FROM
-	                [Folders]
-
-                -- Record the page that is passed to this stored procedure
-
-	            INSERT INTO
-		            @Folders (PageId)
-	            SELECT
-		            cms.[Page].PageId
-	            FROM
-		            cms.[Page]
-	            INNER JOIN
-		            cms.[MasterPage]
-	            ON
-		            cms.[Page].TenantId = cms.[MasterPage].TenantId AND
-		            cms.[Page].MasterPageId = cms.[MasterPage].MasterPageId
-	            WHERE
-		            cms.[Page].TenantId = @TenantId AND
-		            cms.[Page].PageId = @ParentPageId AND
-		            cms.[MasterPage].PageType = 0 /* PageType.Folder */
-            ";
-        }
-
-        private string GetFoldersSql()
-        {
-            return @"
-                DECLARE @Folders TABLE(
-                    PageId [bigint] NOT NULL PRIMARY KEY CLUSTERED
-                )
-
-                -- Record the page that is passed to this stored procedure
-
-	            INSERT INTO
-		            @Folders (PageId)
-	            SELECT
-		            cms.[Page].PageId
-	            FROM
-		            cms.[Page]
-	            INNER JOIN
-		            cms.[MasterPage]
-	            ON
-		            cms.[Page].TenantId = cms.[MasterPage].TenantId AND
-		            cms.[Page].MasterPageId = cms.[MasterPage].MasterPageId
-	            WHERE
-		            cms.[Page].TenantId = @TenantId AND
-		            cms.[Page].PageId = @ParentPageId AND
-		            cms.[MasterPage].PageType = 0 /* PageType.Folder */
-            ";
-        }
-
         private string GetListPagesCteRecursiveSql()
         {
             return @"
@@ -471,7 +374,7 @@ namespace Riverside.Cms.Services.Core.Infrastructure
         {
             return $@"
                 {GetListPagesSetupSql()}
-                {GetFoldersRecursiveSql()}
+                {SqlProvider.GetFoldersRecursiveSql()}
                 {GetListPagesCteRecursiveSql()}
                 {GetListPagesSelectSql()}
                 {GetListPagesTotalRecursiveSql()}
@@ -700,7 +603,7 @@ namespace Riverside.Cms.Services.Core.Infrastructure
         {
             return $@"
                 {GetListPagesSetupSql()}
-                {GetFoldersRecursiveSql()}
+                {SqlProvider.GetFoldersRecursiveSql()}
                 {GetListPagesTagsSql()}
                 {GetListPagesTaggedPagesRecursiveSql()}
                 {GetListPagesTaggedPagesCteRecursiveSql()}
@@ -828,95 +731,6 @@ namespace Riverside.Cms.Services.Core.Infrastructure
                 );
 
                 return pageZoneElement;
-            }
-        }
-
-        private string GetListTagsSetupSql()
-        {
-            return @"
-                IF (@ParentPageId IS NULL)
-	                SET @ParentPageId = (SELECT PageId FROM cms.[Page] WHERE cms.[Page].TenantId = @TenantId AND cms.[Page].ParentPageId IS NULL)
-            ";
-        }
-
-        private string GetListTagsSelectSql()
-        {
-            return @"
-                SELECT
-	                COUNT(cms.Tag.TagId) AS Count,
-	                cms.Tag.TagId,
-	                cms.Tag.Name
-                FROM
-	                @Folders [FoldersTable]
-                INNER JOIN
-	                cms.[Page]
-                ON
-	                cms.[Page].TenantId = @TenantId AND
-                    cms.[Page].ParentPageId = [FoldersTable].PageId
-                INNER JOIN
-	                cms.[MasterPage]
-                ON
-	                cms.[Page].TenantId = cms.MasterPage.TenantId AND
-	                cms.[Page].MasterPageId = cms.MasterPage.MasterPageId
-                INNER JOIN
-	                cms.TagPage 
-                ON
-	                cms.[Page].TenantId = cms.TagPage.TenantId AND
-	                cms.[Page].PageId = cms.TagPage.PageId
-                INNER JOIN
-	                cms.Tag
-                ON
-	                cms.TagPage.TenantId = cms.Tag.TenantId AND
-	                cms.TagPage.TagId = cms.Tag.TagId
-                WHERE
-	                cms.MasterPage.PageType	= 1 /* PageType.Document */
-                GROUP BY
-	                cms.Tag.TagId,
-	                cms.Tag.Name
-                ORDER BY
-	                cms.Tag.Name
-            ";
-        }
-
-        private string GetListTagsRecursiveSql()
-        {
-            return $@"
-                {GetListTagsSetupSql()}
-                {GetFoldersRecursiveSql()}
-                {GetListTagsSelectSql()}
-            ";
-        }
-
-        private string GetListTagsSql()
-        {
-            return $@"
-                {GetListTagsSetupSql()}
-                {GetFoldersSql()}
-                {GetListTagsSelectSql()}
-            ";
-        }
-
-        private string GetListTagsSql(bool recursive)
-        {
-            if (recursive)
-                return GetListTagsRecursiveSql();
-            else
-                return GetListTagsSql();
-        }
-
-        public async Task<IEnumerable<TagCount>> ListTags(long tenantId, long? parentPageId, bool recursive)
-        {
-            using (SqlConnection connection = new SqlConnection(_options.Value.SqlConnectionString))
-            {
-                connection.Open();
-                return await connection.QueryAsync<TagCount>(
-                    GetListTagsSql(recursive),
-                    new
-                    {
-                        TenantId = tenantId,
-                        ParentPageId = parentPageId
-                    }
-                );
             }
         }
     }

@@ -63,15 +63,6 @@ namespace Core.API.Controllers
         }
 
         [HttpGet]
-        [Route("api/v1/core/tenants/{tenantId:int}/pages/tags")]
-        [ProducesResponseType(typeof(IEnumerable<TagCount>), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ListTags(long tenantId, [FromQuery]long? parentPageId, [FromQuery]bool? recursive)
-        {
-            IEnumerable<TagCount> tags = await _pageService.ListTags(tenantId, parentPageId, recursive ?? false);
-            return Ok(tags);
-        }
-
-        [HttpGet]
         [Route("api/v1/core/tenants/{tenantId:int}/pages/{pageId:int}/zones")]
         [ProducesResponseType(typeof(IEnumerable<PageZone>), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> SearchPageZones(long tenantId, long pageId)
