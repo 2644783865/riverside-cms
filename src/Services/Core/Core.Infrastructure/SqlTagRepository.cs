@@ -54,7 +54,9 @@ namespace Riverside.Cms.Services.Core.Infrastructure
                         cms.Tag
                     WHERE
                         TenantId = @TenantId AND
-                        TagId IN @TagIds",
+                        TagId IN @TagIds
+                    ORDER BY
+    	                Name",
                     new
                     {
                         TenantId = tenantId,
@@ -77,7 +79,10 @@ namespace Riverside.Cms.Services.Core.Infrastructure
                         cms.Tag
                     WHERE
                         TenantId = @TenantId AND
-                        Name IN @TagNames",
+                        Name IN @TagNames
+                    ORDER BY
+    	                Name
+                    ",
                     new
                     {
                         TenantId = tenantId,
