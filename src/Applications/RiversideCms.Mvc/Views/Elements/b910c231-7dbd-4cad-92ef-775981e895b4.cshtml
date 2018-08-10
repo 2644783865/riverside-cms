@@ -17,7 +17,7 @@
             @foreach (TagCount tag in Model.Content.AvailableTags)
             {
                 <li class="tag-available">
-                    <a class="tag@(tag.Count)" href="@Url.PageUrl(Model.Content.Page.PageId, Model.Content.Page.Name, Model.Content.Page.Home, new[] { tag.Name }, null)">@tag.Name</a>
+                    <a class="tag@(tag.Size)" href="@Url.PageUrl(Model.Content.Page.PageId, Model.Content.Page.Name, Model.Content.Page.Home, new[] { tag.Name }, null)">@tag.Name</a>
                 </li>
             }
             @foreach (Tag tag in Model.Content.SelectedTags)
@@ -32,7 +32,7 @@
             @foreach (TagCount tag in Model.Content.RelatedTags)
             {
                 <li class="tag-available">
-                    <a class="tag@(tag.Count)" href="@Url.PageUrl(Model.Content.Page.PageId, Model.Content.Page.Name, Model.Content.Page.Home, Model.Content.SelectedTags.Select(t => t.Name).Append(tag.Name), null)">
+                    <a class="tag@(tag.Size)" href="@Url.PageUrl(Model.Content.Page.PageId, Model.Content.Page.Name, Model.Content.Page.Home, Model.Content.SelectedTags.Select(t => t.Name).Append(tag.Name), null)">
                         @tag.Name
                     </a>
                 </li>
