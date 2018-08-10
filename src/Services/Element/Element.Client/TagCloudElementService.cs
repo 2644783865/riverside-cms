@@ -17,12 +17,6 @@ namespace Riverside.Cms.Services.Element.Client
         public string NoTagsMessage { get; set; }
     }
 
-    public class TagCloudTag
-    {
-        public Tag Tag { get; set; }
-        public IEnumerable<Tag> ActionTags { get; set; }
-    }
-
     public class TagCloudPageLink
     {
         public bool Home { get; set; }
@@ -32,9 +26,9 @@ namespace Riverside.Cms.Services.Element.Client
 
     public class TagCloudElementContent
     {
-        public bool TagsToDisplay { get; set; }
-        public IEnumerable<TagCloudTag> SelectedTags { get; set; }
+        public IEnumerable<Tag> SelectedTags { get; set; }
         public IEnumerable<TagCount> AvailableTags { get; set; }
+        public IEnumerable<TagCount> RelatedTags { get; set; }
         public TagCloudPageLink Page { get; set; }
     }
 

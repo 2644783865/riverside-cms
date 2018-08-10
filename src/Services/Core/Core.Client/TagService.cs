@@ -87,5 +87,24 @@ namespace Riverside.Cms.Services.Core.Client
                 throw new CoreClientException("Core API failed", ex);
             }
         }
+
+        public async Task<IEnumerable<TagCount>> ListRelatedTagCountsAsync(long tenantId, IEnumerable<long> tagIds, long? parentPageId, bool recursive)
+        {
+            try
+            {
+                string uri = $"{_options.Value.CoreApiBaseUrl}tenants/{tenantId}/tags/related/counts?recursive={recursive.ToString().ToLower()}" +
+                    (tagIds != null && tagIds.Count() > 0 ? $"&tagids={string.Join(",", tagIds)}" : string.Empty) +
+                    (parentPageId.HasValue ? $"&parentpageid={parentPageId.Value}" : string.Empty);
+                using (HttpClient httpClient = new HttpClient())
+                {
+                    string json = await httpClient.GetStringAsync(uri);
+                    return JsonConvert.DeserializeObject<IEnumerable<TagCount>>(json);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new CoreClientException("Core API failed", ex);
+            }
+        }
     }
 }

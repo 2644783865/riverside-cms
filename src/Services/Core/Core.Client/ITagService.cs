@@ -11,5 +11,6 @@ namespace Riverside.Cms.Services.Core.Client
         Task<IEnumerable<Tag>> ListTagsAsync(long tenantId, IEnumerable<long> tagIds);
         Task<IEnumerable<Tag>> ListTagsAsync(long tenantId, IEnumerable<string> tagNames);
         Task<IEnumerable<TagCount>> ListTagCountsAsync(long tenantId, long? parentPageId, bool recursive);
+        Task<IEnumerable<TagCount>> ListRelatedTagCountsAsync(long tenantId, IEnumerable<long> tagIds, long? parentPageId, bool recursive);
     }
 }

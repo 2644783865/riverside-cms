@@ -16,7 +16,7 @@ namespace RiversideCms.Mvc.Extensions
         private static void AddTagNames(RouteValueDictionary routeValueDictionary, IEnumerable<string> tagNames)
         {
             if (tagNames != null)
-                routeValueDictionary.Add("tags", string.Join('+', tagNames));
+                routeValueDictionary.Add("tags", string.Join('+', tagNames.OrderBy(t => t)));
         }
 
         private static void AddPageDetails(RouteValueDictionary routeValueDictionary, long pageId, string pageName, bool home)
