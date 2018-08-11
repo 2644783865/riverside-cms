@@ -74,9 +74,7 @@
                 {
                     <ul class="tags">
                         @foreach (Tag tag in pageListPage.Tags)
-                        {
-                            <li class="tag-available">@Html.PageLink(tag.Name, Model.Content.CurrentPage.PageId, Model.Content.CurrentPage.Name, Model.Content.CurrentPage.Home, new[] { tag.Name }, null)</li>
-                        }
+                        {<li class="tag-available">@Html.PageLink(tag.Name, Model.Content.CurrentPage.PageId, Model.Content.CurrentPage.Name, Model.Content.CurrentPage.Home, new[] { tag.Name }, null)</li>}
                     </ul>
                 }
                 @if (Model.Settings.ShowBackgroundImage)
