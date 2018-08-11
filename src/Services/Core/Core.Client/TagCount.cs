@@ -7,7 +7,6 @@ namespace Riverside.Cms.Services.Core.Client
     public class TagCount
     {
         public int Count { get; set; }
-        public int Size { get; set; }
         public long TagId { get; set; }
         public string Name { get; set; }
     }

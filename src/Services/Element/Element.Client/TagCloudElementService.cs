@@ -24,11 +24,18 @@ namespace Riverside.Cms.Services.Element.Client
         public string Name { get; set; }
     }
 
+    public class TagCloudSize
+    {
+        public int Size { get; set; }
+        public long TagId { get; set; }
+        public string Name { get; set; }
+    }
+
     public class TagCloudElementContent
     {
         public IEnumerable<Tag> SelectedTags { get; set; }
-        public IEnumerable<TagCount> AvailableTags { get; set; }
-        public IEnumerable<TagCount> RelatedTags { get; set; }
+        public IEnumerable<TagCloudSize> AvailableTags { get; set; }
+        public IEnumerable<TagCloudSize> RelatedTags { get; set; }
         public TagCloudPageLink Page { get; set; }
     }
 

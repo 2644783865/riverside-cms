@@ -21,11 +21,18 @@ namespace Riverside.Cms.Services.Element.Domain
         public string Name { get; set; }
     }
 
+    public class TagCloudSize
+    {
+        public int Size { get; set; }
+        public long TagId { get; set; }
+        public string Name { get; set; }
+    }
+
     public class TagCloudElementContent
     {
         public IEnumerable<Tag> SelectedTags { get; set; }
-        public IEnumerable<TagCount> AvailableTags { get; set; }
-        public IEnumerable<TagCount> RelatedTags { get; set; }
+        public IEnumerable<TagCloudSize> AvailableTags { get; set; }
+        public IEnumerable<TagCloudSize> RelatedTags { get; set; }
         public TagCloudPageLink Page { get; set; }
     }
 
@@ -38,6 +45,8 @@ namespace Riverside.Cms.Services.Element.Domain
         private readonly IElementRepository<TagCloudElementSettings> _elementRepository;
         private readonly IPageService _pageService;
         private readonly ITagService _tagService;
+
+        private const int MaxTagSize = 9;
 
         public TagCloudElementService(IElementRepository<TagCloudElementSettings> elementRepository, IPageService pageService, ITagService tagService)
         {
@@ -62,6 +71,39 @@ namespace Riverside.Cms.Services.Element.Domain
             };
         }
 
+        private IEnumerable<TagCloudSize> CalculateTagRelativeSizes(IEnumerable<TagCount> tagCounts)
+        {
+            IEnumerable<KeyValuePair<int, IEnumerable<TagCount>>> tagsByCount = tagCounts
+                .GroupBy(t => t.Count)
+                .ToDictionary(g => g.Key, g => g.Select(tc => tc))
+                .OrderBy(kvp => kvp.Key);
+
+            int distinctCounts = tagsByCount.Count();
+
+            List<TagCloudSize> tagCloudSizes = new List<TagCloudSize>();
+
+            if (distinctCounts > 1)
+            {
+                int index = 0;
+                double sizeStep = (double)MaxTagSize / (double)(distinctCounts - 1);
+                foreach (KeyValuePair<int, IEnumerable<TagCount>> kvp in tagsByCount)
+                {
+                    int size = (int)Math.Round(((double)index) * sizeStep) + 1;
+                    foreach (TagCount tagCount in kvp.Value)
+                        tagCloudSizes.Add(new TagCloudSize { TagId = tagCount.TagId, Name = tagCount.Name, Size = size });
+                    index++;
+                }
+            }
+            else if (distinctCounts == 1)
+            {
+                int size = (int)Math.Round((double)MaxTagSize / 2.0) + 1;
+                foreach (TagCount tagCount in tagsByCount.First().Value)
+                    tagCloudSizes.Add(new TagCloudSize { TagId = tagCount.TagId, Name = tagCount.Name, Size = size });
+            }
+
+            return tagCloudSizes.OrderBy(t => t.Name);
+        }
+
         public async Task<IElementView<TagCloudElementSettings, TagCloudElementContent>> ReadElementViewAsync(long tenantId, long elementId, PageContext context)
         {
             TagCloudElementSettings settings = await _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
@@ -79,15 +121,15 @@ namespace Riverside.Cms.Services.Element.Domain
 
             // When no tags selected, get list of available tags and their counts
             if (!content.SelectedTags.Any())
-                content.AvailableTags = await _tagService.ListTagCountsAsync(tenantId, tagCloudPageId, settings.Recursive);
+                content.AvailableTags = CalculateTagRelativeSizes(await _tagService.ListTagCountsAsync(tenantId, tagCloudPageId, settings.Recursive));
             else
-                content.AvailableTags = new List<TagCount>();
+                content.AvailableTags = new List<TagCloudSize>();
 
             // When tags selected, get list of related tags and their counts
             if (content.SelectedTags.Any())
-                content.RelatedTags = await _tagService.ListRelatedTagCountsAsync(tenantId, context.TagIds, tagCloudPageId, settings.Recursive);
+                content.RelatedTags = CalculateTagRelativeSizes(await _tagService.ListRelatedTagCountsAsync(tenantId, context.TagIds, tagCloudPageId, settings.Recursive));
             else
-                content.RelatedTags = new List<TagCount>();
+                content.RelatedTags = new List<TagCloudSize>();
 
             return new ElementView<TagCloudElementSettings, TagCloudElementContent>
             {

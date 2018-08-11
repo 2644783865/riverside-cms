@@ -14,7 +14,7 @@
     @if (Model.Content.AvailableTags.Any() || Model.Content.SelectedTags.Any() || Model.Content.RelatedTags.Any())
     {
         <ul class="tags">
-            @foreach (TagCount tag in Model.Content.AvailableTags)
+            @foreach (TagCloudSize tag in Model.Content.AvailableTags)
             {
                 <li class="tag-available">
                     <a class="tag@(tag.Size)" href="@Url.PageUrl(Model.Content.Page.PageId, Model.Content.Page.Name, Model.Content.Page.Home, new[] { tag.Name }, null)">@tag.Name</a>
@@ -29,7 +29,7 @@
                     </a>
                 </li>
             }
-            @foreach (TagCount tag in Model.Content.RelatedTags)
+            @foreach (TagCloudSize tag in Model.Content.RelatedTags)
             {
                 <li class="tag-available">
                     <a class="tag@(tag.Size)" href="@Url.PageUrl(Model.Content.Page.PageId, Model.Content.Page.Name, Model.Content.Page.Home, Model.Content.SelectedTags.Select(t => t.Name).Append(tag.Name), null)">
