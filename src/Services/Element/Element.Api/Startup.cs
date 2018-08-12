@@ -34,6 +34,7 @@ namespace Element.Api
             services.AddTransient<ICodeSnippetElementService, CodeSnippetElementService>();
             services.AddTransient<IFooterElementService, FooterElementService>();
             services.AddTransient<IHtmlElementService, HtmlElementService>();
+            services.AddTransient<ILatestThreadsElementService, LatestThreadsElementService>();
             services.AddTransient<INavigationBarElementService, NavigationBarElementService>();
             services.AddTransient<IPageHeaderElementService, PageHeaderElementService>();
             services.AddTransient<IPageListElementService, PageListElementService>();
@@ -43,6 +44,7 @@ namespace Element.Api
             services.AddTransient<IElementRepository<CodeSnippetElementSettings>, SqlCodeSnippetElementRepository>();
             services.AddTransient<IElementRepository<FooterElementSettings>, SqlFooterElementRepository>();
             services.AddTransient<IElementRepository<HtmlElementSettings>, SqlHtmlElementRepository>();
+            services.AddTransient<IElementRepository<LatestThreadsElementSettings>, SqlLatestThreadsElementRepository>();
             services.AddTransient<IElementRepository<NavigationBarElementSettings>, SqlNavigationBarElementRepository>();
             services.AddTransient<IElementRepository<PageHeaderElementSettings>, SqlPageHeaderElementRepository>();
             services.AddTransient<IElementRepository<PageListElementSettings>, SqlPageListElementRepository>();

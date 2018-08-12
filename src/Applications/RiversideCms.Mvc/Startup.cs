@@ -33,6 +33,7 @@ namespace RiversideCms.Mvc
             services.AddTransient<ICodeSnippetElementService, CodeSnippetElementService>();
             services.AddTransient<IFooterElementService, FooterElementService>();
             services.AddTransient<IHtmlElementService, HtmlElementService>();
+            services.AddTransient<ILatestThreadsElementService, LatestThreadsElementService>();
             services.AddTransient<INavigationBarElementService, NavigationBarElementService>();
             services.AddTransient<IPageHeaderElementService, PageHeaderElementService>();
             services.AddTransient<IPageListElementService, PageListElementService>();

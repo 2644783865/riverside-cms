@@ -14,17 +14,19 @@ namespace Element.Api.Controllers
         private readonly ICodeSnippetElementService _codeSnippetElementService;
         private readonly IFooterElementService _footerElementService;
         private readonly IHtmlElementService _htmlElementService;
+        private readonly ILatestThreadsElementService _latestThreadsElementService;
         private readonly INavigationBarElementService _navigationBarElementService;
         private readonly IPageHeaderElementService _pageHeaderElementService;
         private readonly IPageListElementService _pageListElementService;
         private readonly IShareElementService _shareElementService;
         private readonly ITagCloudElementService _tagCloudElementService;
 
-        public ElementsController(ICodeSnippetElementService codeSnippetElementService, IFooterElementService footerElementService, IHtmlElementService htmlElementService, INavigationBarElementService navigationBarElementService, IPageHeaderElementService pageHeaderElementService, IPageListElementService pageListElementService, IShareElementService shareElementService, ITagCloudElementService tagCloudElementService)
+        public ElementsController(ICodeSnippetElementService codeSnippetElementService, IFooterElementService footerElementService, IHtmlElementService htmlElementService, ILatestThreadsElementService latestThreadsElementService, INavigationBarElementService navigationBarElementService, IPageHeaderElementService pageHeaderElementService, IPageListElementService pageListElementService, IShareElementService shareElementService, ITagCloudElementService tagCloudElementService)
         {
             _codeSnippetElementService = codeSnippetElementService;
             _footerElementService = footerElementService;
             _htmlElementService = htmlElementService;
+            _latestThreadsElementService = latestThreadsElementService;
             _navigationBarElementService = navigationBarElementService;
             _pageHeaderElementService = pageHeaderElementService;
             _pageListElementService = pageListElementService;
@@ -108,6 +110,33 @@ namespace Element.Api.Controllers
         {
             PageContext context = new PageContext { PageId = pageId };
             IElementView<HtmlElementSettings, HtmlElementContent> view = await _htmlElementService.ReadElementViewAsync(tenantId, elementId, context);
+            if (view == null)
+                return NotFound();
+            return Ok(view);
+        }
+
+        // LATEST THREADS
+
+        [HttpGet]
+        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/f9557287-ba01-48e3-9ab4-e2f4831933d0/elements/{elementId:int}")]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(LatestThreadsElementSettings), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> ReadLatestThreadsElementSettings(long tenantId, long elementId, [FromQuery]long pageId)
+        {
+            LatestThreadsElementSettings settings = await _latestThreadsElementService.ReadElementSettingsAsync(tenantId, elementId);
+            if (settings == null)
+                return NotFound();
+            return Ok(settings);
+        }
+
+        [HttpGet]
+        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/f9557287-ba01-48e3-9ab4-e2f4831933d0/elements/{elementId:int}/view")]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(IElementView<LatestThreadsElementSettings, LatestThreadsElementContent>), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> ReadLatestThreadsElementView(long tenantId, long elementId, [FromQuery]long pageId)
+        {
+            PageContext context = new PageContext { PageId = pageId };
+            IElementView<LatestThreadsElementSettings, LatestThreadsElementContent> view = await _latestThreadsElementService.ReadElementViewAsync(tenantId, elementId, context);
             if (view == null)
                 return NotFound();
             return Ok(view);

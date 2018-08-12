@@ -10,17 +10,19 @@ namespace RiversideCms.Mvc.Services
         private readonly ICodeSnippetElementService _codeSnippetElementService;
         private readonly IFooterElementService _footerElementService;
         private readonly IHtmlElementService _htmlElementService;
+        private readonly ILatestThreadsElementService _latestThreadsElementService;
         private readonly INavigationBarElementService _navigationBarElementService;
         private readonly IPageHeaderElementService _pageHeaderElementService;
         private readonly IPageListElementService _pageListElementService;
         private readonly IShareElementService _shareElementService;
         private readonly ITagCloudElementService _tagCloudElementService;
 
-        public ElementServiceFactory(ICodeSnippetElementService codeSnippetElementService, IFooterElementService footerElementService, IHtmlElementService htmlElementService, INavigationBarElementService navigationBarElementService, IPageHeaderElementService pageHeaderElementService, IPageListElementService pageListElementService, IShareElementService shareElementService, ITagCloudElementService tagCloudElementService)
+        public ElementServiceFactory(ICodeSnippetElementService codeSnippetElementService, IFooterElementService footerElementService, IHtmlElementService htmlElementService, ILatestThreadsElementService latestThreadsElementService, INavigationBarElementService navigationBarElementService, IPageHeaderElementService pageHeaderElementService, IPageListElementService pageListElementService, IShareElementService shareElementService, ITagCloudElementService tagCloudElementService)
         {
             _codeSnippetElementService = codeSnippetElementService;
             _footerElementService = footerElementService;
             _htmlElementService = htmlElementService;
+            _latestThreadsElementService = latestThreadsElementService;
             _navigationBarElementService = navigationBarElementService;
             _pageHeaderElementService = pageHeaderElementService;
             _pageListElementService = pageListElementService;
@@ -40,6 +42,9 @@ namespace RiversideCms.Mvc.Services
 
                 case "c92ee4c4-b133-44cc-8322-640e99c334dc":
                     return await _htmlElementService.ReadElementViewAsync(tenantId, elementId, context);
+
+                case "f9557287-ba01-48e3-9ab4-e2f4831933d0":
+                    return await _latestThreadsElementService.ReadElementViewAsync(tenantId, elementId, context);
 
                 case "a94c34c0-1a4c-4c91-a669-2f830cf1ea5f":
                     return await _navigationBarElementService.ReadElementViewAsync(tenantId, elementId, context);
