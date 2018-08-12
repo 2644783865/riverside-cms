@@ -1,7 +1,18 @@
-﻿@using Riverside.Cms.Services.Element.Client
+﻿@using RiversideCms.Mvc.Extensions
+@using Riverside.Cms.Services.Element.Client
 
 @model IElementView<LatestThreadsElementSettings, LatestThreadsElementContent>
 
 <div class="rcms-latest-threads">
+
+    @if (Model.Settings.DisplayName != null)
+    {
+        <h2>@Model.Settings.DisplayName</h2>
+    }
+
+    @if (Model.Settings.Preamble != null)
+    {
+        <p class="rcms-preamble">@Html.FormatMultiline(Model.Settings.Preamble)</p>
+    }
 
 </div>
