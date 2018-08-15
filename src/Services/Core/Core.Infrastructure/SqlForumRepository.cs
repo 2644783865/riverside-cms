@@ -29,11 +29,6 @@ namespace Riverside.Cms.Services.Core.Infrastructure
             return null;
         }
 
-        private string GetListLatestThreadsRecursiveSql()
-        {
-            return null;
-        }
-
         private string GetListLatestThreadsSetupSql()
         {
             return @"
@@ -56,6 +51,23 @@ namespace Riverside.Cms.Services.Core.Infrastructure
                 WHERE
 	                cms.[Page].TenantId = @TenantId AND
                     cms.[Page].ParentPageId = @ParentPageId
+            ";
+        }
+
+        private string GetListLatestThreadsPagesRecursiveSql()
+        {
+            return @"
+                INSERT INTO
+	                @Pages (PageId)
+                SELECT
+	                cms.[Page].PageId
+                FROM
+	                cms.[Page]
+                INNER JOIN
+	                @Folders [FoldersTable]
+                ON
+	                cms.[Page].TenantId = @TenantId AND
+                    cms.[Page].ParentPageId = [FoldersTable].PageId
             ";
         }
 
@@ -188,6 +200,17 @@ namespace Riverside.Cms.Services.Core.Infrastructure
             return $@"
                 {GetListLatestThreadsSetupSql()}
                 {GetListLatestThreadsPagesSql()}
+                {GetListLatestThreadsForumsSql()}
+                {GetListLatestThreadsThreadsSql()}
+            ";
+        }
+
+        private string GetListLatestThreadsRecursiveSql()
+        {
+            return $@"
+                {GetListLatestThreadsSetupSql()}
+                {SqlProvider.GetFoldersRecursiveSql()}
+                {GetListLatestThreadsPagesRecursiveSql()}
                 {GetListLatestThreadsForumsSql()}
                 {GetListLatestThreadsThreadsSql()}
             ";
