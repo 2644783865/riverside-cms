@@ -14,25 +14,16 @@ namespace Riverside.Cms.Services.Core.Infrastructure
     {
         private readonly IOptions<SqlOptions> _options;
 
+        private const string TaggedPagesTableName = "Pages";
+
         public SqlForumRepository(IOptions<SqlOptions> options)
         {
             _options = options;
         }
 
-        private string GetListTaggedLatestThreadsRecursiveSql()
-        {
-            return null;
-        }
-
-        private string GetListTaggedLatestThreadsSql()
-        {
-            return null;
-        }
-
         private string GetListLatestThreadsSetupSql()
         {
             return @"
-                DECLARE @Pages TABLE ([PageId] [bigint] NOT NULL PRIMARY KEY CLUSTERED)
                 DECLARE @Forums TABLE ([PageId] [bigint] NOT NULL PRIMARY KEY CLUSTERED, ElementId bigint NOT NULL)
                 IF (@ParentPageId IS NULL)
 	                SET @ParentPageId = (SELECT PageId FROM cms.[Page] WHERE cms.[Page].TenantId = @TenantId AND cms.[Page].ParentPageId IS NULL)
@@ -42,6 +33,7 @@ namespace Riverside.Cms.Services.Core.Infrastructure
         private string GetListLatestThreadsPagesSql()
         {
             return @"
+                DECLARE @Pages TABLE ([PageId] [bigint] NOT NULL PRIMARY KEY CLUSTERED)
                 INSERT INTO
 	                @Pages (PageId)
                 SELECT
@@ -57,6 +49,7 @@ namespace Riverside.Cms.Services.Core.Infrastructure
         private string GetListLatestThreadsPagesRecursiveSql()
         {
             return @"
+                DECLARE @Pages TABLE ([PageId] [bigint] NOT NULL PRIMARY KEY CLUSTERED)
                 INSERT INTO
 	                @Pages (PageId)
                 SELECT
@@ -211,6 +204,29 @@ namespace Riverside.Cms.Services.Core.Infrastructure
                 {GetListLatestThreadsSetupSql()}
                 {SqlProvider.GetFoldersRecursiveSql()}
                 {GetListLatestThreadsPagesRecursiveSql()}
+                {GetListLatestThreadsForumsSql()}
+                {GetListLatestThreadsThreadsSql()}
+            ";
+        }
+
+        private string GetListTaggedLatestThreadsSql()
+        {
+            return $@"
+                {GetListLatestThreadsSetupSql()}
+                {SqlProvider.GetTagsSql()}
+                {SqlProvider.GetTaggedPagesSql(TaggedPagesTableName)}
+                {GetListLatestThreadsForumsSql()}
+                {GetListLatestThreadsThreadsSql()}
+            ";
+        }
+
+        private string GetListTaggedLatestThreadsRecursiveSql()
+        {
+            return $@"
+                {GetListLatestThreadsSetupSql()}
+                {SqlProvider.GetFoldersRecursiveSql()}
+                {SqlProvider.GetTagsSql()}
+                {SqlProvider.GetTaggedPagesRecursiveSql(TaggedPagesTableName)}
                 {GetListLatestThreadsForumsSql()}
                 {GetListLatestThreadsThreadsSql()}
             ";

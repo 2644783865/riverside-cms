@@ -102,5 +102,95 @@ namespace Riverside.Cms.Services.Core.Infrastructure
 		            cms.[MasterPage].PageType = 0 /* PageType.Folder */
             ";
         }
+
+        public static string GetTaggedPagesSql(string pagesTableName)
+        {
+            return $@"
+                DECLARE @{pagesTableName} TABLE (
+                    PageId bigint NOT NULL PRIMARY KEY CLUSTERED
+                )
+
+                DECLARE @TagCount int
+                SELECT @TagCount = (SELECT COUNT(*) FROM @Tags)
+
+                INSERT INTO
+	                @{pagesTableName} (PageId)
+                SELECT
+	                cms.[Page].PageId
+                FROM
+	                cms.[Page]
+                INNER JOIN
+	                cms.TagPage
+                ON
+	                cms.[Page].TenantId = cms.TagPage.TenantId AND
+	                cms.[Page].PageId = cms.TagPage.PageId
+                INNER JOIN
+	                @Tags Tags
+                ON
+	                cms.TagPage.TagId = Tags.TagId
+                WHERE
+	                cms.[Page].TenantId = @TenantId AND
+                    cms.[Page].ParentPageId = @ParentPageId
+                GROUP BY
+	                cms.[Page].PageId
+                HAVING
+	                COUNT(Tags.TagId) = @TagCount
+            ";
+        }
+
+        public static string GetTaggedPagesRecursiveSql(string pagesTableName)
+        {
+            return $@"
+                DECLARE @{pagesTableName} TABLE (
+                    PageId bigint NOT NULL PRIMARY KEY CLUSTERED
+                )
+
+                DECLARE @TagCount int
+                SELECT @TagCount = (SELECT COUNT(*) FROM @Tags)
+
+                INSERT INTO
+	                @{pagesTableName} (PageId)
+                SELECT
+	                cms.[Page].PageId
+                FROM
+	                cms.[Page]
+                INNER JOIN
+	                @Folders [FoldersTable]
+                ON
+	                cms.[Page].TenantId = @TenantId AND
+                    cms.[Page].ParentPageId = [FoldersTable].PageId
+                INNER JOIN
+	                cms.TagPage
+                ON
+	                cms.[Page].TenantId = cms.TagPage.TenantId AND
+	                cms.[Page].PageId = cms.TagPage.PageId
+                INNER JOIN
+	                @Tags Tags
+                ON
+	                cms.TagPage.TagId = Tags.TagId
+                GROUP BY
+	                cms.[Page].PageId
+                HAVING
+	                COUNT(Tags.TagId) = @TagCount
+            ";
+        }
+
+        public static string GetTagsSql()
+        {
+            return @"
+                DECLARE @Tags TABLE (
+                    TagId bigint NOT NULL PRIMARY KEY CLUSTERED
+                )
+                INSERT INTO
+                    @Tags (TagId)
+                SELECT
+                    cms.Tag.TagId
+                FROM
+                    cms.Tag
+                WHERE
+                    cms.Tag.TenantId = @TenantId AND
+                    cms.Tag.TagId IN @TagIds
+            ";
+        }
     }
 }
