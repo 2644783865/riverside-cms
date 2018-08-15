@@ -118,24 +118,16 @@ namespace Riverside.Cms.Services.Core.Infrastructure
 	                element.ForumThread.ElementId AS ForumId,
 	                element.ForumThread.ThreadId,
 	                element.ForumThread.UserId,
-	                cms.[User].Alias,
 	                element.ForumThread.[Subject],
 	                element.ForumThread.[Message],
 	                element.ForumThread.Notify,
 	                element.ForumThread.[Views],
 	                element.ForumThread.Replies,
 	                element.ForumThread.LastPostId,
-	                element.ForumThread.LastMessageCreated,
+	                element.ForumThread.LastMessageCreated AS LastPostCreated,
 	                element.ForumThread.Created,
 	                element.ForumThread.Updated,
-	                LastPostUser.UserId AS LastPostUserId,
-	                LastPostUser.Alias AS LastPostAlias,
-	                cms.[Image].Width AS Width,
-	                cms.[Image].Height AS Height,
-	                cms.Upload.Updated AS Uploaded,
-	                LastPostImage.Width AS LastPostWidth,
-	                LastPostImage.Height AS LastPostHeight,
-	                LastPostUpload.Updated AS LastPostUploaded
+	                LastPostUser.UserId AS LastPostUserId
                 FROM
 	                ForumThreads
                 INNER JOIN
