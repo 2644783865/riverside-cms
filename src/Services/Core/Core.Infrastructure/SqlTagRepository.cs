@@ -13,6 +13,8 @@ namespace Riverside.Cms.Services.Core.Infrastructure
     {
         private readonly IOptions<SqlOptions> _options;
 
+        private const string TaggedPagesTableName = "Pages";
+
         public SqlTagRepository(IOptions<SqlOptions> options)
         {
             _options = options;
@@ -181,58 +183,6 @@ namespace Riverside.Cms.Services.Core.Infrastructure
             }
         }
 
-        private string GetListRelatedTagsTagsSql()
-        {
-            return @"
-                DECLARE @Tags TABLE ([TagId] [bigint] NOT NULL PRIMARY KEY CLUSTERED)
-                INSERT INTO
-                    @Tags (TagId)
-                SELECT
-                    cms.Tag.TagId
-                FROM
-                    cms.Tag
-                WHERE
-                    cms.Tag.TenantId = @TenantId AND
-                    cms.Tag.TagId IN @TagIds
-                DECLARE @TagCount int
-                SELECT @TagCount = (SELECT COUNT(*) FROM @Tags)
-            ";
-        }
-
-        private string GetListRelatedTagsPagesSql()
-        {
-            return @"
-                -- Get pages with all tags
-
-                DECLARE @Pages TABLE ([PageId] [bigint] NOT NULL PRIMARY KEY CLUSTERED)
-
-                INSERT INTO
-	                @Pages (PageId)
-                SELECT
-	                cms.[Page].PageId
-                FROM
-	                cms.[Page]
-                INNER JOIN
-	                @Folders [FoldersTable]
-                ON
-	                cms.[Page].TenantId = @TenantId AND
-                    cms.[Page].ParentPageId = [FoldersTable].PageId
-                INNER JOIN
-	                cms.TagPage
-                ON
-	                cms.[Page].TenantId = cms.TagPage.TenantId AND
-	                cms.[Page].PageId   = cms.TagPage.PageId
-                INNER JOIN
-	                @Tags Tags
-                ON
-	                cms.TagPage.TagId = Tags.TagId
-                GROUP BY
-	                cms.[Page].PageId
-                HAVING
-	                COUNT(Tags.TagId) = @TagCount
-            ";
-        }
-
         private string GetListRelatedTagsSelectSql()
         {
             return @"
@@ -281,9 +231,9 @@ namespace Riverside.Cms.Services.Core.Infrastructure
         {
             return $@"
                 {GetListTagsSetupSql()}
-                {GetListRelatedTagsTagsSql()}
+                {SqlProvider.GetTagsSql()}
                 {SqlProvider.GetFoldersSql()}
-                {GetListRelatedTagsPagesSql()}
+                {SqlProvider.GetTaggedPagesRecursiveSql(TaggedPagesTableName)}
                 {GetListRelatedTagsSelectSql()}
             ";
         }
@@ -292,9 +242,9 @@ namespace Riverside.Cms.Services.Core.Infrastructure
         {
             return $@"
                 {GetListTagsSetupSql()}
-                {GetListRelatedTagsTagsSql()}
+                {SqlProvider.GetTagsSql()}
                 {SqlProvider.GetFoldersRecursiveSql()}
-                {GetListRelatedTagsPagesSql()}
+                {SqlProvider.GetTaggedPagesRecursiveSql(TaggedPagesTableName)}
                 {GetListRelatedTagsSelectSql()}
             ";
         }
