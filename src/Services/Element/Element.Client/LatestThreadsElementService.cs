@@ -21,6 +21,7 @@ namespace Riverside.Cms.Services.Element.Client
 
     public class LatestThreadsElementContent
     {
+        public IEnumerable<ForumThread> Threads { get; set; }
     }
 
     public interface ILatestThreadsElementService : IElementSettingsService<LatestThreadsElementSettings>, IElementViewService<LatestThreadsElementSettings, LatestThreadsElementContent>

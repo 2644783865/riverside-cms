@@ -115,7 +115,7 @@ namespace Riverside.Cms.Services.Core.Infrastructure
                 SELECT
 	                ForumThreads.PageId,
 	                element.ForumThread.TenantId,
-	                element.ForumThread.ElementId,
+	                element.ForumThread.ElementId AS ForumId,
 	                element.ForumThread.ThreadId,
 	                element.ForumThread.UserId,
 	                cms.[User].Alias,

@@ -27,6 +27,7 @@ namespace Element.Api
 
         private void ConfigureDependencyInjectionServices(IServiceCollection services)
         {
+            services.AddTransient<IForumService, ForumService>();
             services.AddTransient<IPageService, PageService>();
             services.AddTransient<IStorageService, StorageService>();
             services.AddTransient<ITagService, TagService>();

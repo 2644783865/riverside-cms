@@ -18,6 +18,7 @@ namespace Riverside.Cms.Services.Element.Domain
 
     public class LatestThreadsElementContent
     {
+        public IEnumerable<ForumThread> Threads { get; set; }
     }
 
     public interface ILatestThreadsElementService : IElementSettingsService<LatestThreadsElementSettings>, IElementViewService<LatestThreadsElementSettings, LatestThreadsElementContent>
@@ -27,10 +28,12 @@ namespace Riverside.Cms.Services.Element.Domain
     public class LatestThreadsElementService : ILatestThreadsElementService
     {
         private readonly IElementRepository<LatestThreadsElementSettings> _elementRepository;
+        private readonly IForumService _forumService;
 
-        public LatestThreadsElementService(IElementRepository<LatestThreadsElementSettings> elementRepository)
+        public LatestThreadsElementService(IElementRepository<LatestThreadsElementSettings> elementRepository, IForumService forumService)
         {
             _elementRepository = elementRepository;
+            _forumService = forumService;
         }
 
         public Task<LatestThreadsElementSettings> ReadElementSettingsAsync(long tenantId, long elementId)
@@ -43,6 +46,10 @@ namespace Riverside.Cms.Services.Element.Domain
             LatestThreadsElementSettings settings = await _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
 
             LatestThreadsElementContent content = new LatestThreadsElementContent();
+
+            long latestThreadsPageId = settings.PageId ?? context.PageId;
+
+            content.Threads = await _forumService.ListLatestThreadsAsync(tenantId, latestThreadsPageId, settings.Recursive, context.TagIds, settings.PageSize);
 
             return new ElementView<LatestThreadsElementSettings, LatestThreadsElementContent>
             {
