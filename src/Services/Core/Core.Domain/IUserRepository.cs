@@ -7,6 +7,7 @@ namespace Riverside.Cms.Services.Core.Domain
 {
     public interface IUserRepository
     {
+        Task<User> ReadUserAsync(long tenantId, long userId);
         Task<IEnumerable<User>> ListUsersAsync(long tenantId, IEnumerable<long> userIds);
     }
 }

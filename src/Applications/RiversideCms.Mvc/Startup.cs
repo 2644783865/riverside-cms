@@ -28,6 +28,7 @@ namespace RiversideCms.Mvc
             services.AddTransient<IPageService, PageService>();
             services.AddTransient<IPageViewService, PageViewService>();
             services.AddTransient<ITagService, TagService>();
+            services.AddTransient<IUserService, UserService>();
 
             // Element services
             services.AddTransient<ICodeSnippetElementService, CodeSnippetElementService>();
@@ -82,6 +83,7 @@ namespace RiversideCms.Mvc
                 routes.MapRoute("PageImage", "pages/{pageId}/images/{pageImageType}/{*description}", new { controller = "pages", action = "readimage" });
                 routes.MapRoute("PageTagged", "pages/{pageId}/{description}/tagged/{*tags}", new { controller = "pages", action = "readtagged" });
                 routes.MapRoute("Page", "pages/{pageId}/{*description}", new { controller = "pages", action = "read" });
+                routes.MapRoute("UserImage", "users/{userId}/images/{userImageType}/{*description}", new { controller = "users", action = "readimage" });
                 routes.MapRoute("Login", "account/login", new { controller = "account", action = "login" });
                 routes.MapRoute("Logout", "account/logout", new { controller = "account", action = "logout" });
                 routes.MapRoute("Register", "account/register", new { controller = "account", action = "register" });

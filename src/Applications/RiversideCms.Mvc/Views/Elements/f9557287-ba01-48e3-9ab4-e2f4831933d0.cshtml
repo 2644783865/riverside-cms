@@ -25,15 +25,19 @@
             @foreach (LatestThreadsThread thread in Model.Content.Threads)
             {
                 <li>
-                    <a href="@Url.PageUrl(thread.PageId, "thread.PageName", false, null, null)">
+                    <a href="@Url.PageUrl(thread.PageId, thread.Subject, false, null, null)">
                         <div class="media-object">
                             @if (thread.LastPostByUser != null && thread.LastPostByUser.Image != null)
                             {
-                                <span>LastPostByImage</span>
+                                <img src="@Url.RouteUrl("UserImage", new { userid = thread.LastPostByUser.UserId, userimagetype = "thumbnail", description = Url.UrlFriendly(thread.LastPostByUser.Alias), t = thread.LastPostByUser.Image.BlobId})" alt="@thread.LastPostByUser.Alias"
+                                     width="@thread.LastPostByUser.Image.Width"
+                                     height="@thread.LastPostByUser.Image.Height" />
                             }
                             else if (thread.CreatedByUser.Image != null)
                             {
-                                <span>CreatedByImage</span>
+                                <img src="@Url.RouteUrl("UserImage", new { userid = thread.CreatedByUser.UserId, userimagetype = "thumbnail", description = Url.UrlFriendly(thread.CreatedByUser.Alias), t = thread.CreatedByUser.Image.BlobId})" alt="@thread.CreatedByUser.Alias"
+                                     width="@thread.CreatedByUser.Image.Width"
+                                     height="@thread.CreatedByUser.Image.Height" />
                             }
                         </div>
                         @thread.Subject <span class="badge">@(thread.Replies + 1)</span>
