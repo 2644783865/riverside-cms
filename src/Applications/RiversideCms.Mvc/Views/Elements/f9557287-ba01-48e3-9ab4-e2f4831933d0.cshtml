@@ -15,4 +15,32 @@
         <p class="rcms-preamble">@Html.FormatMultiline(Model.Settings.Preamble)</p>
     }
 
+    @if (!Model.Content.Threads.Any())
+    {
+        <p>@Model.Settings.NoThreadsMessage</p>
+    }
+    else
+    {
+        <ul class="comments">
+            @foreach (LatestThreadsThread thread in Model.Content.Threads)
+            {
+                <li>
+                    <a href="@Url.PageUrl(thread.PageId, "thread.PageName", false, null, null)">
+                        <div class="media-object">
+                            @if (thread.LastPostByUser != null && thread.LastPostByUser.Image != null)
+                            {
+                                <span>LastPostByImage</span>
+                            }
+                            else if (thread.CreatedByUser.Image != null)
+                            {
+                                <span>CreatedByImage</span>
+                            }
+                        </div>
+                        @thread.Subject <span class="badge">@(thread.Replies + 1)</span>
+                    </a>
+                </li>
+            }
+        </ul>
+    }
+
 </div>
