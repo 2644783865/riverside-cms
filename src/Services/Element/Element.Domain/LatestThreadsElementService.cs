@@ -62,16 +62,31 @@ namespace Riverside.Cms.Services.Element.Domain
     {
         private readonly IElementRepository<LatestThreadsElementSettings> _elementRepository;
         private readonly IForumService _forumService;
+        private readonly IUserService _userService;
 
-        public LatestThreadsElementService(IElementRepository<LatestThreadsElementSettings> elementRepository, IForumService forumService)
+        public LatestThreadsElementService(IElementRepository<LatestThreadsElementSettings> elementRepository, IForumService forumService, IUserService userService)
         {
             _elementRepository = elementRepository;
             _forumService = forumService;
+            _userService = userService;
         }
 
         public Task<LatestThreadsElementSettings> ReadElementSettingsAsync(long tenantId, long elementId)
         {
             return _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
+        }
+
+        private LatestThreadsUser GetUser(long? userId, IDictionary<long, User> usersById)
+        {
+            if (!userId.HasValue)
+                return null;
+            User user = usersById[userId.Value];
+            return new LatestThreadsUser
+            {
+                Alias = user.Alias,
+                UserId = user.UserId,
+                Image = null
+            };
         }
 
         public async Task<IElementView<LatestThreadsElementSettings, LatestThreadsElementContent>> ReadElementViewAsync(long tenantId, long elementId, PageContext context)
@@ -82,7 +97,10 @@ namespace Riverside.Cms.Services.Element.Domain
 
             IEnumerable<ForumThread> threads = await _forumService.ListLatestThreadsAsync(tenantId, latestThreadsPageId, settings.Recursive, context.TagIds, settings.PageSize);
 
-            // _userService.ListUsers - get by list of user IDs
+            IEnumerable<long> userIds = Enumerable.Concat<long>(threads.Select(t => t.UserId), threads.Where(t => t.LastPostUserId.HasValue).Select(t => (long)t.LastPostUserId)).Distinct();
+            IEnumerable<User> users = await _userService.ListUsersAsync(tenantId, userIds);
+            IDictionary<long, User> usersById = users.ToDictionary(u => u.UserId, u => u);
+
             // _storageService.ListBlobs - get by list of IDs returned from list users
 
             LatestThreadsElementContent content = new LatestThreadsElementContent
@@ -90,7 +108,7 @@ namespace Riverside.Cms.Services.Element.Domain
                 Threads = threads.Select(t => new LatestThreadsThread
                 {
                     Created = t.Created,
-                    CreatedByUser = null,
+                    CreatedByUser = GetUser(t.UserId, usersById),
                     ForumId = t.ForumId,
                     LastPostCreated = t.LastPostCreated,
                     LastPostId = t.LastPostId,
@@ -102,7 +120,7 @@ namespace Riverside.Cms.Services.Element.Domain
                     TenantId = tenantId,
                     ThreadId = t.ThreadId,
                     Updated = t.Updated,
-                    LastPostByUser = null,
+                    LastPostByUser = GetUser(t.LastPostUserId, usersById),
                     Views = t.Views
                 })
             };
