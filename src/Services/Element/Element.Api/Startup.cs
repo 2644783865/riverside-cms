@@ -31,6 +31,7 @@ namespace Element.Api
             services.AddTransient<IPageService, PageService>();
             services.AddTransient<IStorageService, StorageService>();
             services.AddTransient<ITagService, TagService>();
+            services.AddTransient<IUserService, UserService>();
 
             services.AddTransient<ICodeSnippetElementService, CodeSnippetElementService>();
             services.AddTransient<IFooterElementService, FooterElementService>();

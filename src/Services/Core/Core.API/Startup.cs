@@ -29,14 +29,17 @@ namespace Core.API
             services.AddTransient<IStorageService, StorageService>();
 
             services.AddTransient<IForumService, ForumService>();
+            services.AddTransient<IMasterPageService, MasterPageService>();
             services.AddTransient<IPageService, PageService>();
             services.AddTransient<IPageViewService, PageViewService>();
-            services.AddTransient<IMasterPageService, MasterPageService>();
             services.AddTransient<ITagService, TagService>();
+            services.AddTransient<IUserService, UserService>();
+
             services.AddTransient<IForumRepository, SqlForumRepository>();
-            services.AddTransient<IPageRepository, SqlPageRepository>();
             services.AddTransient<IMasterPageRepository, SqlMasterPageRepository>();
+            services.AddTransient<IPageRepository, SqlPageRepository>();
             services.AddTransient<ITagRepository, SqlTagRepository>();
+            services.AddTransient<IUserRepository, SqlUserRepository>();
         }
 
         private void ConfigureOptionServices(IServiceCollection services)
