@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Riverside.Cms.Services.Core.Client;
+using Riverside.Cms.Services.Storage.Client;
 
 namespace Riverside.Cms.Services.Element.Domain
 {
@@ -62,12 +63,14 @@ namespace Riverside.Cms.Services.Element.Domain
     {
         private readonly IElementRepository<LatestThreadsElementSettings> _elementRepository;
         private readonly IForumService _forumService;
+        private readonly IStorageService _storageService;
         private readonly IUserService _userService;
 
-        public LatestThreadsElementService(IElementRepository<LatestThreadsElementSettings> elementRepository, IForumService forumService, IUserService userService)
+        public LatestThreadsElementService(IElementRepository<LatestThreadsElementSettings> elementRepository, IForumService forumService, IStorageService storageService, IUserService userService)
         {
             _elementRepository = elementRepository;
             _forumService = forumService;
+            _storageService = storageService;
             _userService = userService;
         }
 
@@ -76,7 +79,20 @@ namespace Riverside.Cms.Services.Element.Domain
             return _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
         }
 
-        private LatestThreadsUser GetUser(long? userId, IDictionary<long, User> usersById)
+        private LatestThreadsImage GetImage(long? blobId, IDictionary<long, BlobImage> blobsById)
+        {
+            if (!blobId.HasValue)
+                return null;
+            BlobImage blobImage = blobsById[blobId.Value];
+            return new LatestThreadsImage
+            {
+                BlobId = blobImage.BlobId,
+                Height = blobImage.Height,
+                Width = blobImage.Width
+            };
+        }
+
+        private LatestThreadsUser GetUser(long? userId, IDictionary<long, User> usersById, IDictionary<long, BlobImage> blobsById)
         {
             if (!userId.HasValue)
                 return null;
@@ -85,7 +101,7 @@ namespace Riverside.Cms.Services.Element.Domain
             {
                 Alias = user.Alias,
                 UserId = user.UserId,
-                Image = null
+                Image = GetImage(user.ThumbnailImageBlobId, blobsById)
             };
         }
 
@@ -101,14 +117,16 @@ namespace Riverside.Cms.Services.Element.Domain
             IEnumerable<User> users = await _userService.ListUsersAsync(tenantId, userIds);
             IDictionary<long, User> usersById = users.ToDictionary(u => u.UserId, u => u);
 
-            // _storageService.ListBlobs - get by list of IDs returned from list users
+            IEnumerable<long> blobIds = users.Where(u => u.ThumbnailImageBlobId.HasValue).Select(u => (long)u.ThumbnailImageBlobId);
+            IEnumerable<Blob> blobs = await _storageService.ListBlobsAsync(tenantId, blobIds);
+            IDictionary<long, BlobImage> blobsById = blobs.ToDictionary(b => b.BlobId, b => (BlobImage)b);
 
             LatestThreadsElementContent content = new LatestThreadsElementContent
             {
                 Threads = threads.Select(t => new LatestThreadsThread
                 {
                     Created = t.Created,
-                    CreatedByUser = GetUser(t.UserId, usersById),
+                    CreatedByUser = GetUser(t.UserId, usersById, blobsById),
                     ForumId = t.ForumId,
                     LastPostCreated = t.LastPostCreated,
                     LastPostId = t.LastPostId,
@@ -120,7 +138,7 @@ namespace Riverside.Cms.Services.Element.Domain
                     TenantId = tenantId,
                     ThreadId = t.ThreadId,
                     Updated = t.Updated,
-                    LastPostByUser = GetUser(t.LastPostUserId, usersById),
+                    LastPostByUser = GetUser(t.LastPostUserId, usersById, blobsById),
                     Views = t.Views
                 })
             };
