@@ -34,18 +34,11 @@ namespace Riverside.Cms.Services.Element.Domain
     public class LatestThreadsThread
     {
         public long PageId { get; set; }
-        public long TenantId { get; set; }
         public long ForumId { get; set; }
         public long ThreadId { get; set; }
         public string Subject { get; set; }
-        public string Message { get; set; }
-        public bool Notify { get; set; }
-        public int Views { get; set; }
         public int Replies { get; set; }
         public long? LastPostId { get; set; }
-        public DateTime LastPostCreated { get; set; }
-        public DateTime Created { get; set; }
-        public DateTime Updated { get; set; }
         public LatestThreadsUser StartedByUser { get; set; }
         public LatestThreadsUser LastPostByUser { get; set; }
     }
@@ -125,21 +118,14 @@ namespace Riverside.Cms.Services.Element.Domain
             {
                 Threads = threads.Select(t => new LatestThreadsThread
                 {
-                    Created = t.Created,
                     ForumId = t.ForumId,
-                    LastPostCreated = t.LastPostCreated,
                     LastPostId = t.LastPostId,
-                    Message = t.Message,
-                    Notify = t.Notify,
                     PageId = t.PageId,
                     Replies = t.Replies,
                     Subject = t.Subject,
                     StartedByUser = GetUser(t.UserId, usersById, blobsById),
-                    TenantId = tenantId,
                     ThreadId = t.ThreadId,
-                    Updated = t.Updated,
-                    LastPostByUser = GetUser(t.LastPostUserId, usersById, blobsById),
-                    Views = t.Views
+                    LastPostByUser = GetUser(t.LastPostUserId, usersById, blobsById)
                 })
             };
 
