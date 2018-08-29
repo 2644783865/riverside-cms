@@ -41,6 +41,7 @@ namespace Element.Api
             services.AddTransient<IPageHeaderElementService, PageHeaderElementService>();
             services.AddTransient<IPageListElementService, PageListElementService>();
             services.AddTransient<IShareElementService, ShareElementService>();
+            services.AddTransient<ISocialBarElementService, SocialBarElementService>();
             services.AddTransient<ITagCloudElementService, TagCloudElementService>();
 
             services.AddTransient<IElementRepository<CodeSnippetElementSettings>, SqlCodeSnippetElementRepository>();
@@ -51,6 +52,7 @@ namespace Element.Api
             services.AddTransient<IElementRepository<PageHeaderElementSettings>, SqlPageHeaderElementRepository>();
             services.AddTransient<IElementRepository<PageListElementSettings>, SqlPageListElementRepository>();
             services.AddTransient<IElementRepository<ShareElementSettings>, SqlShareElementRepository>();
+            services.AddTransient<IElementRepository<SocialBarElementSettings>, SqlSocialBarElementRepository>();
             services.AddTransient<IElementRepository<TagCloudElementSettings>, SqlTagCloudElementRepository>();
         }
 

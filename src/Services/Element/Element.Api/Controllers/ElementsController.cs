@@ -19,9 +19,10 @@ namespace Element.Api.Controllers
         private readonly IPageHeaderElementService _pageHeaderElementService;
         private readonly IPageListElementService _pageListElementService;
         private readonly IShareElementService _shareElementService;
+        private readonly ISocialBarElementService _socialBarElementService;
         private readonly ITagCloudElementService _tagCloudElementService;
 
-        public ElementsController(ICodeSnippetElementService codeSnippetElementService, IFooterElementService footerElementService, IHtmlElementService htmlElementService, ILatestThreadsElementService latestThreadsElementService, INavigationBarElementService navigationBarElementService, IPageHeaderElementService pageHeaderElementService, IPageListElementService pageListElementService, IShareElementService shareElementService, ITagCloudElementService tagCloudElementService)
+        public ElementsController(ICodeSnippetElementService codeSnippetElementService, IFooterElementService footerElementService, IHtmlElementService htmlElementService, ILatestThreadsElementService latestThreadsElementService, INavigationBarElementService navigationBarElementService, IPageHeaderElementService pageHeaderElementService, IPageListElementService pageListElementService, IShareElementService shareElementService, ISocialBarElementService socialBarElementService, ITagCloudElementService tagCloudElementService)
         {
             _codeSnippetElementService = codeSnippetElementService;
             _footerElementService = footerElementService;
@@ -31,6 +32,7 @@ namespace Element.Api.Controllers
             _pageHeaderElementService = pageHeaderElementService;
             _pageListElementService = pageListElementService;
             _shareElementService = shareElementService;
+            _socialBarElementService = socialBarElementService;
             _tagCloudElementService = tagCloudElementService;
         }
 
@@ -247,6 +249,33 @@ namespace Element.Api.Controllers
         {
             PageContext context = new PageContext { PageId = pageId };
             IElementView<ShareElementSettings, ShareElementContent> view = await _shareElementService.ReadElementViewAsync(tenantId, elementId, context);
+            if (view == null)
+                return NotFound();
+            return Ok(view);
+        }
+
+        // SOCIAL BAR
+
+        [HttpGet]
+        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/4e6b936d-e8a1-4ff2-9576-9f9b78f82895/elements/{elementId:int}")]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(SocialBarElementSettings), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> ReadSocialBarElementSettings(long tenantId, long elementId)
+        {
+            SocialBarElementSettings settings = await _socialBarElementService.ReadElementSettingsAsync(tenantId, elementId);
+            if (settings == null)
+                return NotFound();
+            return Ok(settings);
+        }
+
+        [HttpGet]
+        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/4e6b936d-e8a1-4ff2-9576-9f9b78f82895/elements/{elementId:int}/view")]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(IElementView<SocialBarElementSettings, SocialBarElementContent>), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> ReadSocialBarElementView(long tenantId, long elementId, [FromQuery]long pageId)
+        {
+            PageContext context = new PageContext { PageId = pageId };
+            IElementView<SocialBarElementSettings, SocialBarElementContent> view = await _socialBarElementService.ReadElementViewAsync(tenantId, elementId, context);
             if (view == null)
                 return NotFound();
             return Ok(view);

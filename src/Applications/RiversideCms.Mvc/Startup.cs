@@ -39,6 +39,7 @@ namespace RiversideCms.Mvc
             services.AddTransient<IPageHeaderElementService, PageHeaderElementService>();
             services.AddTransient<IPageListElementService, PageListElementService>();
             services.AddTransient<IShareElementService, ShareElementService>();
+            services.AddTransient<ISocialBarElementService, SocialBarElementService>();
             services.AddTransient<ITagCloudElementService, TagCloudElementService>();
 
             // Element factory
