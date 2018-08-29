@@ -6,9 +6,18 @@ using Riverside.Cms.Services.Core.Client;
 
 namespace Riverside.Cms.Services.Element.Domain
 {
+    public class HtmlBlob
+    {
+        public long HtmlBlobId { get; set; }
+        public long ImageBlobId { get; set; }
+        public long PreviewImageBlobId { get; set; }
+        public long ThumbnailImageBlobId { get; set; }
+    }
+
     public class HtmlElementSettings : ElementSettings
     {
         public string Html { get; set; }
+        public IEnumerable<HtmlBlob> Blobs { get; set; }
     }
 
     public class HtmlElementContent
