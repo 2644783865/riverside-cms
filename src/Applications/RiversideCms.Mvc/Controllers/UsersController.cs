@@ -26,7 +26,7 @@ namespace RiversideCms.Mvc.Controllers
 
             BlobContent blobContent = await _userService.ReadUserImageAsync(tenantId, userId, userImageType);
 
-            return File(blobContent.Stream, blobContent.Type);
+            return File(blobContent.Stream, blobContent.Type, blobContent.Name);
         }
     }
 }

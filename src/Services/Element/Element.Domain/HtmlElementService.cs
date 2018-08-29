@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 using System.Threading.Tasks;
 using Riverside.Cms.Services.Core.Client;
+using Riverside.Cms.Services.Storage.Client;
 
 namespace Riverside.Cms.Services.Element.Domain
 {
@@ -25,17 +26,21 @@ namespace Riverside.Cms.Services.Element.Domain
         public string FormattedHtml { get; set; }
     }
 
-    public interface IHtmlElementService : IElementSettingsService<HtmlElementSettings>, IElementViewService<HtmlElementSettings, HtmlElementContent>
+    public interface IHtmlElementService : IElementSettingsService<HtmlElementSettings>, IElementViewService<HtmlElementSettings, HtmlElementContent>, IElementStorageService
     {
     }
 
     public class HtmlElementService : IHtmlElementService
     {
         private readonly IElementRepository<HtmlElementSettings> _elementRepository;
+        private readonly IStorageService _storageService;
 
-        public HtmlElementService(IElementRepository<HtmlElementSettings> elementRepository)
+        private const string HtmlImagePath = "elements/html/{0}";
+
+        public HtmlElementService(IElementRepository<HtmlElementSettings> elementRepository, IStorageService storageService)
         {
             _elementRepository = elementRepository;
+            _storageService = storageService;
         }
 
         public Task<HtmlElementSettings> ReadElementSettingsAsync(long tenantId, long elementId)
@@ -64,6 +69,41 @@ namespace Riverside.Cms.Services.Element.Domain
                 Settings = settings,
                 Content = content
             };
+        }
+
+        private long? GetBlobId(HtmlBlob htmlBlob, PageImageType pageImageType)
+        {
+            switch (pageImageType)
+            {
+                case PageImageType.Original:
+                    return htmlBlob.ImageBlobId;
+
+                case PageImageType.Preview:
+                    return htmlBlob.PreviewImageBlobId;
+
+                case PageImageType.Thumbnail:
+                    return htmlBlob.ThumbnailImageBlobId;
+
+                default:
+                    return null;
+            }
+        }
+
+        public async Task<BlobContent> ReadBlobContentAsync(long tenantId, long elementId, long elementBlobId, PageImageType imageType)
+        {
+            HtmlElementSettings settings = await _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
+            if (settings == null)
+                return null;
+
+            HtmlBlob blob = settings.Blobs.Where(b => b.HtmlBlobId == elementBlobId).FirstOrDefault();
+            if (blob == null)
+                return null;
+
+            long? blobId = GetBlobId(blob, imageType);
+            if (blobId == null)
+                return null;
+
+            return await _storageService.ReadBlobContentAsync(tenantId, blobId.Value, string.Format(HtmlImagePath, elementId));
         }
     }
 }

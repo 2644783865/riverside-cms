@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Riverside.Cms.Services.Core.Client;
 using Riverside.Cms.Services.Element.Domain;
+using Riverside.Cms.Services.Storage.Client;
 
 namespace Element.Api.Controllers
 {
@@ -102,6 +103,17 @@ namespace Element.Api.Controllers
             if (settings == null)
                 return NotFound();
             return Ok(settings);
+        }
+
+        [HttpGet]
+        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/c92ee4c4-b133-44cc-8322-640e99c334dc/elements/{elementId:int}/blobs/{elementBlobId:int}/content")]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> ReadHtmlElementBlobContent(long tenantId, long elementId, long elementBlobId, [FromQuery]PageImageType imageType)
+        {
+            BlobContent content = await _htmlElementService.ReadBlobContentAsync(tenantId, elementId, elementBlobId, imageType);
+            if (content == null)
+                return NotFound();
+            return File(content.Stream, content.Type, content.Name);
         }
 
         [HttpGet]

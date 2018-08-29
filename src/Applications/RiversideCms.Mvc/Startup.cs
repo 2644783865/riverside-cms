@@ -81,7 +81,8 @@ namespace RiversideCms.Mvc
             {
                 routes.MapRoute("Home", "", new { controller = "pages", action = "home" });
                 routes.MapRoute("HomeTagged", "tagged/{*tags}", new { controller = "pages", action = "hometagged" });
-                routes.MapRoute("PageImage", "pages/{pageId}/images/{pageImageType}/{*description}", new { controller = "pages", action = "readimage" });
+                routes.MapRoute("PageImage", "pages/{pageId}/images/{pageImageType}/{*description}", new { controller = "pages", action = "readpageimage" });
+                routes.MapRoute("ElementImage", "elements/{elementId}/uploads/{elementBlobId}/{*description}", new { controller = "pages", action = "readelementimage" });
                 routes.MapRoute("PageTagged", "pages/{pageId}/{description}/tagged/{*tags}", new { controller = "pages", action = "readtagged" });
                 routes.MapRoute("Page", "pages/{pageId}/{*description}", new { controller = "pages", action = "read" });
                 routes.MapRoute("UserImage", "users/{userId}/images/{userImageType}/{*description}", new { controller = "users", action = "readimage" });

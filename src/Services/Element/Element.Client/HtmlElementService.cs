@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Riverside.Cms.Services.Core.Client;
+using Riverside.Cms.Services.Storage.Client;
 
 namespace Riverside.Cms.Services.Element.Client
 {
@@ -28,7 +29,7 @@ namespace Riverside.Cms.Services.Element.Client
         public string FormattedHtml { get; set; }
     }
 
-    public interface IHtmlElementService : IElementSettingsService<HtmlElementSettings>, IElementViewService<HtmlElementSettings, HtmlElementContent>
+    public interface IHtmlElementService : IElementSettingsService<HtmlElementSettings>, IElementViewService<HtmlElementSettings, HtmlElementContent>, IElementStorageService
     {
     }
 
@@ -67,6 +68,28 @@ namespace Riverside.Cms.Services.Element.Client
                 {
                     string json = await httpClient.GetStringAsync(uri);
                     return JsonConvert.DeserializeObject<ElementView<HtmlElementSettings, HtmlElementContent>>(json);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new ElementClientException("Element API failed", ex);
+            }
+        }
+
+        public async Task<BlobContent> ReadBlobContentAsync(long tenantId, long elementId, long elementBlobId, PageImageType imageType)
+        {
+            try
+            {
+                string uri = $"{_options.Value.ElementApiBaseUrl}tenants/{tenantId}/elementtypes/c92ee4c4-b133-44cc-8322-640e99c334dc/elements/{elementId}/blobs/{elementBlobId}/content?imagetype={imageType.ToString().ToLower()}";
+                using (HttpClient httpClient = new HttpClient())
+                {
+                    HttpResponseMessage response = await httpClient.GetAsync(uri);
+                    return new BlobContent
+                    {
+                        Name = response.Content.Headers.ContentDisposition.FileName,
+                        Type = response.Content.Headers.ContentType.MediaType,
+                        Stream = await response.Content.ReadAsStreamAsync()
+                    };
                 }
             }
             catch (Exception ex)

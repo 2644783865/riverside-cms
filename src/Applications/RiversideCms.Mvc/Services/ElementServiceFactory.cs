@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Riverside.Cms.Services.Core.Client;
 using Riverside.Cms.Services.Element.Client;
+using Riverside.Cms.Services.Storage.Client;
 
 namespace RiversideCms.Mvc.Services
 {
@@ -65,6 +66,18 @@ namespace RiversideCms.Mvc.Services
 
                 case "b910c231-7dbd-4cad-92ef-775981e895b4":
                     return await _tagCloudElementService.ReadElementViewAsync(tenantId, elementId, context);
+
+                default:
+                    return null;
+            }
+        }
+
+        public async Task<BlobContent> GetElementBlobContentAsync(long tenantId, Guid elementTypeId, long elementId, long elementBlobId, PageImageType imageType)
+        {
+            switch (elementTypeId.ToString())
+            {
+                case "c92ee4c4-b133-44cc-8322-640e99c334dc":
+                    return await _htmlElementService.ReadBlobContentAsync(tenantId, elementId, elementBlobId, imageType);
 
                 default:
                     return null;
