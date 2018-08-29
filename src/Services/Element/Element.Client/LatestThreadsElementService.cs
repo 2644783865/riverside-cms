@@ -48,7 +48,7 @@ namespace Riverside.Cms.Services.Element.Client
         public DateTime LastPostCreated { get; set; }
         public DateTime Created { get; set; }
         public DateTime Updated { get; set; }
-        public LatestThreadsUser CreatedByUser { get; set; }
+        public LatestThreadsUser StartedByUser { get; set; }
         public LatestThreadsUser LastPostByUser { get; set; }
     }
 

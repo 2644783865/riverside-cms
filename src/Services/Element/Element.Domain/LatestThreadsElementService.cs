@@ -46,7 +46,7 @@ namespace Riverside.Cms.Services.Element.Domain
         public DateTime LastPostCreated { get; set; }
         public DateTime Created { get; set; }
         public DateTime Updated { get; set; }
-        public LatestThreadsUser CreatedByUser { get; set; }
+        public LatestThreadsUser StartedByUser { get; set; }
         public LatestThreadsUser LastPostByUser { get; set; }
     }
 
@@ -126,7 +126,6 @@ namespace Riverside.Cms.Services.Element.Domain
                 Threads = threads.Select(t => new LatestThreadsThread
                 {
                     Created = t.Created,
-                    CreatedByUser = GetUser(t.UserId, usersById, blobsById),
                     ForumId = t.ForumId,
                     LastPostCreated = t.LastPostCreated,
                     LastPostId = t.LastPostId,
@@ -135,6 +134,7 @@ namespace Riverside.Cms.Services.Element.Domain
                     PageId = t.PageId,
                     Replies = t.Replies,
                     Subject = t.Subject,
+                    StartedByUser = GetUser(t.UserId, usersById, blobsById),
                     TenantId = tenantId,
                     ThreadId = t.ThreadId,
                     Updated = t.Updated,

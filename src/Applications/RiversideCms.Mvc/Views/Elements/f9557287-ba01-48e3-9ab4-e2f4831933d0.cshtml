@@ -33,11 +33,11 @@
                                      width="@thread.LastPostByUser.Image.Width"
                                      height="@thread.LastPostByUser.Image.Height" />
                             }
-                            else if (thread.CreatedByUser.Image != null)
+                            else if (thread.StartedByUser.Image != null)
                             {
-                                <img src="@Url.RouteUrl("UserImage", new { userid = thread.CreatedByUser.UserId, userimagetype = "thumbnail", description = Url.UrlFriendly(thread.CreatedByUser.Alias), t = thread.CreatedByUser.Image.BlobId})" alt="@thread.CreatedByUser.Alias"
-                                     width="@thread.CreatedByUser.Image.Width"
-                                     height="@thread.CreatedByUser.Image.Height" />
+                                <img src="@Url.RouteUrl("UserImage", new { userid = thread.StartedByUser.UserId, userimagetype = "thumbnail", description = Url.UrlFriendly(thread.StartedByUser.Alias), t = thread.StartedByUser.Image.BlobId})" alt="@thread.StartedByUser.Alias"
+                                     width="@thread.StartedByUser.Image.Width"
+                                     height="@thread.StartedByUser.Image.Height" />
                             }
                         </div>
                         @thread.Subject <span class="badge">@(thread.Replies + 1)</span>
