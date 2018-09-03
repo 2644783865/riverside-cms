@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Riverside.Cms.Services.Core.Client;
 using Riverside.Cms.Services.Storage.Client;
@@ -48,9 +49,57 @@ namespace Riverside.Cms.Services.Element.Domain
             return _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
         }
 
-        private string FormatHtml(string html)
+        private string ReplaceKeywords(string html)
         {
             return html.Replace("%YEAR%", DateTime.UtcNow.Year.ToString());
+        }
+
+        private string FormatBlobUrl(Guid elementTypeId, string blobUrl)
+        {
+            // Converts URL like: /elements/775/uploads/408?t=636576020355975145 to /elementtypes/c92ee4c4-b133-44cc-8322-640e99c334dc/elements/775/blobs/408/content?t=636576020049621023
+            string[] blobUrlParts = blobUrl.Split('/');
+            long elementId = Convert.ToInt64(blobUrlParts[2]);
+            string elementBlobIdAndQueryString = blobUrlParts[4];
+            int indexOfQueryString = elementBlobIdAndQueryString.IndexOf("?");
+            long elementBlobId = Convert.ToInt64(elementBlobIdAndQueryString.Substring(0, indexOfQueryString));
+            long t = Convert.ToInt64(elementBlobIdAndQueryString.Substring(indexOfQueryString + 3));
+            return $"/elementtypes/{elementTypeId.ToString().ToLower()}/elements/{elementId}/blobs/{elementBlobId}/content?t={t}";
+        }
+
+        private string FormatBlobUrls(Guid elementTypeId, string html)
+        {
+            StringBuilder sb = new StringBuilder();
+            int currentIndex = 0;
+            int blobUrlStartIndex = 0; 
+            while (blobUrlStartIndex != -1)
+            {
+                blobUrlStartIndex = html.IndexOf("/elements/", currentIndex);
+                if (blobUrlStartIndex == -1)
+                {
+                    // Blob URL not found
+                    string appendText = html.Substring(currentIndex);
+                    sb.Append(appendText);
+                }
+                else
+                {
+                    // Blob URL found
+                    string appendText = html.Substring(currentIndex, blobUrlStartIndex - currentIndex);
+                    sb.Append(appendText);
+                    int blobUrlStopIndex = html.IndexOf("\"", blobUrlStartIndex);
+                    string blobUrl = html.Substring(blobUrlStartIndex, blobUrlStopIndex - blobUrlStartIndex);
+                    blobUrl = FormatBlobUrl(elementTypeId, blobUrl);
+                    sb.Append(blobUrl);
+                    currentIndex = blobUrlStopIndex;
+                }
+            }
+            return sb.ToString();
+        }
+
+        private string FormatHtml(Guid elementTypeId, string html)
+        {
+            html = ReplaceKeywords(html);
+            html = FormatBlobUrls(elementTypeId, html);
+            return html;
         }
 
         public async Task<IElementView<HtmlElementSettings, HtmlElementContent>> ReadElementViewAsync(long tenantId, long elementId, PageContext context)
@@ -61,7 +110,7 @@ namespace Riverside.Cms.Services.Element.Domain
 
             HtmlElementContent content = new HtmlElementContent
             {
-                FormattedHtml = FormatHtml(settings.Html)
+                FormattedHtml = FormatHtml(settings.ElementTypeId, settings.Html)
             };
 
             return new ElementView<HtmlElementSettings, HtmlElementContent>
