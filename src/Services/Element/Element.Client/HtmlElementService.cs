@@ -24,7 +24,7 @@ namespace Riverside.Cms.Services.Element.Client
         public IEnumerable<HtmlBlob> Blobs { get; set; }
     }
 
-    public class HtmlImage
+    public class HtmlContentImage
     {
         public long BlobId { get; set; }
         public int Width { get; set; }
@@ -35,7 +35,7 @@ namespace Riverside.Cms.Services.Element.Client
     public class HtmlElementContent
     {
         public string FormattedHtml { get; set; }
-        public IEnumerable<HtmlImage> Images { get; set; }
+        public IDictionary<long, HtmlContentImage> Images { get; set; }
     }
 
     public interface IHtmlElementService : IElementSettingsService<HtmlElementSettings>, IElementViewService<HtmlElementSettings, HtmlElementContent>, IElementStorageService

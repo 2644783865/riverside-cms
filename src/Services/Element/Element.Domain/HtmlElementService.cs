@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using Riverside.Cms.Services.Core.Client;
 using Riverside.Cms.Services.Storage.Client;
 
@@ -22,7 +23,7 @@ namespace Riverside.Cms.Services.Element.Domain
         public IEnumerable<HtmlBlob> Blobs { get; set; }
     }
 
-    public class HtmlImage
+    public class HtmlContentImage
     {
         public long BlobId { get; set; }
         public int Width { get; set; }
@@ -33,7 +34,7 @@ namespace Riverside.Cms.Services.Element.Domain
     public class HtmlElementContent
     {
         public string FormattedHtml { get; set; }
-        public IEnumerable<HtmlImage> Images { get; set; }
+        public IDictionary<long, HtmlContentImage> Images { get; set; }
     }
 
     public interface IHtmlElementService : IElementSettingsService<HtmlElementSettings>, IElementViewService<HtmlElementSettings, HtmlElementContent>, IElementStorageService
@@ -63,55 +64,69 @@ namespace Riverside.Cms.Services.Element.Domain
             return html.Replace("%YEAR%", DateTime.UtcNow.Year.ToString());
         }
 
-        private string FormatBlobUrl(Guid elementTypeId, string blobUrl, IDictionary<long, BlobImage> blobsById)
+        private string CorrectImageHtml(Guid elementTypeId, string imageHtml, IDictionary<long, HtmlContentImage> imagesByHtmlBlobId)
         {
-            // Converts URL like: /elements/775/uploads/408?t=636576020355975145 to /elementtypes/c92ee4c4-b133-44cc-8322-640e99c334dc/elements/775/blobs/408/content?t=636576020049621023
-            string[] blobUrlParts = blobUrl.Split('/');
-            long elementId = Convert.ToInt64(blobUrlParts[2]);
-            string elementBlobIdAndQueryString = blobUrlParts[4];
-            int indexOfQueryString = elementBlobIdAndQueryString.IndexOf("?");
-            long elementBlobId = Convert.ToInt64(elementBlobIdAndQueryString.Substring(0, indexOfQueryString));
-            long t = Convert.ToInt64(elementBlobIdAndQueryString.Substring(indexOfQueryString + 3));
-            string alt = null;
-            if (blobsById.ContainsKey(elementBlobId) && blobsById[elementBlobId] != null)
-                alt = blobsById[elementBlobId].Name;
-            return $"/elementtypes/{elementTypeId.ToString().ToLower()}/elements/{elementId}/blobs/{elementBlobId}/content?t={t}\" alt=\"{alt}";
+            string[] imageHtmlParts = imageHtml.Split('/');
+            string htmlBlobIdAndQueryString = imageHtmlParts[4];
+            int indexOfQueryString = htmlBlobIdAndQueryString.IndexOf("?");
+            long htmlBlobId = Convert.ToInt64(htmlBlobIdAndQueryString.Substring(0, indexOfQueryString));
+
+            if (!imagesByHtmlBlobId.ContainsKey(htmlBlobId) || imagesByHtmlBlobId[htmlBlobId] == null)
+                return "[[]]";
+            // TODO: Add width, heigth, alt in here
+            return $"[[IMG:{imagesByHtmlBlobId[htmlBlobId].BlobId}]]";
         }
 
-        private string FormatBlobUrls(Guid elementTypeId, string html, IDictionary<long, BlobImage> blobsById)
+        private string CorrectImagesHtml(Guid elementTypeId, string html, IDictionary<long, HtmlContentImage> imagesByHtmlBlobId)
         {
             StringBuilder sb = new StringBuilder();
             int currentIndex = 0;
-            int blobUrlStartIndex = 0; 
-            while (blobUrlStartIndex != -1)
+            int imgStartIndex = 0; 
+            while (imgStartIndex != -1)
             {
-                blobUrlStartIndex = html.IndexOf("/elements/", currentIndex);
-                if (blobUrlStartIndex == -1)
+                imgStartIndex = html.IndexOf("<img src=\"/elements/", currentIndex);
+                if (imgStartIndex == -1)
                 {
-                    // Blob URL not found
+                    // Image not found
                     string appendText = html.Substring(currentIndex);
                     sb.Append(appendText);
                 }
                 else
                 {
-                    // Blob URL found
-                    string appendText = html.Substring(currentIndex, blobUrlStartIndex - currentIndex);
+                    // Image found
+                    string appendText = html.Substring(currentIndex, imgStartIndex - currentIndex);
                     sb.Append(appendText);
-                    int blobUrlStopIndex = html.IndexOf("\"", blobUrlStartIndex);
-                    string blobUrl = html.Substring(blobUrlStartIndex, blobUrlStopIndex - blobUrlStartIndex);
-                    blobUrl = FormatBlobUrl(elementTypeId, blobUrl, blobsById);
-                    sb.Append(blobUrl);
-                    currentIndex = blobUrlStopIndex;
+                    int imgStopIndex = html.IndexOf(">", imgStartIndex) + 1;
+                    string imgHtml = html.Substring(imgStartIndex, imgStopIndex - imgStartIndex);
+                    imgHtml = CorrectImageHtml(elementTypeId, imgHtml, imagesByHtmlBlobId);
+                    sb.Append(imgHtml);
+                    currentIndex = imgStopIndex;
                 }
             }
             return sb.ToString();
         }
 
-        private string FormatHtml(Guid elementTypeId, string html, IDictionary<long, BlobImage> blobsById)
+        private string FormatHtml(Guid elementTypeId, string html, IDictionary<long, HtmlContentImage> imagesByHtmlBlobId)
         {
             html = ReplaceKeywords(html);
-            html = FormatBlobUrls(elementTypeId, html, blobsById);
+            html = CorrectImagesHtml(elementTypeId, html, imagesByHtmlBlobId);
             return html;
+        }
+
+        private HtmlContentImage GetHtmlImageFromBlobId(long blobId, IDictionary<long, BlobImage> blobsById)
+        {
+            if (!blobsById.ContainsKey(blobId))
+                return null;
+
+            BlobImage blobImage = blobsById[blobId];
+
+            return new HtmlContentImage
+            {
+                BlobId = blobImage.BlobId,
+                Width = blobImage.Width,
+                Height = blobImage.Height,
+                Name = blobImage.Name
+            };
         }
 
         public async Task<IElementView<HtmlElementSettings, HtmlElementContent>> ReadElementViewAsync(long tenantId, long elementId, PageContext context)
@@ -120,19 +135,21 @@ namespace Riverside.Cms.Services.Element.Domain
             if (settings == null)
                 return null;
 
+            // Retrieve all preview image blobs
             IEnumerable<long> blobIds = settings.Blobs.Select(b => b.PreviewImageBlobId);
             IEnumerable<Blob> blobs = await _storageService.ListBlobsAsync(tenantId, blobIds);
             IDictionary<long, BlobImage> blobsById = blobs.ToDictionary(b => b.BlobId, b => (BlobImage)b);
-            IDictionary<long, BlobImage> blobsByHtmlBlobId = settings.Blobs.ToDictionary(h => h.HtmlBlobId, h => blobsById.ContainsKey(h.PreviewImageBlobId) ? blobsById[h.PreviewImageBlobId] : null);
+            // TODO: Check what if mismatch GetHtmlImageFromBlobId returns NULLs?
+            IDictionary<long, HtmlContentImage> imagesByHtmlBlobId = settings.Blobs.ToDictionary(h => h.HtmlBlobId, h => GetHtmlImageFromBlobId(h.PreviewImageBlobId, blobsById));
+            IDictionary<long, HtmlContentImage> imagesByBlobId = settings.Blobs.Select(h => GetHtmlImageFromBlobId(h.PreviewImageBlobId, blobsById)).ToDictionary(h => h.BlobId, h => h);
 
-            IEnumerable<HtmlImage> images = blobs.Select(b => new HtmlImage { BlobId = b.BlobId, Width = ((BlobImage)b).Width, Height = ((BlobImage)b).Height, Name = b.Name });
-           
-            string formattedHtml = FormatHtml(settings.ElementTypeId, settings.Html, blobsByHtmlBlobId);
+            // Format HTML
+            string formattedHtml = FormatHtml(settings.ElementTypeId, settings.Html, imagesByHtmlBlobId);
 
             HtmlElementContent content = new HtmlElementContent
             {
                 FormattedHtml = formattedHtml,
-                Images = images
+                Images = imagesByBlobId
             };
 
             return new ElementView<HtmlElementSettings, HtmlElementContent>
