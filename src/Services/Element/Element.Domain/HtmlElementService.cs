@@ -22,9 +22,18 @@ namespace Riverside.Cms.Services.Element.Domain
         public IEnumerable<HtmlBlob> Blobs { get; set; }
     }
 
+    public class HtmlImage
+    {
+        public long BlobId { get; set; }
+        public int Width { get; set; }
+        public int Height { get; set; }
+        public string Name { get; set; }
+    }
+
     public class HtmlElementContent
     {
         public string FormattedHtml { get; set; }
+        public IEnumerable<HtmlImage> Images { get; set; }
     }
 
     public interface IHtmlElementService : IElementSettingsService<HtmlElementSettings>, IElementViewService<HtmlElementSettings, HtmlElementContent>, IElementStorageService
@@ -54,7 +63,7 @@ namespace Riverside.Cms.Services.Element.Domain
             return html.Replace("%YEAR%", DateTime.UtcNow.Year.ToString());
         }
 
-        private string FormatBlobUrl(Guid elementTypeId, string blobUrl)
+        private string FormatBlobUrl(Guid elementTypeId, string blobUrl, IDictionary<long, BlobImage> blobsById)
         {
             // Converts URL like: /elements/775/uploads/408?t=636576020355975145 to /elementtypes/c92ee4c4-b133-44cc-8322-640e99c334dc/elements/775/blobs/408/content?t=636576020049621023
             string[] blobUrlParts = blobUrl.Split('/');
@@ -63,10 +72,13 @@ namespace Riverside.Cms.Services.Element.Domain
             int indexOfQueryString = elementBlobIdAndQueryString.IndexOf("?");
             long elementBlobId = Convert.ToInt64(elementBlobIdAndQueryString.Substring(0, indexOfQueryString));
             long t = Convert.ToInt64(elementBlobIdAndQueryString.Substring(indexOfQueryString + 3));
-            return $"/elementtypes/{elementTypeId.ToString().ToLower()}/elements/{elementId}/blobs/{elementBlobId}/content?t={t}";
+            string alt = null;
+            if (blobsById.ContainsKey(elementBlobId) && blobsById[elementBlobId] != null)
+                alt = blobsById[elementBlobId].Name;
+            return $"/elementtypes/{elementTypeId.ToString().ToLower()}/elements/{elementId}/blobs/{elementBlobId}/content?t={t}\" alt=\"{alt}";
         }
 
-        private string FormatBlobUrls(Guid elementTypeId, string html)
+        private string FormatBlobUrls(Guid elementTypeId, string html, IDictionary<long, BlobImage> blobsById)
         {
             StringBuilder sb = new StringBuilder();
             int currentIndex = 0;
@@ -87,7 +99,7 @@ namespace Riverside.Cms.Services.Element.Domain
                     sb.Append(appendText);
                     int blobUrlStopIndex = html.IndexOf("\"", blobUrlStartIndex);
                     string blobUrl = html.Substring(blobUrlStartIndex, blobUrlStopIndex - blobUrlStartIndex);
-                    blobUrl = FormatBlobUrl(elementTypeId, blobUrl);
+                    blobUrl = FormatBlobUrl(elementTypeId, blobUrl, blobsById);
                     sb.Append(blobUrl);
                     currentIndex = blobUrlStopIndex;
                 }
@@ -95,10 +107,10 @@ namespace Riverside.Cms.Services.Element.Domain
             return sb.ToString();
         }
 
-        private string FormatHtml(Guid elementTypeId, string html)
+        private string FormatHtml(Guid elementTypeId, string html, IDictionary<long, BlobImage> blobsById)
         {
             html = ReplaceKeywords(html);
-            html = FormatBlobUrls(elementTypeId, html);
+            html = FormatBlobUrls(elementTypeId, html, blobsById);
             return html;
         }
 
@@ -108,9 +120,19 @@ namespace Riverside.Cms.Services.Element.Domain
             if (settings == null)
                 return null;
 
+            IEnumerable<long> blobIds = settings.Blobs.Select(b => b.PreviewImageBlobId);
+            IEnumerable<Blob> blobs = await _storageService.ListBlobsAsync(tenantId, blobIds);
+            IDictionary<long, BlobImage> blobsById = blobs.ToDictionary(b => b.BlobId, b => (BlobImage)b);
+            IDictionary<long, BlobImage> blobsByHtmlBlobId = settings.Blobs.ToDictionary(h => h.HtmlBlobId, h => blobsById.ContainsKey(h.PreviewImageBlobId) ? blobsById[h.PreviewImageBlobId] : null);
+
+            IEnumerable<HtmlImage> images = blobs.Select(b => new HtmlImage { BlobId = b.BlobId, Width = ((BlobImage)b).Width, Height = ((BlobImage)b).Height, Name = b.Name });
+           
+            string formattedHtml = FormatHtml(settings.ElementTypeId, settings.Html, blobsByHtmlBlobId);
+
             HtmlElementContent content = new HtmlElementContent
             {
-                FormattedHtml = FormatHtml(settings.ElementTypeId, settings.Html)
+                FormattedHtml = formattedHtml,
+                Images = images
             };
 
             return new ElementView<HtmlElementSettings, HtmlElementContent>
