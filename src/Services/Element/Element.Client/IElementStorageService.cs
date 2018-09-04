@@ -9,6 +9,6 @@ namespace Riverside.Cms.Services.Element.Client
 {
     public interface IElementStorageService
     {
-        Task<BlobContent> ReadBlobContentAsync(long tenantId, long elementId, long elementBlobId, PageImageType imageType);
+        Task<BlobContent> ReadBlobContentAsync(long tenantId, long elementId, long blobSetId, PageImageType imageType);
     }
 }

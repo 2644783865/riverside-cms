@@ -41,7 +41,7 @@ namespace Riverside.Cms.Services.Element.Infrastructure
                         cms.Element.TenantId = @TenantId AND
                         cms.Element.ElementId = @ElementId
                     SELECT
-                        element.HtmlUpload.HtmlUploadId AS HtmlBlobId,
+                        element.HtmlUpload.HtmlUploadId AS BlobSetId,
 	                    element.HtmlUpload.ImageUploadId AS ImageBlobId,
 	                    element.HtmlUpload.PreviewImageUploadId AS PreviewImageBlobId,
 	                    element.HtmlUpload.ThumbnailImageUploadId AS ThumbnailImageBlobId
@@ -59,7 +59,7 @@ namespace Riverside.Cms.Services.Element.Infrastructure
                 {
                     HtmlElementSettings settings = await gr.ReadFirstOrDefaultAsync<HtmlElementSettings>();
                     if (settings != null)
-                        settings.Blobs = await gr.ReadAsync<HtmlBlob>();
+                        settings.BlobSets = await gr.ReadAsync<HtmlBlobSet>();
                     return settings;
                 }
             }

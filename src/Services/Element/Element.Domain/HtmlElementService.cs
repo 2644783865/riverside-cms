@@ -4,14 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using Riverside.Cms.Services.Core.Client;
 using Riverside.Cms.Services.Storage.Client;
 
 namespace Riverside.Cms.Services.Element.Domain
 {
-    public class HtmlBlob
+    public class HtmlBlobSet
     {
-        public long HtmlBlobId { get; set; }
+        public long BlobSetId { get; set; }
         public long ImageBlobId { get; set; }
         public long PreviewImageBlobId { get; set; }
         public long ThumbnailImageBlobId { get; set; }
@@ -20,21 +21,29 @@ namespace Riverside.Cms.Services.Element.Domain
     public class HtmlElementSettings : ElementSettings
     {
         public string Html { get; set; }
-        public IEnumerable<HtmlBlob> Blobs { get; set; }
+        public IEnumerable<HtmlBlobSet> BlobSets { get; set; }
     }
 
-    public class HtmlContentImage
+    public class HtmlPreviewImage
     {
-        public long BlobId { get; set; }
+        public long BlobSetId { get; set; }
         public int Width { get; set; }
         public int Height { get; set; }
+        public string Name { get; set; }
+    }
+
+    public class HtmlPreviewImageOverride
+    {
+        public long BlobSetId { get; set; }
+        public string Width { get; set; }
+        public string Height { get; set; }
         public string Name { get; set; }
     }
 
     public class HtmlElementContent
     {
         public string FormattedHtml { get; set; }
-        public IDictionary<long, HtmlContentImage> Images { get; set; }
+        public IDictionary<long, HtmlPreviewImage> Images { get; set; }
     }
 
     public interface IHtmlElementService : IElementSettingsService<HtmlElementSettings>, IElementViewService<HtmlElementSettings, HtmlElementContent>, IElementStorageService
@@ -64,20 +73,90 @@ namespace Riverside.Cms.Services.Element.Domain
             return html.Replace("%YEAR%", DateTime.UtcNow.Year.ToString());
         }
 
-        private string CorrectImageHtml(Guid elementTypeId, string imageHtml, IDictionary<long, HtmlContentImage> imagesByHtmlBlobId)
+        /// <summary>
+        /// Gets attribute value from an HTML element.
+        /// </summary>
+        /// <param name="html">Html, e.g. "<img src='/elements/775/uploads/397?t=636576020049621023' width='45' height='56' alt='Car photo' />"</param>
+        /// <param name="attribute">Name of attribute to retrieve, e.g. "width".</param>
+        /// <returns>Attribute value.</returns>
+        private string GetAttribute(string html, string attribute)
         {
-            string[] imageHtmlParts = imageHtml.Split('/');
-            string htmlBlobIdAndQueryString = imageHtmlParts[4];
-            int indexOfQueryString = htmlBlobIdAndQueryString.IndexOf("?");
-            long htmlBlobId = Convert.ToInt64(htmlBlobIdAndQueryString.Substring(0, indexOfQueryString));
+            // Find beginning of attribute
+            string attributeStartText = $"{attribute}=\"";
+            int attributeStartIndex = html.IndexOf(attributeStartText);
+            if (attributeStartIndex == -1)
+                return null;
 
-            if (!imagesByHtmlBlobId.ContainsKey(htmlBlobId) || imagesByHtmlBlobId[htmlBlobId] == null)
-                return "[[]]";
-            // TODO: Add width, heigth, alt in here
-            return $"[[IMG:{imagesByHtmlBlobId[htmlBlobId].BlobId}]]";
+            // Find end of attribute value
+            string attributeStopText = "\"";
+            int attributeStopIndex = html.IndexOf(attributeStopText, attributeStartIndex + attributeStartText.Length);
+            if (attributeStopIndex == -1)
+                return null;
+
+            // Return attribute value that is between double quotes
+            return html.Substring(attributeStartIndex + attributeStartText.Length, attributeStopIndex - attributeStartIndex - attributeStartText.Length);
         }
 
-        private string CorrectImagesHtml(Guid elementTypeId, string html, IDictionary<long, HtmlContentImage> imagesByHtmlBlobId)
+        /// <summary>
+        /// Converts HTML image tag details into an JSON object.
+        /// </summary>
+        /// <param name="imageHtml">Html, e.g. "<img src='/elements/775/uploads/397?t=636576020049621023' width='45' height='56' alt='Car photo' />"</param>
+        /// <returns>JSON representation of object within opening and closing double square brackets.</returns>
+        private string ReplaceImageWithJson(string imageHtml, IDictionary<long, HtmlPreviewImage> previewImagesByBlobSetId)
+        {
+            // Get HTML image tag attributes
+            string src = GetAttribute(imageHtml, "src");
+            string width = GetAttribute(imageHtml, "width");
+            string height = GetAttribute(imageHtml, "height");
+            string alt = GetAttribute(imageHtml, "alt");
+
+            // At a minimum we need src attribute to determine blob identifier
+            if (src == null)
+                return "[[{}]]";
+
+            // Src attribute determines HTML blob identifier
+            string[] srcParts = src.Split('/');
+            if (srcParts.Length < 5)
+                return "[[{}]]";
+            string blobSetIdAndQueryString = srcParts[4];
+            int indexOfQueryString = blobSetIdAndQueryString.IndexOf("?");
+            if (indexOfQueryString == -1)
+                return "[[{}]]";
+            string blobSetIdText = blobSetIdAndQueryString.Substring(0, indexOfQueryString);
+            long blobSetId;
+            if (!Int64.TryParse(blobSetIdText, out blobSetId))
+                return "[[{}]]";
+
+            // Check that image with HTML blob identifier exists
+            if (!previewImagesByBlobSetId.ContainsKey(blobSetId) || previewImagesByBlobSetId[blobSetId] == null)
+                return "[[{}]]";
+
+            // Finally, encode image HTML into JSON
+            HtmlPreviewImageOverride image = new HtmlPreviewImageOverride
+            {
+                BlobSetId = blobSetId,
+                Name = alt,
+                Width = width,
+                Height = height
+            };
+            DefaultContractResolver contractResolver = new DefaultContractResolver
+            {
+                NamingStrategy = new CamelCaseNamingStrategy()
+            };
+            JsonSerializerSettings serializerSettings = new JsonSerializerSettings
+            {
+                ContractResolver = contractResolver
+            };
+            return $"[[{JsonConvert.SerializeObject(image, serializerSettings)}]]";
+        }
+
+        /// <summary>
+        /// Parses HTML, replacing image tags with JSON representations.
+        /// </summary>
+        /// <param name="html">The original HTML.</param>
+        /// <param name="previewImagesByBlobSetId"></param>
+        /// <returns></returns>
+        private string ReplaceImagesWithJson(string html, IDictionary<long, HtmlPreviewImage> previewImagesByBlobSetId)
         {
             StringBuilder sb = new StringBuilder();
             int currentIndex = 0;
@@ -98,7 +177,7 @@ namespace Riverside.Cms.Services.Element.Domain
                     sb.Append(appendText);
                     int imgStopIndex = html.IndexOf(">", imgStartIndex) + 1;
                     string imgHtml = html.Substring(imgStartIndex, imgStopIndex - imgStartIndex);
-                    imgHtml = CorrectImageHtml(elementTypeId, imgHtml, imagesByHtmlBlobId);
+                    imgHtml = ReplaceImageWithJson(imgHtml, previewImagesByBlobSetId);
                     sb.Append(imgHtml);
                     currentIndex = imgStopIndex;
                 }
@@ -106,23 +185,25 @@ namespace Riverside.Cms.Services.Element.Domain
             return sb.ToString();
         }
 
-        private string FormatHtml(Guid elementTypeId, string html, IDictionary<long, HtmlContentImage> imagesByHtmlBlobId)
+        /// <summary>
+        /// Formats HTML.
+        /// </summary>
+        /// <param name="html">Source HTML.</param>
+        /// <param name="previewImagesByBlobSetId"></param>
+        /// <returns>Reformatted HTML.</returns>
+        private string FormatHtml(string html, IDictionary<long, HtmlPreviewImage> previewImagesByBlobSetId)
         {
             html = ReplaceKeywords(html);
-            html = CorrectImagesHtml(elementTypeId, html, imagesByHtmlBlobId);
+            html = ReplaceImagesWithJson(html, previewImagesByBlobSetId);
             return html;
         }
 
-        private HtmlContentImage GetHtmlImageFromBlobId(long blobId, IDictionary<long, BlobImage> blobsById)
+        private HtmlPreviewImage GetHtmlPreviewImageFromHtmlBlob(HtmlBlobSet blobSet, IDictionary<long, BlobImage> blobsById)
         {
-            if (!blobsById.ContainsKey(blobId))
-                return null;
-
-            BlobImage blobImage = blobsById[blobId];
-
-            return new HtmlContentImage
+            BlobImage blobImage = blobsById[blobSet.PreviewImageBlobId];
+            return new HtmlPreviewImage
             {
-                BlobId = blobImage.BlobId,
+                BlobSetId = blobSet.BlobSetId,
                 Width = blobImage.Width,
                 Height = blobImage.Height,
                 Name = blobImage.Name
@@ -131,27 +212,33 @@ namespace Riverside.Cms.Services.Element.Domain
 
         public async Task<IElementView<HtmlElementSettings, HtmlElementContent>> ReadElementViewAsync(long tenantId, long elementId, PageContext context)
         {
+            // Get element settings
             HtmlElementSettings settings = await _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
             if (settings == null)
                 return null;
 
-            // Retrieve all preview image blobs
-            IEnumerable<long> blobIds = settings.Blobs.Select(b => b.PreviewImageBlobId);
+            // Get details of all preview images that may be displayed in the HTML content
+            IEnumerable<long> blobIds = settings.BlobSets.Select(s => s.PreviewImageBlobId);
             IEnumerable<Blob> blobs = await _storageService.ListBlobsAsync(tenantId, blobIds);
             IDictionary<long, BlobImage> blobsById = blobs.ToDictionary(b => b.BlobId, b => (BlobImage)b);
-            // TODO: Check what if mismatch GetHtmlImageFromBlobId returns NULLs?
-            IDictionary<long, HtmlContentImage> imagesByHtmlBlobId = settings.Blobs.ToDictionary(h => h.HtmlBlobId, h => GetHtmlImageFromBlobId(h.PreviewImageBlobId, blobsById));
-            IDictionary<long, HtmlContentImage> imagesByBlobId = settings.Blobs.Select(h => GetHtmlImageFromBlobId(h.PreviewImageBlobId, blobsById)).ToDictionary(h => h.BlobId, h => h);
+
+            // Construct dictionary containing details of all preview images keyed by blob set identifier
+            IDictionary<long, HtmlPreviewImage> previewImagesByHtmlBlobId = settings.BlobSets
+                .Where(s => blobsById.ContainsKey(s.PreviewImageBlobId))
+                .Select(s => GetHtmlPreviewImageFromHtmlBlob(s, blobsById))
+                .ToDictionary(i => i.BlobSetId, i => i);
 
             // Format HTML
-            string formattedHtml = FormatHtml(settings.ElementTypeId, settings.Html, imagesByHtmlBlobId);
+            string formattedHtml = FormatHtml(settings.Html, previewImagesByHtmlBlobId);
 
+            // Construct element content
             HtmlElementContent content = new HtmlElementContent
             {
                 FormattedHtml = formattedHtml,
-                Images = imagesByBlobId
+                Images = previewImagesByHtmlBlobId
             };
 
+            // Return element view
             return new ElementView<HtmlElementSettings, HtmlElementContent>
             {
                 Settings = settings,
@@ -159,35 +246,35 @@ namespace Riverside.Cms.Services.Element.Domain
             };
         }
 
-        private long? GetBlobId(HtmlBlob htmlBlob, PageImageType pageImageType)
+        private long? GetBlobId(HtmlBlobSet blobSet, PageImageType pageImageType)
         {
             switch (pageImageType)
             {
                 case PageImageType.Original:
-                    return htmlBlob.ImageBlobId;
+                    return blobSet.ImageBlobId;
 
                 case PageImageType.Preview:
-                    return htmlBlob.PreviewImageBlobId;
+                    return blobSet.PreviewImageBlobId;
 
                 case PageImageType.Thumbnail:
-                    return htmlBlob.ThumbnailImageBlobId;
+                    return blobSet.ThumbnailImageBlobId;
 
                 default:
                     return null;
             }
         }
 
-        public async Task<BlobContent> ReadBlobContentAsync(long tenantId, long elementId, long elementBlobId, PageImageType imageType)
+        public async Task<BlobContent> ReadBlobContentAsync(long tenantId, long elementId, long blobSetId, PageImageType imageType)
         {
             HtmlElementSettings settings = await _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
             if (settings == null)
                 return null;
 
-            HtmlBlob blob = settings.Blobs.Where(b => b.HtmlBlobId == elementBlobId).FirstOrDefault();
-            if (blob == null)
+            HtmlBlobSet blobSet = settings.BlobSets.Where(s => s.BlobSetId == blobSetId).FirstOrDefault();
+            if (blobSet == null)
                 return null;
 
-            long? blobId = GetBlobId(blob, imageType);
+            long? blobId = GetBlobId(blobSet, imageType);
             if (blobId == null)
                 return null;
 

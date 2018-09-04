@@ -108,7 +108,7 @@ namespace RiversideCms.Mvc.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> ReadElementImage(Guid elementTypeId, long elementId, long elementBlobId, PageImageType? format)
+        public async Task<IActionResult> ReadElementBlob(Guid elementTypeId, long elementId, long blobSetId, PageImageType? format)
         {
             long tenantId = TenantId;
 
@@ -116,7 +116,7 @@ namespace RiversideCms.Mvc.Controllers
             if (format.HasValue)
                 imageType = format.Value;
 
-            BlobContent blobContent = await _elementServiceFactory.GetElementBlobContentAsync(tenantId, elementTypeId, elementId, elementBlobId, imageType);
+            BlobContent blobContent = await _elementServiceFactory.GetElementBlobContentAsync(tenantId, elementTypeId, elementId, blobSetId, imageType);
 
             return File(blobContent.Stream, blobContent.Type, blobContent.Name);
         }

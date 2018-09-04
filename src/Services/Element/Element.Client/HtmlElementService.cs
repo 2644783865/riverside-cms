@@ -10,9 +10,9 @@ using Riverside.Cms.Services.Storage.Client;
 
 namespace Riverside.Cms.Services.Element.Client
 {
-    public class HtmlBlob
+    public class HtmlBlobSet
     {
-        public long HtmlBlobId { get; set; }
+        public long BlobSetId { get; set; }
         public long ImageBlobId { get; set; }
         public long PreviewImageBlobId { get; set; }
         public long ThumbnailImageBlobId { get; set; }
@@ -21,21 +21,29 @@ namespace Riverside.Cms.Services.Element.Client
     public class HtmlElementSettings : ElementSettings
     {
         public string Html { get; set; }
-        public IEnumerable<HtmlBlob> Blobs { get; set; }
+        public IEnumerable<HtmlBlobSet> BlobSets { get; set; }
     }
 
-    public class HtmlContentImage
+    public class HtmlPreviewImage
     {
-        public long BlobId { get; set; }
+        public long BlobSetId { get; set; }
         public int Width { get; set; }
         public int Height { get; set; }
+        public string Name { get; set; }
+    }
+
+    public class HtmlPreviewImageOverride
+    {
+        public long BlobSetId { get; set; }
+        public string Width { get; set; }
+        public string Height { get; set; }
         public string Name { get; set; }
     }
 
     public class HtmlElementContent
     {
         public string FormattedHtml { get; set; }
-        public IDictionary<long, HtmlContentImage> Images { get; set; }
+        public IDictionary<long, HtmlPreviewImage> Images { get; set; }
     }
 
     public interface IHtmlElementService : IElementSettingsService<HtmlElementSettings>, IElementViewService<HtmlElementSettings, HtmlElementContent>, IElementStorageService
@@ -85,11 +93,11 @@ namespace Riverside.Cms.Services.Element.Client
             }
         }
 
-        public async Task<BlobContent> ReadBlobContentAsync(long tenantId, long elementId, long elementBlobId, PageImageType imageType)
+        public async Task<BlobContent> ReadBlobContentAsync(long tenantId, long elementId, long blobSetId, PageImageType imageType)
         {
             try
             {
-                string uri = $"{_options.Value.ElementApiBaseUrl}tenants/{tenantId}/elementtypes/c92ee4c4-b133-44cc-8322-640e99c334dc/elements/{elementId}/blobs/{elementBlobId}/content?imagetype={imageType.ToString().ToLower()}";
+                string uri = $"{_options.Value.ElementApiBaseUrl}tenants/{tenantId}/elementtypes/c92ee4c4-b133-44cc-8322-640e99c334dc/elements/{elementId}/blobsets/{blobSetId}/content?imagetype={imageType.ToString().ToLower()}";
                 using (HttpClient httpClient = new HttpClient())
                 {
                     HttpResponseMessage response = await httpClient.GetAsync(uri);
