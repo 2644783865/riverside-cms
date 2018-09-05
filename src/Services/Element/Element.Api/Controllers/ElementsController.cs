@@ -108,9 +108,9 @@ namespace Element.Api.Controllers
         [HttpGet]
         [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/c92ee4c4-b133-44cc-8322-640e99c334dc/elements/{elementId:int}/blobsets/{blobSetId:int}/content")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public async Task<IActionResult> ReadHtmlElementBlobContent(long tenantId, long elementId, long blobSetId, [FromQuery]PageImageType imageType)
+        public async Task<IActionResult> ReadHtmlElementBlobContent(long tenantId, long elementId, long blobSetId, [FromQuery]string blobLabel)
         {
-            BlobContent content = await _htmlElementService.ReadBlobContentAsync(tenantId, elementId, blobSetId, imageType);
+            BlobContent content = await _htmlElementService.ReadBlobContentAsync(tenantId, elementId, blobSetId, blobLabel);
             if (content == null)
                 return NotFound();
             return File(content.Stream, content.Type, content.Name);

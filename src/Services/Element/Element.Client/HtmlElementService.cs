@@ -93,11 +93,11 @@ namespace Riverside.Cms.Services.Element.Client
             }
         }
 
-        public async Task<BlobContent> ReadBlobContentAsync(long tenantId, long elementId, long blobSetId, PageImageType imageType)
+        public async Task<BlobContent> ReadBlobContentAsync(long tenantId, long elementId, long blobSetId, string blobLabel)
         {
             try
             {
-                string uri = $"{_options.Value.ElementApiBaseUrl}tenants/{tenantId}/elementtypes/c92ee4c4-b133-44cc-8322-640e99c334dc/elements/{elementId}/blobsets/{blobSetId}/content?imagetype={imageType.ToString().ToLower()}";
+                string uri = $"{_options.Value.ElementApiBaseUrl}tenants/{tenantId}/elementtypes/c92ee4c4-b133-44cc-8322-640e99c334dc/elements/{elementId}/blobsets/{blobSetId}/content?bloblabel={blobLabel}";
                 using (HttpClient httpClient = new HttpClient())
                 {
                     HttpResponseMessage response = await httpClient.GetAsync(uri);

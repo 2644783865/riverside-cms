@@ -72,12 +72,12 @@ namespace RiversideCms.Mvc.Services
             }
         }
 
-        public async Task<BlobContent> GetElementBlobContentAsync(long tenantId, Guid elementTypeId, long elementId, long blobSetId, PageImageType imageType)
+        public async Task<BlobContent> GetElementBlobContentAsync(long tenantId, Guid elementTypeId, long elementId, long blobSetId, string blobLabel)
         {
             switch (elementTypeId.ToString())
             {
                 case "c92ee4c4-b133-44cc-8322-640e99c334dc":
-                    return await _htmlElementService.ReadBlobContentAsync(tenantId, elementId, blobSetId, imageType);
+                    return await _htmlElementService.ReadBlobContentAsync(tenantId, elementId, blobSetId, blobLabel);
 
                 default:
                     return null;

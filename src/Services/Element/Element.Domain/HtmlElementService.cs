@@ -57,6 +57,10 @@ namespace Riverside.Cms.Services.Element.Domain
 
         private const string HtmlImagePath = "elements/html/{0}";
 
+        private const string OriginalBlobLabel = "original";
+        private const string ThumbnailBlobLabel = "thumbnail";
+        private const string PreviewBlobLabel = "preview";
+
         public HtmlElementService(IElementRepository<HtmlElementSettings> elementRepository, IStorageService storageService)
         {
             _elementRepository = elementRepository;
@@ -246,25 +250,25 @@ namespace Riverside.Cms.Services.Element.Domain
             };
         }
 
-        private long? GetBlobId(HtmlBlobSet blobSet, PageImageType pageImageType)
+        private long? GetBlobId(HtmlBlobSet blobSet, string blobLabel)
         {
-            switch (pageImageType)
+            switch (blobLabel)
             {
-                case PageImageType.Original:
+                case OriginalBlobLabel:
                     return blobSet.ImageBlobId;
 
-                case PageImageType.Preview:
+                case PreviewBlobLabel:
                     return blobSet.PreviewImageBlobId;
 
-                case PageImageType.Thumbnail:
+                case ThumbnailBlobLabel:
                     return blobSet.ThumbnailImageBlobId;
 
                 default:
-                    return null;
+                    return blobSet.PreviewImageBlobId;
             }
         }
 
-        public async Task<BlobContent> ReadBlobContentAsync(long tenantId, long elementId, long blobSetId, PageImageType imageType)
+        public async Task<BlobContent> ReadBlobContentAsync(long tenantId, long elementId, long blobSetId, string blobLabel)
         {
             HtmlElementSettings settings = await _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
             if (settings == null)
@@ -274,7 +278,7 @@ namespace Riverside.Cms.Services.Element.Domain
             if (blobSet == null)
                 return null;
 
-            long? blobId = GetBlobId(blobSet, imageType);
+            long? blobId = GetBlobId(blobSet, blobLabel);
             if (blobId == null)
                 return null;
 
