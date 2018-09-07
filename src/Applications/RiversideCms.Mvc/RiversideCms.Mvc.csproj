@@ -19,6 +19,7 @@
     <ProjectReference Include="..\..\Services\Core\Core.Client\Core.Client.csproj" />
     <ProjectReference Include="..\..\Services\Element\Element.Client\Element.Client.csproj" />
     <ProjectReference Include="..\..\Services\Storage\Storage.Client\Storage.Client.csproj" />
+    <ProjectReference Include="..\..\Utilities\Text\Text.Formatting\Text.Formatting.csproj" />
   </ItemGroup>
 
 </Project>

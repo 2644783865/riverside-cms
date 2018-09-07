@@ -4,5 +4,5 @@
 @model IElementView<HtmlElementSettings, HtmlElementContent>
 
 <div class="rcms-html">
-    @Html.Raw(Model.Content.FormattedHtml)
+    @Html.FormatHtmlElementHtml(Model)
 </div>
