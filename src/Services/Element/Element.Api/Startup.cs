@@ -12,6 +12,7 @@ using Riverside.Cms.Services.Core.Client;
 using Riverside.Cms.Services.Element.Domain;
 using Riverside.Cms.Services.Element.Infrastructure;
 using Riverside.Cms.Services.Storage.Client;
+using Riverside.Cms.Utilities.Text.Formatting;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace Element.Api
@@ -27,6 +28,8 @@ namespace Element.Api
 
         private void ConfigureDependencyInjectionServices(IServiceCollection services)
         {
+            services.AddTransient<IStringUtilities, StringUtilities>();
+
             services.AddTransient<IForumService, ForumService>();
             services.AddTransient<IPageService, PageService>();
             services.AddTransient<IStorageService, StorageService>();

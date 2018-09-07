@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Utilities\Text\Text.Formatting\Text.Formatting.csproj" />
     <ProjectReference Include="..\..\Core\Core.Client\Core.Client.csproj" />
     <ProjectReference Include="..\..\Storage\Storage.Client\Storage.Client.csproj" />
   </ItemGroup>

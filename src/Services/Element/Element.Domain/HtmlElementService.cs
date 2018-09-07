@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Riverside.Cms.Services.Core.Client;
 using Riverside.Cms.Services.Storage.Client;
+using Riverside.Cms.Utilities.Text.Formatting;
 
 namespace Riverside.Cms.Services.Element.Domain
 {
@@ -54,6 +55,7 @@ namespace Riverside.Cms.Services.Element.Domain
     {
         private readonly IElementRepository<HtmlElementSettings> _elementRepository;
         private readonly IStorageService _storageService;
+        private readonly IStringUtilities _stringUtilities;
 
         private const string HtmlImagePath = "elements/html/{0}";
 
@@ -61,10 +63,11 @@ namespace Riverside.Cms.Services.Element.Domain
         private const string ThumbnailBlobLabel = "thumbnail";
         private const string PreviewBlobLabel = "preview";
 
-        public HtmlElementService(IElementRepository<HtmlElementSettings> elementRepository, IStorageService storageService)
+        public HtmlElementService(IElementRepository<HtmlElementSettings> elementRepository, IStorageService storageService, IStringUtilities stringUtilities)
         {
             _elementRepository = elementRepository;
             _storageService = storageService;
+            _stringUtilities = stringUtilities;
         }
 
         public Task<HtmlElementSettings> ReadElementSettingsAsync(long tenantId, long elementId)
@@ -78,118 +81,6 @@ namespace Riverside.Cms.Services.Element.Domain
         }
 
         /// <summary>
-        /// Gets attribute value from an HTML element.
-        /// </summary>
-        /// <param name="html">Html, e.g. "<img src='/elements/775/uploads/397?t=636576020049621023' width='45' height='56' alt='Car photo' />"</param>
-        /// <param name="attribute">Name of attribute to retrieve, e.g. "width".</param>
-        /// <returns>Attribute value.</returns>
-        private string GetAttribute(string html, string attribute)
-        {
-            // Find beginning of attribute
-            string attributeStartText = $"{attribute}=\"";
-            int attributeStartIndex = html.IndexOf(attributeStartText);
-            if (attributeStartIndex == -1)
-                return null;
-
-            // Find end of attribute value
-            string attributeStopText = "\"";
-            int attributeStopIndex = html.IndexOf(attributeStopText, attributeStartIndex + attributeStartText.Length);
-            if (attributeStopIndex == -1)
-                return null;
-
-            // Return attribute value that is between double quotes
-            return html.Substring(attributeStartIndex + attributeStartText.Length, attributeStopIndex - attributeStartIndex - attributeStartText.Length);
-        }
-
-        /// <summary>
-        /// Converts HTML image tag details into an JSON object.
-        /// </summary>
-        /// <param name="imageHtml">Html, e.g. "<img src='/elements/775/uploads/397?t=636576020049621023' width='45' height='56' alt='Car photo' />"</param>
-        /// <returns>JSON representation of object within opening and closing double square brackets.</returns>
-        private string ReplaceImageWithJson(string imageHtml, IDictionary<long, HtmlPreviewImage> previewImagesByBlobSetId)
-        {
-            // Get HTML image tag attributes
-            string src = GetAttribute(imageHtml, "src");
-            string width = GetAttribute(imageHtml, "width");
-            string height = GetAttribute(imageHtml, "height");
-            string alt = GetAttribute(imageHtml, "alt");
-
-            // At a minimum we need src attribute to determine blob identifier
-            if (src == null)
-                return "[[{}]]";
-
-            // Src attribute determines HTML blob identifier
-            string[] srcParts = src.Split('/');
-            if (srcParts.Length < 5)
-                return "[[{}]]";
-            string blobSetIdAndQueryString = srcParts[4];
-            int indexOfQueryString = blobSetIdAndQueryString.IndexOf("?");
-            if (indexOfQueryString == -1)
-                return "[[{}]]";
-            string blobSetIdText = blobSetIdAndQueryString.Substring(0, indexOfQueryString);
-            long blobSetId;
-            if (!Int64.TryParse(blobSetIdText, out blobSetId))
-                return "[[{}]]";
-
-            // Check that image with HTML blob identifier exists
-            if (!previewImagesByBlobSetId.ContainsKey(blobSetId) || previewImagesByBlobSetId[blobSetId] == null)
-                return "[[{}]]";
-
-            // Finally, encode image HTML into JSON
-            HtmlPreviewImageOverride image = new HtmlPreviewImageOverride
-            {
-                BlobSetId = blobSetId,
-                Name = alt,
-                Width = width,
-                Height = height
-            };
-            DefaultContractResolver contractResolver = new DefaultContractResolver
-            {
-                NamingStrategy = new CamelCaseNamingStrategy()
-            };
-            JsonSerializerSettings serializerSettings = new JsonSerializerSettings
-            {
-                ContractResolver = contractResolver
-            };
-            return $"[[{JsonConvert.SerializeObject(image, serializerSettings)}]]";
-        }
-
-        /// <summary>
-        /// Parses HTML, replacing image tags with JSON representations.
-        /// </summary>
-        /// <param name="html">The original HTML.</param>
-        /// <param name="previewImagesByBlobSetId"></param>
-        /// <returns></returns>
-        private string ReplaceImagesWithJson(string html, IDictionary<long, HtmlPreviewImage> previewImagesByBlobSetId)
-        {
-            StringBuilder sb = new StringBuilder();
-            int currentIndex = 0;
-            int imgStartIndex = 0; 
-            while (imgStartIndex != -1)
-            {
-                imgStartIndex = html.IndexOf("<img src=\"/elements/", currentIndex);
-                if (imgStartIndex == -1)
-                {
-                    // Image not found
-                    string appendText = html.Substring(currentIndex);
-                    sb.Append(appendText);
-                }
-                else
-                {
-                    // Image found
-                    string appendText = html.Substring(currentIndex, imgStartIndex - currentIndex);
-                    sb.Append(appendText);
-                    int imgStopIndex = html.IndexOf(">", imgStartIndex) + 1;
-                    string imgHtml = html.Substring(imgStartIndex, imgStopIndex - imgStartIndex);
-                    imgHtml = ReplaceImageWithJson(imgHtml, previewImagesByBlobSetId);
-                    sb.Append(imgHtml);
-                    currentIndex = imgStopIndex;
-                }
-            }
-            return sb.ToString();
-        }
-
-        /// <summary>
         /// Formats HTML.
         /// </summary>
         /// <param name="html">Source HTML.</param>
@@ -198,7 +89,10 @@ namespace Riverside.Cms.Services.Element.Domain
         private string FormatHtml(string html, IDictionary<long, HtmlPreviewImage> previewImagesByBlobSetId)
         {
             html = ReplaceKeywords(html);
-            html = ReplaceImagesWithJson(html, previewImagesByBlobSetId);
+
+            HtmlElementHelper helper = new HtmlElementHelper(previewImagesByBlobSetId);
+            html = _stringUtilities.BlockReplace(html, "<img src=\"/elements/", ">", helper.Replace);
+
             return html;
         }
 

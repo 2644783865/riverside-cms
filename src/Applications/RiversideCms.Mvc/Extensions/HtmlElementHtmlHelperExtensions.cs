@@ -14,12 +14,12 @@ namespace RiversideCms.Mvc.Extensions
 {
     public static class HtmlElementHtmlHelperExtensions
     {
-        private class FormatHtmlElementHelper
+        private class HtmlElementHelper
         {
             private readonly IElementView<HtmlElementSettings, HtmlElementContent> _view;
             private readonly IUrlHelper _urlHelper;
 
-            public FormatHtmlElementHelper(IElementView<HtmlElementSettings, HtmlElementContent> view, IUrlHelper urlHelper)
+            public HtmlElementHelper(IElementView<HtmlElementSettings, HtmlElementContent> view, IUrlHelper urlHelper)
             {
                 _view = view;
                 _urlHelper = urlHelper;
@@ -48,7 +48,7 @@ namespace RiversideCms.Mvc.Extensions
                 return new HtmlString(string.Empty);
 
             IUrlHelper urlHelper = new UrlHelper(htmlHelper.ViewContext);
-            FormatHtmlElementHelper helper = new FormatHtmlElementHelper(view, urlHelper);
+            HtmlElementHelper helper = new HtmlElementHelper(view, urlHelper);
             IStringUtilities utilitites = new StringUtilities();
             string html = utilitites.BlockReplace(view.Content.FormattedHtml, "[[{", "}]]", helper.Replace);
 
