@@ -12,6 +12,7 @@ namespace Element.Api.Controllers
 {
     public class ElementsController : Controller
     {
+        private readonly IAlbumElementService _albumElementService;
         private readonly ICodeSnippetElementService _codeSnippetElementService;
         private readonly IFooterElementService _footerElementService;
         private readonly IHtmlElementService _htmlElementService;
@@ -23,8 +24,9 @@ namespace Element.Api.Controllers
         private readonly ISocialBarElementService _socialBarElementService;
         private readonly ITagCloudElementService _tagCloudElementService;
 
-        public ElementsController(ICodeSnippetElementService codeSnippetElementService, IFooterElementService footerElementService, IHtmlElementService htmlElementService, ILatestThreadsElementService latestThreadsElementService, INavigationBarElementService navigationBarElementService, IPageHeaderElementService pageHeaderElementService, IPageListElementService pageListElementService, IShareElementService shareElementService, ISocialBarElementService socialBarElementService, ITagCloudElementService tagCloudElementService)
+        public ElementsController(IAlbumElementService albumElementService, ICodeSnippetElementService codeSnippetElementService, IFooterElementService footerElementService, IHtmlElementService htmlElementService, ILatestThreadsElementService latestThreadsElementService, INavigationBarElementService navigationBarElementService, IPageHeaderElementService pageHeaderElementService, IPageListElementService pageListElementService, IShareElementService shareElementService, ISocialBarElementService socialBarElementService, ITagCloudElementService tagCloudElementService)
         {
+            _albumElementService = albumElementService;
             _codeSnippetElementService = codeSnippetElementService;
             _footerElementService = footerElementService;
             _htmlElementService = htmlElementService;
@@ -35,6 +37,44 @@ namespace Element.Api.Controllers
             _shareElementService = shareElementService;
             _socialBarElementService = socialBarElementService;
             _tagCloudElementService = tagCloudElementService;
+        }
+
+        // ALBUM
+
+        [HttpGet]
+        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/b539d2a4-52ae-40d5-b366-e42447b93d15/elements/{elementId:int}")]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(AlbumElementSettings), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> ReadAlbumElementSettings(long tenantId, long elementId, [FromQuery]long pageId)
+        {
+            AlbumElementSettings settings = await _albumElementService.ReadElementSettingsAsync(tenantId, elementId);
+            if (settings == null)
+                return NotFound();
+            return Ok(settings);
+        }
+
+        [HttpGet]
+        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/b539d2a4-52ae-40d5-b366-e42447b93d15/elements/{elementId:int}/blobsets/{blobSetId:int}/content")]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> ReadAlbumElementBlobContent(long tenantId, long elementId, long blobSetId, [FromQuery]string blobLabel)
+        {
+            BlobContent content = await _albumElementService.ReadBlobContentAsync(tenantId, elementId, blobSetId, blobLabel);
+            if (content == null)
+                return NotFound();
+            return File(content.Stream, content.Type, content.Name);
+        }
+
+        [HttpGet]
+        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/b539d2a4-52ae-40d5-b366-e42447b93d15/elements/{elementId:int}/view")]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(IElementView<AlbumElementSettings, AlbumElementContent>), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> ReadAlbumElementView(long tenantId, long elementId, [FromQuery]long pageId)
+        {
+            PageContext context = new PageContext { PageId = pageId };
+            IElementView<AlbumElementSettings, AlbumElementContent> view = await _albumElementService.ReadElementViewAsync(tenantId, elementId, context);
+            if (view == null)
+                return NotFound();
+            return Ok(view);
         }
 
         // CODE SNIPPET

@@ -1,0 +1,69 @@
+﻿@using RiversideCms.Mvc.Extensions
+@using Riverside.Cms.Services.Element.Client
+
+@model IElementView<AlbumElementSettings, AlbumElementContent>
+
+<div class="rcms-album" ng-app="albumApp" ng-controller="AlbumController" ng-keydown="keyDown($event)" ng-init="initialise(@Model.Settings.Photos.Count())">
+
+    @if (!Model.Content.Photos.Any())
+    {
+        <div class="rcms-album-photo-info">
+            <h2>Album has no photos</h2>
+            <p>Edit album to add photos.</p>
+        </div>
+    }
+    else
+    {
+        <div class="rcms-album-photos">
+            @{
+                int index = -1;
+                foreach (AlbumPhoto photo in Model.Settings.Photos)
+                {
+                    index++;
+                    AlbumContentPhoto contentPhoto = Model.Content.Photos.ContainsKey(photo.BlobSetId) ? Model.Content.Photos[photo.BlobSetId] : null;
+                    string previewImageUrl = Url.RouteUrl(RouteNames.ElementBlobContent, new { elementtypeid = Model.Settings.ElementTypeId, elementid = Model.Settings.ElementId, blobsetid = photo.BlobSetId, bloblabel = "preview", t = photo.PreviewImageBlobId });
+                    <div class="rcms-album-photo">
+                        <a data-index="@index" data-ng-click="$event.preventDefault();showPhoto($event)" title="@photo.Name" href="@previewImageUrl">
+                            <img width="@contentPhoto.ThumbnailWidth"
+                                 height="@contentPhoto.ThumbnailHeight"
+                                 alt="@photo.Name"
+                                 src="@Url.RouteUrl(RouteNames.ElementBlobContent, new { elementtypeid = Model.Settings.ElementTypeId, elementid = Model.Settings.ElementId, blobsetid = photo.BlobSetId, bloblabel = "thumbnail", t = photo.ThumbnailImageBlobId })" />
+                        </a>
+                    </div>
+                }
+            }
+        </div>
+
+        <div class="rcms-viewer" ng-show="visible" ng-cloak>
+            <div class="rcms-viewer-backdrop">
+            </div>
+            <div class="rcms-viewer-popup">
+                <div class="rcms-viewer-main-outer">
+                    <div visualiser class="rcms-viewer-main">
+                        <div class="spinner" ng-show="loadingVisual"></div>
+                        <img visual ng-src="{{selectedPhoto.imageUrl}}" ng-style="visualStyle()" ng-hide="loadingVisual" />
+                    </div>
+                </div>
+                <div class="rcms-viewer-side">
+                    <div class="rcms-viewer-options">
+                        <a ng-click="hideViewer()" href><i class="fa fa-times" aria-hidden="true"></i></a>
+                    </div>
+                    <div class="rcms-viewer-details">
+                        <h3 ng-show="selectedPhoto.name">{{selectedPhoto.name}}</h3>
+                        <p ng-show="selectedPhoto.description">{{selectedPhoto.description}}</p>
+                    </div>
+                    <div class="rcms-viewer-pager">
+                        <ul>
+                            <li><a ng-click="previous()" href>Previous</a></li>
+                            <li><a ng-click="next()" href>Next</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+</div>
+
+<script src="@Url.Content("~/js/angular.min.js")"></script>
+<script src="@Url.Content("~/js/album.js")"></script>
