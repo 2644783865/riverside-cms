@@ -55,11 +55,21 @@ namespace Core.API.Controllers
         [HttpGet]
         [Route("api/v1/core/tenants/{tenantId:int}/pages")]
         [ProducesResponseType(typeof(PageListResult), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ListPages(long tenantId, [FromQuery]long? parentPageId, [FromQuery]bool? recursive, [FromQuery]PageType? pageType, [FromQuery]string tagIds, [FromQuery]SortBy? sortBy, [FromQuery]bool? sortAsc, [FromQuery]int? pageIndex, [FromQuery]int? pageSize)
+        [ProducesResponseType(typeof(IEnumerable<Page>), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> ListPages(long tenantId, [FromQuery]long? parentPageId, [FromQuery]bool? recursive, [FromQuery]PageType? pageType, [FromQuery]string tagIds, [FromQuery]SortBy? sortBy, [FromQuery]bool? sortAsc, [FromQuery]int? pageIndex, [FromQuery]int? pageSize, [FromQuery]string pageIds)
         {
-            IEnumerable<long> tagIdCollection = !string.IsNullOrWhiteSpace(tagIds) ? tagIds.Split(",").Select(long.Parse) : null;
-            PageListResult pages = await _pageService.ListPagesAsync(tenantId, parentPageId, recursive ?? false, pageType ?? PageType.Document, tagIdCollection, sortBy ?? SortBy.Created, sortAsc ?? false, pageIndex ?? 0, pageSize ?? DefaultPageSize);
-            return Ok(pages);
+            object result = null;
+            if (pageIds != null)
+            {
+                IEnumerable<long> pageIdCollection = !string.IsNullOrWhiteSpace(pageIds) ? pageIds.Split(",").Select(long.Parse) : null;
+                result = await _pageService.ListPagesAsync(tenantId, pageIdCollection);
+            }
+            else
+            {
+                IEnumerable<long> tagIdCollection = !string.IsNullOrWhiteSpace(tagIds) ? tagIds.Split(",").Select(long.Parse) : null;
+                result = await _pageService.ListPagesAsync(tenantId, parentPageId, recursive ?? false, pageType ?? PageType.Document, tagIdCollection, sortBy ?? SortBy.Created, sortAsc ?? false, pageIndex ?? 0, pageSize ?? DefaultPageSize);
+            }
+            return Ok(result);
         }
 
         [HttpGet]

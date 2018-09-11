@@ -32,6 +32,7 @@ namespace RiversideCms.Mvc
 
             // Element services
             services.AddTransient<IAlbumElementService, AlbumElementService>();
+            services.AddTransient<ICarouselElementService, CarouselElementService>();
             services.AddTransient<ICodeSnippetElementService, CodeSnippetElementService>();
             services.AddTransient<IFooterElementService, FooterElementService>();
             services.AddTransient<IHtmlElementService, HtmlElementService>();

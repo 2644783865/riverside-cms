@@ -578,6 +578,67 @@ namespace Riverside.Cms.Services.Core.Infrastructure
             }
         }
 
+        public async Task<IEnumerable<Page>> ListPagesAsync(long tenantId, IEnumerable<long> pageIds)
+        {
+            using (SqlConnection connection = new SqlConnection(_options.Value.SqlConnectionString))
+            {
+                connection.Open();
+                using (GridReader gr = await connection.QueryMultipleAsync(@"
+                    SELECT
+	                    cms.[Page].TenantId,
+	                    cms.[Page].PageId,
+	                    cms.[Page].ParentPageId,
+	                    cms.[Page].MasterPageId,
+	                    cms.[Page].Name,
+	                    cms.[Page].[Description],
+	                    cms.[Page].Created,
+	                    cms.[Page].Updated,
+	                    cms.[Page].Occurred,
+	                    cms.[Page].ThumbnailImageUploadId AS ThumbnailImageBlobId,
+	                    cms.[Page].PreviewImageUploadId AS PreviewImageBlobId,
+	                    cms.[Page].ImageUploadId AS ImageBlobId
+                    FROM
+	                    cms.[Page]
+                    WHERE
+                        cms.[Page].TenantId = @TenantId AND
+                        cms.[Page].PageId IN @PageIds
+
+                    SELECT
+                        cms.TagPage.PageId,
+                        cms.Tag.TagId,
+                        cms.Tag.Name
+                    FROM
+                        cms.Tag
+                    INNER JOIN
+                        cms.TagPage
+                    ON
+                        cms.Tag.TenantId = cms.TagPage.TenantId AND
+                        cms.Tag.TagId = cms.TagPage.TagId
+                    INNER JOIN
+                        cms.[Page]
+                    ON
+                        cms.TagPage.TenantId = @TenantId AND
+                        cms.TagPage.PageId = cms.[Page].PageId
+                    WHERE
+                        cms.[Page].TenantId = @TenantId AND
+                        cms.[Page].PageId IN @PageIds
+                    ORDER BY
+                        cms.TagPage.PageId,
+                        cms.Tag.Name
+                ",
+                new
+                {
+                    TenantId = tenantId,
+                    PageIds = pageIds
+                }))
+                {
+                    IEnumerable<Page> pages = await gr.ReadAsync<Page>();
+                    IEnumerable<PageTag> pageTabs = await gr.ReadAsync<PageTag>();
+                    return PopulatePageTags(pages, pageTabs);
+                }
+            }
+        }
+
         public async Task<IEnumerable<PageZone>> SearchPageZonesAsync(long tenantId, long pageId)
         {
             using (SqlConnection connection = new SqlConnection(_options.Value.SqlConnectionString))

@@ -63,8 +63,8 @@ namespace Storage.API.Controllers
             IEnumerable<Blob> blobs = null;
             if (blobIds != null)
             {
-                IEnumerable<long> blobIdIdCollection = !string.IsNullOrWhiteSpace(blobIds) ? blobIds.Split(",").Select(long.Parse) : null;
-                blobs = await _storageService.ListBlobsAsync(tenantId, blobIdIdCollection);
+                IEnumerable<long> blobIdCollection = !string.IsNullOrWhiteSpace(blobIds) ? blobIds.Split(",").Select(long.Parse) : null;
+                blobs = await _storageService.ListBlobsAsync(tenantId, blobIdCollection);
             }
             else
             {

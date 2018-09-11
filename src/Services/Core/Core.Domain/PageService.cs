@@ -19,14 +19,19 @@ namespace Riverside.Cms.Services.Core.Domain
             _storageService = storageService;
         }
 
-        public async Task<IEnumerable<Page>> ListPagesInHierarchyAsync(long tenantId, long pageId)
+        public Task<IEnumerable<Page>> ListPagesInHierarchyAsync(long tenantId, long pageId)
         {
-            return await _pageRepository.ListPagesInHierarchyAsync(tenantId, pageId);
+            return _pageRepository.ListPagesInHierarchyAsync(tenantId, pageId);
         }
 
-        public async Task<PageListResult> ListPagesAsync(long tenantId, long? parentPageId, bool recursive, PageType pageType, IEnumerable<long> tagIds, SortBy sortBy, bool sortAsc, int pageIndex, int pageSize)
+        public Task<IEnumerable<Page>> ListPagesAsync(long tenantId, IEnumerable<long> pageIds)
         {
-            return await _pageRepository.ListPagesAsync(tenantId, parentPageId, recursive, pageType, tagIds, sortBy, sortAsc, pageIndex, pageSize);
+            return _pageRepository.ListPagesAsync(tenantId, pageIds);
+        }
+
+        public Task<PageListResult> ListPagesAsync(long tenantId, long? parentPageId, bool recursive, PageType pageType, IEnumerable<long> tagIds, SortBy sortBy, bool sortAsc, int pageIndex, int pageSize)
+        {
+            return _pageRepository.ListPagesAsync(tenantId, parentPageId, recursive, pageType, tagIds, sortBy, sortAsc, pageIndex, pageSize);
         }
 
         public Task<Page> ReadPageAsync(long tenantId, long pageId)

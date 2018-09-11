@@ -9,6 +9,7 @@ namespace RiversideCms.Mvc.Services
     public class ElementServiceFactory : IElementServiceFactory
     {
         private readonly IAlbumElementService _albumElementService;
+        private readonly ICarouselElementService _carouselElementService;
         private readonly ICodeSnippetElementService _codeSnippetElementService;
         private readonly IFooterElementService _footerElementService;
         private readonly IHtmlElementService _htmlElementService;
@@ -20,9 +21,10 @@ namespace RiversideCms.Mvc.Services
         private readonly ISocialBarElementService _socialBarElementService;
         private readonly ITagCloudElementService _tagCloudElementService;
 
-        public ElementServiceFactory(IAlbumElementService albumElementService, ICodeSnippetElementService codeSnippetElementService, IFooterElementService footerElementService, IHtmlElementService htmlElementService, ILatestThreadsElementService latestThreadsElementService, INavigationBarElementService navigationBarElementService, IPageHeaderElementService pageHeaderElementService, IPageListElementService pageListElementService, IShareElementService shareElementService, ISocialBarElementService socialBarElementService, ITagCloudElementService tagCloudElementService)
+        public ElementServiceFactory(IAlbumElementService albumElementService, ICarouselElementService carouselElementService, ICodeSnippetElementService codeSnippetElementService, IFooterElementService footerElementService, IHtmlElementService htmlElementService, ILatestThreadsElementService latestThreadsElementService, INavigationBarElementService navigationBarElementService, IPageHeaderElementService pageHeaderElementService, IPageListElementService pageListElementService, IShareElementService shareElementService, ISocialBarElementService socialBarElementService, ITagCloudElementService tagCloudElementService)
         {
             _albumElementService = albumElementService;
+            _carouselElementService = carouselElementService;
             _codeSnippetElementService = codeSnippetElementService;
             _footerElementService = footerElementService;
             _htmlElementService = htmlElementService;
@@ -41,6 +43,9 @@ namespace RiversideCms.Mvc.Services
             {
                 case "b539d2a4-52ae-40d5-b366-e42447b93d15":
                     return await _albumElementService.ReadElementViewAsync(tenantId, elementId, context);
+
+                case "aacb11a0-5532-47cb-aab9-939cee3d5175":
+                    return await _carouselElementService.ReadElementViewAsync(tenantId, elementId, context);
 
                 case "5401977d-865f-4a7a-b416-0a26305615de":
                     return await _codeSnippetElementService.ReadElementViewAsync(tenantId, elementId, context);
@@ -83,6 +88,9 @@ namespace RiversideCms.Mvc.Services
             {
                 case "b539d2a4-52ae-40d5-b366-e42447b93d15":
                     return await _albumElementService.ReadBlobContentAsync(tenantId, elementId, blobSetId, blobLabel);
+
+                case "aacb11a0-5532-47cb-aab9-939cee3d5175":
+                    return await _carouselElementService.ReadBlobContentAsync(tenantId, elementId, blobSetId, blobLabel);
 
                 case "c92ee4c4-b133-44cc-8322-640e99c334dc":
                     return await _htmlElementService.ReadBlobContentAsync(tenantId, elementId, blobSetId, blobLabel);

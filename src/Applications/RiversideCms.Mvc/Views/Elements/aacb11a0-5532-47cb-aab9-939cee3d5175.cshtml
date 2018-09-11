@@ -1,0 +1,53 @@
+﻿@using RiversideCms.Mvc.Extensions
+@using Riverside.Cms.Services.Element.Client
+
+@model IElementView<CarouselElementSettings, CarouselElementContent>
+
+<div class="rcms-carousel">
+
+    <ul>
+        @if (!Model.Settings.Slides.Any())
+        {
+            <li>
+                <div class="rcms-carousel-slide">
+                    <div class="rcms-carousel-slide-info">
+                        <h2>Carousel has no slides</h2>
+                        <p>Edit carousel to add slides.</p>
+                    </div>
+                </div>
+            </li>
+        }
+        else
+        {
+            foreach (CarouselSlide slide in Model.Settings.Slides)
+            {
+                if (Model.Content.Slides.ContainsKey(slide.BlobSetId))
+                {
+                    CarouselContentSlide contentSlide = Model.Content.Slides[slide.BlobSetId];
+                    <li>
+                        <div class="rcms-carousel-slide" style="background-image: url(@Url.RouteUrl(RouteNames.ElementBlobContent, new { elementtypeid = Model.Settings.ElementTypeId, elementid = Model.Settings.ElementId, blobsetid = slide.BlobSetId, bloblabel = "preview", t = slide.PreviewImageBlobId }));">
+                            @if (slide.Name != null || slide.Description != null || contentSlide.Button != null)
+                            {
+                                <div class="rcms-carousel-slide-info">
+                                    @if (slide.Name != null)
+                                    {
+                                        <h2>@slide.Name</h2>
+                                    }
+                                    @if (slide.Description != null)
+                                    {
+                                        <p>@slide.Description</p>
+                                    }
+                                    @if (contentSlide.Button != null)
+                                    {
+                                        <a role="button" href="@Url.PageUrl(contentSlide.Button.PageId, contentSlide.Button.Name, contentSlide.Button.Home, null, null)">@(contentSlide.Button.ButtonText ?? contentSlide.Button.Name)</a>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </li>
+                }
+            }
+        }
+    </ul>
+
+</div>

@@ -37,6 +37,7 @@ namespace Element.Api
             services.AddTransient<IUserService, UserService>();
 
             services.AddTransient<IAlbumElementService, AlbumElementService>();
+            services.AddTransient<ICarouselElementService, CarouselElementService>();
             services.AddTransient<ICodeSnippetElementService, CodeSnippetElementService>();
             services.AddTransient<IFooterElementService, FooterElementService>();
             services.AddTransient<IHtmlElementService, HtmlElementService>();
@@ -49,6 +50,7 @@ namespace Element.Api
             services.AddTransient<ITagCloudElementService, TagCloudElementService>();
 
             services.AddTransient<IElementRepository<AlbumElementSettings>, SqlAlbumElementRepository>();
+            services.AddTransient<IElementRepository<CarouselElementSettings>, SqlCarouselElementRepository>();
             services.AddTransient<IElementRepository<CodeSnippetElementSettings>, SqlCodeSnippetElementRepository>();
             services.AddTransient<IElementRepository<FooterElementSettings>, SqlFooterElementRepository>();
             services.AddTransient<IElementRepository<HtmlElementSettings>, SqlHtmlElementRepository>();

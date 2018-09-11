@@ -74,6 +74,24 @@ namespace Riverside.Cms.Services.Core.Client
             }
         }
 
+        public async Task<IEnumerable<Page>> ListPagesAsync(long tenantId, IEnumerable<long> pageIds)
+        {
+            try
+            {
+                string uri = $"{_options.Value.CoreApiBaseUrl}tenants/{tenantId}/pages" +
+                    (pageIds != null && pageIds.Count() > 0 ? $"?pageids={string.Join(",", pageIds)}" : string.Empty);
+                using (HttpClient httpClient = new HttpClient())
+                {
+                    string json = await httpClient.GetStringAsync(uri);
+                    return JsonConvert.DeserializeObject<IEnumerable<Page>>(json);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new CoreClientException("Core API failed", ex);
+            }
+        }
+
         public async Task<PageListResult> ListPagesAsync(long tenantId, long? parentPageId, bool recursive, PageType pageType, IEnumerable<long> tagIds, SortBy sortBy, bool sortAsc, int pageIndex, int pageSize)
         {
             try

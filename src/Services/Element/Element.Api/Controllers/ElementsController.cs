@@ -13,6 +13,7 @@ namespace Element.Api.Controllers
     public class ElementsController : Controller
     {
         private readonly IAlbumElementService _albumElementService;
+        private readonly ICarouselElementService _carouselElementService;
         private readonly ICodeSnippetElementService _codeSnippetElementService;
         private readonly IFooterElementService _footerElementService;
         private readonly IHtmlElementService _htmlElementService;
@@ -24,9 +25,10 @@ namespace Element.Api.Controllers
         private readonly ISocialBarElementService _socialBarElementService;
         private readonly ITagCloudElementService _tagCloudElementService;
 
-        public ElementsController(IAlbumElementService albumElementService, ICodeSnippetElementService codeSnippetElementService, IFooterElementService footerElementService, IHtmlElementService htmlElementService, ILatestThreadsElementService latestThreadsElementService, INavigationBarElementService navigationBarElementService, IPageHeaderElementService pageHeaderElementService, IPageListElementService pageListElementService, IShareElementService shareElementService, ISocialBarElementService socialBarElementService, ITagCloudElementService tagCloudElementService)
+        public ElementsController(IAlbumElementService albumElementService, ICarouselElementService carouselElementService, ICodeSnippetElementService codeSnippetElementService, IFooterElementService footerElementService, IHtmlElementService htmlElementService, ILatestThreadsElementService latestThreadsElementService, INavigationBarElementService navigationBarElementService, IPageHeaderElementService pageHeaderElementService, IPageListElementService pageListElementService, IShareElementService shareElementService, ISocialBarElementService socialBarElementService, ITagCloudElementService tagCloudElementService)
         {
             _albumElementService = albumElementService;
+            _carouselElementService = carouselElementService;
             _codeSnippetElementService = codeSnippetElementService;
             _footerElementService = footerElementService;
             _htmlElementService = htmlElementService;
@@ -72,6 +74,44 @@ namespace Element.Api.Controllers
         {
             PageContext context = new PageContext { PageId = pageId };
             IElementView<AlbumElementSettings, AlbumElementContent> view = await _albumElementService.ReadElementViewAsync(tenantId, elementId, context);
+            if (view == null)
+                return NotFound();
+            return Ok(view);
+        }
+
+        // CAROUSEL
+
+        [HttpGet]
+        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/aacb11a0-5532-47cb-aab9-939cee3d5175/elements/{elementId:int}")]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(CarouselElementSettings), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> ReadCarouselElementSettings(long tenantId, long elementId, [FromQuery]long pageId)
+        {
+            CarouselElementSettings settings = await _carouselElementService.ReadElementSettingsAsync(tenantId, elementId);
+            if (settings == null)
+                return NotFound();
+            return Ok(settings);
+        }
+
+        [HttpGet]
+        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/aacb11a0-5532-47cb-aab9-939cee3d5175/elements/{elementId:int}/blobsets/{blobSetId:int}/content")]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        public async Task<IActionResult> ReadCarouselElementBlobContent(long tenantId, long elementId, long blobSetId, [FromQuery]string blobLabel)
+        {
+            BlobContent content = await _carouselElementService.ReadBlobContentAsync(tenantId, elementId, blobSetId, blobLabel);
+            if (content == null)
+                return NotFound();
+            return File(content.Stream, content.Type, content.Name);
+        }
+
+        [HttpGet]
+        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/aacb11a0-5532-47cb-aab9-939cee3d5175/elements/{elementId:int}/view")]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(IElementView<CarouselElementSettings, CarouselElementContent>), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> ReadCarouselElementView(long tenantId, long elementId, [FromQuery]long pageId)
+        {
+            PageContext context = new PageContext { PageId = pageId };
+            IElementView<CarouselElementSettings, CarouselElementContent> view = await _carouselElementService.ReadElementViewAsync(tenantId, elementId, context);
             if (view == null)
                 return NotFound();
             return Ok(view);
