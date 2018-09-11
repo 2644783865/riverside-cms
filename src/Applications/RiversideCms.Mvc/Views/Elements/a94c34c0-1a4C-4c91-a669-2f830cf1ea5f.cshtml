@@ -72,3 +72,8 @@
         </div>
     </nav>
 </div>
+
+@{
+    this.Context.Items["script_jquery"] = new ScriptInclude { Priority = 1, Name = "jquery.min.js" };
+    this.Context.Items["script_bootstrap"] = new ScriptInclude { Priority = 2, Name = "bootstrap.min.js" };
+}

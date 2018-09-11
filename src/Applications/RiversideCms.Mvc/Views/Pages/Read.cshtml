@@ -1,4 +1,5 @@
-﻿@using Riverside.Cms.Services.Core.Client
+﻿@using RiversideCms.Mvc.Extensions
+@using Riverside.Cms.Services.Core.Client
 
 @model PageRender
 
@@ -44,7 +45,18 @@
 
     @Html.Raw(Model.View.EndRender)
 
-    <script src="@Url.Content("~/js/jquery-1.10.2.min.js")"></script>
-    <script src="@Url.Content("~/js/bootstrap.min.js")"></script>
+    @{
+        IEnumerable<ScriptInclude> includes = this.Context.Items
+            .Where(kvp => kvp.Key.GetType() == typeof(string))
+            .Where(kvp => ((string)kvp.Key).StartsWith("script_"))
+            .Select(kvp => (ScriptInclude)kvp.Value)
+            .OrderBy(si => si.Priority);
+
+        @foreach (ScriptInclude include in includes)
+        {
+            string js = $"~/js/{include.Name}";
+            <script src="@Url.Content(js)"></script>
+        }
+    }
 </body>
 </html>
