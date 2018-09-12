@@ -24,12 +24,19 @@ services:
       - core.api
       - storage.api
 
+  cms.api:
+    image: cms.api
+    build:
+      context: ./src/Services/Cms.Api
+      dockerfile: Dockerfile
+
   riversidecms.mvc:
     image: riversidecms.mvc
     build:
       context: ./src/Applications/RiversideCms.Mvc
       dockerfile: Dockerfile
     depends_on:
+      - cms.api
       - core.api
       - element.api
       - storage.api

@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Riverside.Cms.Services.Storage.Domain;
 
-namespace Storage.API.Controllers
+namespace Riverside.Cms.Services.Storage.Mvc
 {
     public class StorageController : Controller
     {
@@ -63,7 +63,7 @@ namespace Storage.API.Controllers
             IEnumerable<Blob> blobs = null;
             if (blobIds != null)
             {
-                IEnumerable<long> blobIdCollection = !string.IsNullOrWhiteSpace(blobIds) ? blobIds.Split(",").Select(long.Parse) : null;
+                IEnumerable<long> blobIdCollection = !string.IsNullOrWhiteSpace(blobIds) ? blobIds.Split(',').Select(long.Parse) : null;
                 blobs = await _storageService.ListBlobsAsync(tenantId, blobIdCollection);
             }
             else

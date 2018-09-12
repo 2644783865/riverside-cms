@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Riverside.Cms.Services.Core.Client;
 using Riverside.Cms.Services.Element.Domain;
 using Riverside.Cms.Services.Storage.Client;
 
-namespace Element.Api.Controllers
+namespace Riverside.Cms.Services.Element.Mvc
 {
     public class ElementsController : Controller
     {
@@ -310,7 +310,7 @@ namespace Element.Api.Controllers
         [ProducesResponseType(typeof(IElementView<PageListElementSettings, PageListElementContent>), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> ReadPageListElementView(long tenantId, long elementId, [FromQuery]long pageId, [FromQuery]string tagIds, [FromQuery]string page)
         {
-            IEnumerable<long> tagIdCollection = !string.IsNullOrWhiteSpace(tagIds) ? tagIds.Split(",").Select(long.Parse) : null;
+            IEnumerable<long> tagIdCollection = !string.IsNullOrWhiteSpace(tagIds) ? tagIds.Split(',').Select(long.Parse) : null;
             IDictionary<string, string> parameters = page != null ? new Dictionary<string, string> { { "page", page } } : null;
             PageContext context = new PageContext { PageId = pageId, Parameters = parameters, TagIds = tagIdCollection };
             IElementView<PageListElementSettings, PageListElementContent> view = await _pageListElementService.ReadElementViewAsync(tenantId, elementId, context);
@@ -393,7 +393,7 @@ namespace Element.Api.Controllers
         [ProducesResponseType(typeof(IElementView<TagCloudElementSettings, TagCloudElementContent>), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> ReadTagCloudElementView(long tenantId, long elementId, [FromQuery]long pageId, [FromQuery]string tagIds)
         {
-            IEnumerable<long> tagIdCollection = !string.IsNullOrWhiteSpace(tagIds) ? tagIds.Split(",").Select(long.Parse) : null;
+            IEnumerable<long> tagIdCollection = !string.IsNullOrWhiteSpace(tagIds) ? tagIds.Split(',').Select(long.Parse) : null;
             PageContext context = new PageContext { PageId = pageId, TagIds = tagIdCollection };
             IElementView<TagCloudElementSettings, TagCloudElementContent> view = await _tagCloudElementService.ReadElementViewAsync(tenantId, elementId, context);
             if (view == null)

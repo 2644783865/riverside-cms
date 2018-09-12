@@ -17,6 +17,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Storage.Domain\Storage.Domain.csproj" />
     <ProjectReference Include="..\Storage.Infrastructure\Storage.Infrastructure.csproj" />
+    <ProjectReference Include="..\Storage.Mvc\Storage.Mvc.csproj" />
   </ItemGroup>
 
 </Project>

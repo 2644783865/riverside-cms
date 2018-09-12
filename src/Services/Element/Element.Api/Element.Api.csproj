@@ -18,6 +18,7 @@
     <ProjectReference Include="..\..\..\Utilities\Text\Text.Formatting\Text.Formatting.csproj" />
     <ProjectReference Include="..\Element.Domain\Element.Domain.csproj" />
     <ProjectReference Include="..\Element.Infrastructure\Element.Infrastructure.csproj" />
+    <ProjectReference Include="..\Element.Mvc\Element.Mvc.csproj" />
   </ItemGroup>
 
 </Project>

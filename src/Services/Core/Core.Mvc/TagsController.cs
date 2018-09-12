@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Riverside.Cms.Services.Core.Domain;
 
-namespace Core.API.Controllers
+namespace Riverside.Cms.Services.Core.Mvc
 {
     public class TagsController : Controller
     {
@@ -37,12 +37,12 @@ namespace Core.API.Controllers
             IEnumerable<Tag> tags = null;
             if (tagIds != null)
             {
-                IEnumerable<long> tagIdCollection = !string.IsNullOrWhiteSpace(tagIds) ? tagIds.Split(",").Select(long.Parse) : null;
+                IEnumerable<long> tagIdCollection = !string.IsNullOrWhiteSpace(tagIds) ? tagIds.Split(',').Select(long.Parse) : null;
                 tags = await _tagService.ListTagsAsync(tenantId, tagIdCollection);
             }
             else if (tagNames != null)
             {
-                IEnumerable<string> tagNameCollection = tagNames.Split(",").Select(t => t.Trim()).Distinct().Where(t => t != string.Empty);
+                IEnumerable<string> tagNameCollection = tagNames.Split(',').Select(t => t.Trim()).Distinct().Where(t => t != string.Empty);
                 tags = await _tagService.ListTagsAsync(tenantId, tagNameCollection);
             }
             else
@@ -66,7 +66,7 @@ namespace Core.API.Controllers
         [ProducesResponseType(typeof(IEnumerable<TagCount>), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> ListRelatedTagCounts(long tenantId, [FromQuery]string tagIds, [FromQuery]long? parentPageId, [FromQuery]bool? recursive)
         {
-            IEnumerable<long> tagIdCollection = !string.IsNullOrWhiteSpace(tagIds) ? tagIds.Split(",").Select(long.Parse) : null;
+            IEnumerable<long> tagIdCollection = !string.IsNullOrWhiteSpace(tagIds) ? tagIds.Split(',').Select(long.Parse) : null;
             IEnumerable<TagCount> tags = await _tagService.ListRelatedTagCountsAsync(tenantId, tagIdCollection, parentPageId, recursive ?? false);
             return Ok(tags);
         }

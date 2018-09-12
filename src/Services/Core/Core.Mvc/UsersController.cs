@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Riverside.Cms.Services.Core.Domain;
 using Riverside.Cms.Services.Storage.Client;
 
-namespace Core.API.Controllers
+namespace Riverside.Cms.Services.Core.Mvc
 {
     public class UsersController : Controller
     {
@@ -48,7 +48,7 @@ namespace Core.API.Controllers
         [ProducesResponseType(typeof(IEnumerable<User>), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> ListUsers(long tenantId, [FromQuery]string userIds)
         {
-            IEnumerable<long> userIdCollection = !string.IsNullOrWhiteSpace(userIds) ? userIds.Split(",").Select(long.Parse) : null;
+            IEnumerable<long> userIdCollection = !string.IsNullOrWhiteSpace(userIds) ? userIds.Split(',').Select(long.Parse) : null;
             IEnumerable<User> users = await _userService.ListUsersAsync(tenantId, userIdCollection);
             return Ok(users);
         }

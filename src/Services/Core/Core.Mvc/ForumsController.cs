@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Riverside.Cms.Services.Core.Domain;
 
-namespace Core.API.Controllers
+namespace Riverside.Cms.Services.Core.Mvc
 {
     public class ForumsController : Controller
     {
@@ -24,7 +24,7 @@ namespace Core.API.Controllers
         [ProducesResponseType(typeof(IEnumerable<ForumThread>), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> ListForumThreads(long tenantId, [FromQuery]long? parentPageId, [FromQuery]bool? recursive, [FromQuery]string tagIds, [FromQuery]int? pageSize)
         {
-            IEnumerable<long> tagIdCollection = !string.IsNullOrWhiteSpace(tagIds) ? tagIds.Split(",").Select(long.Parse) : null;
+            IEnumerable<long> tagIdCollection = !string.IsNullOrWhiteSpace(tagIds) ? tagIds.Split(',').Select(long.Parse) : null;
             IEnumerable<ForumThread> threads = await _forumService.ListLatestThreadsAsync(tenantId, parentPageId, recursive ?? false, tagIdCollection, pageSize ?? DefaultPageSize);
             return Ok(threads);
         }

@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Riverside.Cms.Services.Core.Domain;
 using Riverside.Cms.Services.Storage.Client;
 
-namespace Core.API.Controllers
+namespace Riverside.Cms.Services.Core.Mvc
 {
     public class PagesController : Controller
     {
@@ -61,12 +61,12 @@ namespace Core.API.Controllers
             object result = null;
             if (pageIds != null)
             {
-                IEnumerable<long> pageIdCollection = !string.IsNullOrWhiteSpace(pageIds) ? pageIds.Split(",").Select(long.Parse) : null;
+                IEnumerable<long> pageIdCollection = !string.IsNullOrWhiteSpace(pageIds) ? pageIds.Split(',').Select(long.Parse) : null;
                 result = await _pageService.ListPagesAsync(tenantId, pageIdCollection);
             }
             else
             {
-                IEnumerable<long> tagIdCollection = !string.IsNullOrWhiteSpace(tagIds) ? tagIds.Split(",").Select(long.Parse) : null;
+                IEnumerable<long> tagIdCollection = !string.IsNullOrWhiteSpace(tagIds) ? tagIds.Split(',').Select(long.Parse) : null;
                 result = await _pageService.ListPagesAsync(tenantId, parentPageId, recursive ?? false, pageType ?? PageType.Document, tagIdCollection, sortBy ?? SortBy.Created, sortAsc ?? false, pageIndex ?? 0, pageSize ?? DefaultPageSize);
             }
             return Ok(result);
