@@ -24,7 +24,7 @@ namespace Riverside.Cms.Services.Core.Mvc
         [Route("api/v1/core/tenants/{tenantId:int}/pages/{pageId:int}")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(Page), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ReadPage(long tenantId, long pageId)
+        public async Task<IActionResult> ReadPageAsync(long tenantId, long pageId)
         {
             Page page = await _pageService.ReadPageAsync(tenantId, pageId);
             if (page == null)
@@ -35,7 +35,7 @@ namespace Riverside.Cms.Services.Core.Mvc
         [HttpGet]
         [Route("api/v1/core/tenants/{tenantId:int}/pages/{pageId:int}/images/{pageImageType}")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public async Task<IActionResult> ReadPageImage(long tenantId, long pageId, PageImageType pageImageType)
+        public async Task<IActionResult> ReadPageImageAsync(long tenantId, long pageId, PageImageType pageImageType)
         {
             BlobContent blobContent = await _pageService.ReadPageImageAsync(tenantId, pageId, pageImageType);
             if (blobContent == null)
@@ -46,7 +46,7 @@ namespace Riverside.Cms.Services.Core.Mvc
         [HttpGet]
         [Route("api/v1/core/tenants/{tenantId:int}/pages/{pageId:int}/hierarchy")]
         [ProducesResponseType(typeof(IEnumerable<Page>), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ListPagesInHierarchy(long tenantId, long pageId)
+        public async Task<IActionResult> ListPagesInHierarchyAsync(long tenantId, long pageId)
         {
             IEnumerable<Page> pages = await _pageService.ListPagesInHierarchyAsync(tenantId, pageId);
             return Ok(pages);
@@ -56,7 +56,7 @@ namespace Riverside.Cms.Services.Core.Mvc
         [Route("api/v1/core/tenants/{tenantId:int}/pages")]
         [ProducesResponseType(typeof(PageListResult), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(IEnumerable<Page>), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ListPages(long tenantId, [FromQuery]long? parentPageId, [FromQuery]bool? recursive, [FromQuery]PageType? pageType, [FromQuery]string tagIds, [FromQuery]SortBy? sortBy, [FromQuery]bool? sortAsc, [FromQuery]int? pageIndex, [FromQuery]int? pageSize, [FromQuery]string pageIds)
+        public async Task<IActionResult> ListPagesAsync(long tenantId, [FromQuery]long? parentPageId, [FromQuery]bool? recursive, [FromQuery]PageType? pageType, [FromQuery]string tagIds, [FromQuery]SortBy? sortBy, [FromQuery]bool? sortAsc, [FromQuery]int? pageIndex, [FromQuery]int? pageSize, [FromQuery]string pageIds)
         {
             object result = null;
             if (pageIds != null)
@@ -75,7 +75,7 @@ namespace Riverside.Cms.Services.Core.Mvc
         [HttpGet]
         [Route("api/v1/core/tenants/{tenantId:int}/pages/{pageId:int}/zones")]
         [ProducesResponseType(typeof(IEnumerable<PageZone>), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> SearchPageZones(long tenantId, long pageId)
+        public async Task<IActionResult> SearchPageZonesAsync(long tenantId, long pageId)
         {
             IEnumerable<PageZone> pageZones = await _pageService.SearchPageZonesAsync(tenantId, pageId);
             return Ok(pageZones);
@@ -85,7 +85,7 @@ namespace Riverside.Cms.Services.Core.Mvc
         [Route("api/v1/core/tenants/{tenantId:int}/pages/{pageId:int}/zones/{pageZoneId:int}")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(PageZone), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ReadPageZone(long tenantId, long pageId, long pageZoneId)
+        public async Task<IActionResult> ReadPageZoneAsync(long tenantId, long pageId, long pageZoneId)
         {
             PageZone pageZone = await _pageService.ReadPageZoneAsync(tenantId, pageId, pageZoneId);
             if (pageZone == null)
@@ -96,7 +96,7 @@ namespace Riverside.Cms.Services.Core.Mvc
         [HttpGet]
         [Route("api/v1/core/tenants/{tenantId:int}/pages/{pageId:int}/zones/{pageZoneId:int}/elements")]
         [ProducesResponseType(typeof(IEnumerable<PageZoneElement>), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> SearchPageZoneElements(long tenantId, long pageId, long pageZoneId)
+        public async Task<IActionResult> SearchPageZoneElementsAsync(long tenantId, long pageId, long pageZoneId)
         {
             IEnumerable<PageZoneElement> pageZoneElements = await _pageService.SearchPageZoneElementsAsync(tenantId, pageId, pageZoneId);
             return Ok(pageZoneElements);
@@ -106,7 +106,7 @@ namespace Riverside.Cms.Services.Core.Mvc
         [Route("api/v1/core/tenants/{tenantId:int}/pages/{pageId:int}/zones/{pageZoneId:int}/elements/{pageZoneElementId:int}")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(PageZoneElement), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ReadPageZoneElement(long tenantId, long pageId, long pageZoneId, long pageZoneElementId)
+        public async Task<IActionResult> ReadPageZoneElementAsync(long tenantId, long pageId, long pageZoneId, long pageZoneElementId)
         {
             PageZoneElement pageZoneElement = await _pageService.ReadPageZoneElementAsync(tenantId, pageId, pageZoneId, pageZoneElementId);
             if (pageZoneElement == null)

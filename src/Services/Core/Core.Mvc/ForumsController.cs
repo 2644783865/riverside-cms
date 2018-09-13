@@ -22,7 +22,7 @@ namespace Riverside.Cms.Services.Core.Mvc
         [HttpGet]
         [Route("api/v1/core/tenants/{tenantId:int}/threads")]
         [ProducesResponseType(typeof(IEnumerable<ForumThread>), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ListForumThreads(long tenantId, [FromQuery]long? parentPageId, [FromQuery]bool? recursive, [FromQuery]string tagIds, [FromQuery]int? pageSize)
+        public async Task<IActionResult> ListForumThreadsAsync(long tenantId, [FromQuery]long? parentPageId, [FromQuery]bool? recursive, [FromQuery]string tagIds, [FromQuery]int? pageSize)
         {
             IEnumerable<long> tagIdCollection = !string.IsNullOrWhiteSpace(tagIds) ? tagIds.Split(',').Select(long.Parse) : null;
             IEnumerable<ForumThread> threads = await _forumService.ListLatestThreadsAsync(tenantId, parentPageId, recursive ?? false, tagIdCollection, pageSize ?? DefaultPageSize);

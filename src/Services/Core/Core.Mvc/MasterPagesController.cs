@@ -21,7 +21,7 @@ namespace Riverside.Cms.Services.Core.Mvc
         [Route("api/v1/core/tenants/{tenantId:int}/masterpages/{masterPageId:int}")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(MasterPage), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ReadMasterPage(long tenantId, long masterPageId)
+        public async Task<IActionResult> ReadMasterPageAsync(long tenantId, long masterPageId)
         {
             MasterPage masterPage = await _masterPageService.ReadMasterPageAsync(tenantId, masterPageId);
             if (masterPage == null)
@@ -32,7 +32,7 @@ namespace Riverside.Cms.Services.Core.Mvc
         [HttpGet]
         [Route("api/v1/core/tenants/{tenantId:int}/masterpages/{masterPageId:int}/zones")]
         [ProducesResponseType(typeof(IEnumerable<MasterPageZone>), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> SearchMasterPageZones(long tenantId, long masterPageId)
+        public async Task<IActionResult> SearchMasterPageZonesAsync(long tenantId, long masterPageId)
         {
             IEnumerable<MasterPageZone> masterPageZones = await _masterPageService.SearchMasterPageZonesAsync(tenantId, masterPageId);
             return Ok(masterPageZones);
@@ -42,7 +42,7 @@ namespace Riverside.Cms.Services.Core.Mvc
         [Route("api/v1/core/tenants/{tenantId:int}/masterpages/{masterPageId:int}/zones/{masterPageZoneId:int}")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(MasterPageZone), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ReadMasterPageZone(long tenantId, long masterPageId, long masterPageZoneId)
+        public async Task<IActionResult> ReadMasterPageZoneAsync(long tenantId, long masterPageId, long masterPageZoneId)
         {
             MasterPageZone masterPageZone = await _masterPageService.ReadMasterPageZoneAsync(tenantId, masterPageId, masterPageZoneId);
             if (masterPageZone == null)
@@ -53,7 +53,7 @@ namespace Riverside.Cms.Services.Core.Mvc
         [HttpGet]
         [Route("api/v1/core/tenants/{tenantId:int}/masterpages/{masterPageId:int}/zones/{masterPageZoneId:int}/elements")]
         [ProducesResponseType(typeof(IEnumerable<MasterPageZoneElement>), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> SearchMasterPageZoneElements(long tenantId, long masterPageId, long masterPageZoneId)
+        public async Task<IActionResult> SearchMasterPageZoneElementsAsync(long tenantId, long masterPageId, long masterPageZoneId)
         {
             IEnumerable<MasterPageZoneElement> masterPageZoneElements = await _masterPageService.SearchMasterPageZoneElementsAsync(tenantId, masterPageId, masterPageZoneId);
             return Ok(masterPageZoneElements);
@@ -63,7 +63,7 @@ namespace Riverside.Cms.Services.Core.Mvc
         [Route("api/v1/core/tenants/{tenantId:int}/masterpages/{masterPageId:int}/zones/{masterPageZoneId:int}/elements/{masterPageZoneElementId:int}")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(MasterPageZoneElement), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ReadMasterPageZoneElement(long tenantId, long masterPageId, long masterPageZoneId, long masterPageZoneElementId)
+        public async Task<IActionResult> ReadMasterPageZoneElementAsync(long tenantId, long masterPageId, long masterPageZoneId, long masterPageZoneElementId)
         {
             MasterPageZoneElement masterPageZoneElement = await _masterPageService.ReadMasterPageZoneElementAsync(tenantId, masterPageId, masterPageZoneId, masterPageZoneElementId);
             if (masterPageZoneElement == null)
