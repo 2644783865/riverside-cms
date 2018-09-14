@@ -3,10 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
-using Riverside.Cms.Services.Core.Client;
-using Riverside.Cms.Services.Storage.Client;
+using Riverside.Cms.Services.Storage.Domain;
 using Riverside.Cms.Utilities.Text.Formatting;
 
 namespace Riverside.Cms.Services.Element.Domain

@@ -8,10 +8,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Riverside.Cms.Services.Core.Client;
+using Riverside.Cms.Services.Core.Domain;
 using Riverside.Cms.Services.Element.Domain;
 using Riverside.Cms.Services.Element.Infrastructure;
-using Riverside.Cms.Services.Storage.Client;
+using Riverside.Cms.Services.Storage.Domain;
 using Riverside.Cms.Utilities.Text.Formatting;
 using Swashbuckle.AspNetCore.Swagger;
 
@@ -65,9 +65,7 @@ namespace Element.Api
 
         private void ConfigureOptionServices(IServiceCollection services)
         {
-            services.Configure<CoreApiOptions>(Configuration);
             services.Configure<SqlOptions>(Configuration);
-            services.Configure<StorageApiOptions>(Configuration);
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.

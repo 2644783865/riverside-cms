@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Storage\Storage.Client\Storage.Client.csproj" />
+    <ProjectReference Include="..\..\Storage\Storage.Domain\Storage.Domain.csproj" />
   </ItemGroup>
 
 </Project>

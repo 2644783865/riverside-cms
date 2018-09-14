@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Riverside.Cms.Services.Core.Domain;
-using Riverside.Cms.Services.Storage.Client;
+using Riverside.Cms.Services.Storage.Domain;
 
 namespace Riverside.Cms.Services.Core.Mvc
 {

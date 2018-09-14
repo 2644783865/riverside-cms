@@ -6,9 +6,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\..\Utilities\Text\Text.Formatting\Text.Formatting.csproj" />
-    <ProjectReference Include="..\..\Core\Core.Client\Core.Client.csproj" />
-    <ProjectReference Include="..\..\Storage\Storage.Client\Storage.Client.csproj" />
+    <ProjectReference Include="..\..\Core\Core.Domain\Core.Domain.csproj" />
+    <ProjectReference Include="..\..\Storage\Storage.Domain\Storage.Domain.csproj" />
   </ItemGroup>
 
 </Project>

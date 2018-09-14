@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Riverside.Cms.Services.Core.Client;
+using Riverside.Cms.Services.Core.Domain;
 
 namespace Riverside.Cms.Services.Element.Domain
 {
@@ -53,7 +53,7 @@ namespace Riverside.Cms.Services.Element.Domain
             return _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
         }
 
-        private bool TabIsActive(Page tabPage, List<Page> currentPageHierarchy)
+        private bool TabIsActive(Page tabPage, IEnumerable<Page> currentPageHierarchy)
         {
             foreach (Page page in currentPageHierarchy)
             {
@@ -66,7 +66,7 @@ namespace Riverside.Cms.Services.Element.Domain
         private async Task<List<NavigationBarContentTab>> GetContentTabs(NavigationBarElementSettings elementSettings, long pageId)
         {
             List<NavigationBarContentTab> tabs = new List<NavigationBarContentTab>();
-            List<Page> currentPageHierarchy = null;
+            IEnumerable<Page> currentPageHierarchy = null;
             foreach (NavigationBarTab tab in elementSettings.Tabs)
             {
                 Page tabPage = await _pageService.ReadPageAsync(elementSettings.TenantId, tab.PageId);

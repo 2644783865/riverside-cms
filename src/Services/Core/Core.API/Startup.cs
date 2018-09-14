@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Riverside.Cms.Services.Core.Domain;
 using Riverside.Cms.Services.Core.Infrastructure;
-using Riverside.Cms.Services.Storage.Client;
+using Riverside.Cms.Services.Storage.Domain;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace Core.API
@@ -45,7 +45,6 @@ namespace Core.API
         private void ConfigureOptionServices(IServiceCollection services)
         {
             services.Configure<SqlOptions>(Configuration);
-            services.Configure<StorageApiOptions>(Configuration);
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.

@@ -6,14 +6,10 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Riverside.Cms.Services.Core.Client;
 using Riverside.Cms.Services.Core.Domain;
 using Riverside.Cms.Services.Core.Infrastructure;
 using Riverside.Cms.Services.Element.Domain;
 using Riverside.Cms.Services.Element.Infrastructure;
-using Riverside.Cms.Services.Storage.Client;
 using Riverside.Cms.Services.Storage.Domain;
 using Riverside.Cms.Services.Storage.Infrastructure;
 using Riverside.Cms.Utilities.Text.Formatting;
@@ -31,13 +27,6 @@ namespace Cms.Api
 
         private void ConfigureDependencyInjectionSharedServices(IServiceCollection services)
         {
-            // Dependent client services
-            services.AddTransient<Riverside.Cms.Services.Core.Client.IForumService, Riverside.Cms.Services.Core.Client.ForumService>();
-            services.AddTransient<Riverside.Cms.Services.Core.Client.IPageService, Riverside.Cms.Services.Core.Client.PageService>();
-            services.AddTransient<Riverside.Cms.Services.Storage.Client.IStorageService, Riverside.Cms.Services.Storage.Client.StorageService>();
-            services.AddTransient<Riverside.Cms.Services.Core.Client.ITagService, Riverside.Cms.Services.Core.Client.TagService>();
-            services.AddTransient<Riverside.Cms.Services.Core.Client.IUserService, Riverside.Cms.Services.Core.Client.UserService>();
-
             // Utilities
             services.AddTransient<IStringUtilities, StringUtilities>();
         }
@@ -45,12 +34,12 @@ namespace Cms.Api
         private void ConfigureDependencyInjectionCoreServices(IServiceCollection services)
         {
             // Core domain services
-            services.AddTransient<Riverside.Cms.Services.Core.Domain.IForumService, Riverside.Cms.Services.Core.Domain.ForumService>();
-            services.AddTransient<Riverside.Cms.Services.Core.Domain.IMasterPageService, Riverside.Cms.Services.Core.Domain.MasterPageService>();
-            services.AddTransient<Riverside.Cms.Services.Core.Domain.IPageService, Riverside.Cms.Services.Core.Domain.PageService>();
-            services.AddTransient<Riverside.Cms.Services.Core.Domain.IPageViewService, Riverside.Cms.Services.Core.Domain.PageViewService>();
-            services.AddTransient<Riverside.Cms.Services.Core.Domain.ITagService, Riverside.Cms.Services.Core.Domain.TagService>();
-            services.AddTransient<Riverside.Cms.Services.Core.Domain.IUserService, Riverside.Cms.Services.Core.Domain.UserService>();
+            services.AddTransient<IForumService, ForumService>();
+            services.AddTransient<IMasterPageService, MasterPageService>();
+            services.AddTransient<IPageService, PageService>();
+            services.AddTransient<IPageViewService, PageViewService>();
+            services.AddTransient<ITagService, TagService>();
+            services.AddTransient<IUserService, UserService>();
 
             // Core infrastructure services
             services.AddTransient<IForumRepository, SqlForumRepository>();
@@ -94,7 +83,7 @@ namespace Cms.Api
         private void ConfigureDependencyInjectionStorageServices(IServiceCollection services)
         {   
             // Storage domain services
-            services.AddTransient<Riverside.Cms.Services.Storage.Domain.IStorageService, Riverside.Cms.Services.Storage.Domain.StorageService>();
+            services.AddTransient<IStorageService, StorageService>();
 
             // Storage infrastructure services
             services.AddTransient<IBlobService, AzureBlobService>();
@@ -108,8 +97,6 @@ namespace Cms.Api
             services.Configure<Riverside.Cms.Services.Element.Infrastructure.SqlOptions>(Configuration);
             services.Configure<Riverside.Cms.Services.Storage.Infrastructure.SqlOptions>(Configuration);
             services.Configure<AzureBlobOptions>(Configuration);
-            services.Configure<CoreApiOptions>(Configuration);
-            services.Configure<StorageApiOptions>(Configuration);
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.

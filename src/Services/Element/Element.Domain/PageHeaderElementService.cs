@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Riverside.Cms.Services.Core.Client;
-using Riverside.Cms.Services.Storage.Client;
+using Riverside.Cms.Services.Core.Domain;
+using Riverside.Cms.Services.Storage.Domain;
 
 namespace Riverside.Cms.Services.Element.Domain
 {
