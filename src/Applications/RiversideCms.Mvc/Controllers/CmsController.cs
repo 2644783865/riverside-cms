@@ -11,7 +11,7 @@ using RiversideCms.Mvc.Services;
 
 namespace RiversideCms.Mvc.Controllers
 {
-    public class PagesController : Controller
+    public class CmsController : Controller
     {
         private readonly IDomainService _domainService;
         private readonly IElementServiceFactory _elementServiceFactory;
@@ -20,7 +20,7 @@ namespace RiversideCms.Mvc.Controllers
         private readonly ITagService _tagService;
         private readonly IUserService _userService;
 
-        public PagesController(IDomainService domainService, IElementServiceFactory elementServiceFactory, IPageService pageService, IPageViewService pageViewService, ITagService tagService, IUserService userService)
+        public CmsController(IDomainService domainService, IElementServiceFactory elementServiceFactory, IPageService pageService, IPageViewService pageViewService, ITagService tagService, IUserService userService)
         {
             _domainService = domainService;
             _elementServiceFactory = elementServiceFactory;

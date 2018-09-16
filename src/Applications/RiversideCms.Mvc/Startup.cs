@@ -165,13 +165,13 @@ namespace RiversideCms.Mvc
 
             app.UseMvc(routes =>
             {
-                routes.MapRoute("Home", "", new { controller = "pages", action = "home" });
-                routes.MapRoute("HomeTagged", "tagged/{*tags}", new { controller = "pages", action = "hometagged" });
-                routes.MapRoute("PageImage", "pages/{pageId}/images/{pageImageType}/{*description}", new { controller = "pages", action = "readpageimageasync" });
-                routes.MapRoute(RouteNames.ElementBlobContent, "elementtypes/{elementTypeId}/elements/{elementId}/blobsets/{blobSetId}/content", new { controller = "pages", action = "readelementblobasync" });
-                routes.MapRoute("PageTagged", "pages/{pageId}/{description}/tagged/{*tags}", new { controller = "pages", action = "readtaggedasync" });
-                routes.MapRoute("Page", "pages/{pageId}/{*description}", new { controller = "pages", action = "readasync" });
-                routes.MapRoute("UserImage", "users/{userId}/images/{userImageType}/{*description}", new { controller = "pages", action = "readuserblobasync" });
+                routes.MapRoute("Home", "", new { controller = "cms", action = "home" });
+                routes.MapRoute("HomeTagged", "tagged/{*tags}", new { controller = "cms", action = "hometagged" });
+                routes.MapRoute("PageImage", "pages/{pageId}/images/{pageImageType}/{*description}", new { controller = "cms", action = "readpageimageasync" });
+                routes.MapRoute(RouteNames.ElementBlobContent, "elementtypes/{elementTypeId}/elements/{elementId}/blobsets/{blobSetId}/content", new { controller = "cms", action = "readelementblobasync" });
+                routes.MapRoute("PageTagged", "pages/{pageId}/{description}/tagged/{*tags}", new { controller = "cms", action = "readtaggedasync" });
+                routes.MapRoute("Page", "pages/{pageId}/{*description}", new { controller = "cms", action = "readasync" });
+                routes.MapRoute("UserImage", "users/{userId}/images/{userImageType}/{*description}", new { controller = "cms", action = "readuserblobasync" });
                 routes.MapRoute("Login", "account/login", new { controller = "account", action = "login" });
                 routes.MapRoute("Logout", "account/logout", new { controller = "account", action = "logout" });
                 routes.MapRoute("Register", "account/register", new { controller = "account", action = "register" });
