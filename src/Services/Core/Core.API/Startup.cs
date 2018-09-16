@@ -11,6 +11,7 @@ using Microsoft.Extensions.Options;
 using Riverside.Cms.Services.Core.Domain;
 using Riverside.Cms.Services.Core.Infrastructure;
 using Riverside.Cms.Services.Storage.Domain;
+using Riverside.Cms.Services.Storage.Infrastructure;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace Core.API
@@ -24,10 +25,20 @@ namespace Core.API
 
         public IConfiguration Configuration { get; }
 
-        private void ConfigureDependencyInjectionServices(IServiceCollection services)
+        private void ConfigureDependencyInjectionStorageServices(IServiceCollection services)
         {
+            // Storage domain services
             services.AddTransient<IStorageService, StorageService>();
 
+            // Storage infrastructure services
+            services.AddTransient<IBlobService, AzureBlobService>();
+            services.AddTransient<IImageService, ImageService>();
+            services.AddTransient<IStorageRepository, SqlStorageRepository>();
+        }
+
+        private void ConfigureDependencyInjectionCoreServices(IServiceCollection services)
+        { 
+            // Core domain services
             services.AddTransient<IDomainService, DomainService>();
             services.AddTransient<IForumService, ForumService>();
             services.AddTransient<IMasterPageService, MasterPageService>();
@@ -36,6 +47,7 @@ namespace Core.API
             services.AddTransient<ITagService, TagService>();
             services.AddTransient<IUserService, UserService>();
 
+            // Core infrastructure services
             services.AddTransient<IDomainRepository, SqlDomainRepository>();
             services.AddTransient<IForumRepository, SqlForumRepository>();
             services.AddTransient<IMasterPageRepository, SqlMasterPageRepository>();
@@ -46,7 +58,9 @@ namespace Core.API
 
         private void ConfigureOptionServices(IServiceCollection services)
         {
-            services.Configure<SqlOptions>(Configuration);
+            services.Configure<Riverside.Cms.Services.Core.Infrastructure.SqlOptions>(Configuration);
+            services.Configure<Riverside.Cms.Services.Storage.Infrastructure.SqlOptions>(Configuration);
+            services.Configure<AzureBlobOptions>(Configuration);
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -59,7 +73,8 @@ namespace Core.API
                 c.SwaggerDoc("v1", new Info { Title = "Core HTTP API", Version = "v1" });
             });
 
-            ConfigureDependencyInjectionServices(services);
+            ConfigureDependencyInjectionCoreServices(services);
+            ConfigureDependencyInjectionStorageServices(services);
             ConfigureOptionServices(services);
         }
 

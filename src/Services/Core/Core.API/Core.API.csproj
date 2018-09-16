@@ -15,6 +15,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Storage\Storage.Domain\Storage.Domain.csproj" />
+    <ProjectReference Include="..\..\Storage\Storage.Infrastructure\Storage.Infrastructure.csproj" />
     <ProjectReference Include="..\Core.Domain\Core.Domain.csproj" />
     <ProjectReference Include="..\Core.Infrastructure\Core.Infrastructure.csproj" />
     <ProjectReference Include="..\Core.Mvc\Core.Mvc.csproj" />
