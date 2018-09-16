@@ -9,6 +9,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Riverside.Cms.Services.Core.Client;
 using Riverside.Cms.Services.Element.Client;
 using Riverside.Cms.Services.Storage.Client;
+using Riverside.Cms.Services.Storage.Infrastructure;
+using Riverside.Cms.Utilities.Text.Formatting;
 using RiversideCms.Mvc.Services;
 
 namespace RiversideCms.Mvc
@@ -22,38 +24,114 @@ namespace RiversideCms.Mvc
 
         public IConfiguration Configuration { get; }
 
-        private void ConfigureDependencyInjectionServices(IServiceCollection services)
+        private void ConfigureDependencyInjectionSharedServices(IServiceCollection services)
+        {
+            // Utilities
+            services.AddTransient<IStringUtilities, StringUtilities>();
+        }
+
+        private void ConfigureDependencyInjectionClientServices(IServiceCollection services)
         {
             // Core services
-            services.AddTransient<IDomainService, DomainService>();
-            services.AddTransient<IPageService, PageService>();
-            services.AddTransient<IPageViewService, PageViewService>();
-            services.AddTransient<ITagService, TagService>();
-            services.AddTransient<IUserService, UserService>();
+            services.AddTransient<Riverside.Cms.Services.Core.Client.IDomainService, Riverside.Cms.Services.Core.Client.DomainService>();
+            services.AddTransient<Riverside.Cms.Services.Core.Client.IPageService, Riverside.Cms.Services.Core.Client.PageService>();
+            services.AddTransient<Riverside.Cms.Services.Core.Client.IPageViewService, Riverside.Cms.Services.Core.Client.PageViewService>();
+            services.AddTransient<Riverside.Cms.Services.Core.Client.ITagService, Riverside.Cms.Services.Core.Client.TagService>();
+            services.AddTransient<Riverside.Cms.Services.Core.Client.IUserService, Riverside.Cms.Services.Core.Client.UserService>();
 
             // Element services
-            services.AddTransient<IAlbumElementService, AlbumElementService>();
-            services.AddTransient<ICarouselElementService, CarouselElementService>();
-            services.AddTransient<ICodeSnippetElementService, CodeSnippetElementService>();
-            services.AddTransient<IFooterElementService, FooterElementService>();
-            services.AddTransient<IHtmlElementService, HtmlElementService>();
-            services.AddTransient<ILatestThreadsElementService, LatestThreadsElementService>();
-            services.AddTransient<INavigationBarElementService, NavigationBarElementService>();
-            services.AddTransient<IPageHeaderElementService, PageHeaderElementService>();
-            services.AddTransient<IPageListElementService, PageListElementService>();
-            services.AddTransient<IShareElementService, ShareElementService>();
-            services.AddTransient<ISocialBarElementService, SocialBarElementService>();
-            services.AddTransient<ITagCloudElementService, TagCloudElementService>();
+            services.AddTransient<Riverside.Cms.Services.Element.Client.IAlbumElementService, Riverside.Cms.Services.Element.Client.AlbumElementService>();
+            services.AddTransient<Riverside.Cms.Services.Element.Client.ICarouselElementService, Riverside.Cms.Services.Element.Client.CarouselElementService>();
+            services.AddTransient<Riverside.Cms.Services.Element.Client.ICodeSnippetElementService, Riverside.Cms.Services.Element.Client.CodeSnippetElementService>();
+            services.AddTransient<Riverside.Cms.Services.Element.Client.IFooterElementService, Riverside.Cms.Services.Element.Client.FooterElementService>();
+            services.AddTransient<Riverside.Cms.Services.Element.Client.IHtmlElementService, Riverside.Cms.Services.Element.Client.HtmlElementService>();
+            services.AddTransient<Riverside.Cms.Services.Element.Client.ILatestThreadsElementService, Riverside.Cms.Services.Element.Client.LatestThreadsElementService>();
+            services.AddTransient<Riverside.Cms.Services.Element.Client.INavigationBarElementService, Riverside.Cms.Services.Element.Client.NavigationBarElementService>();
+            services.AddTransient<Riverside.Cms.Services.Element.Client.IPageHeaderElementService, Riverside.Cms.Services.Element.Client.PageHeaderElementService>();
+            services.AddTransient<Riverside.Cms.Services.Element.Client.IPageListElementService, Riverside.Cms.Services.Element.Client.PageListElementService>();
+            services.AddTransient<Riverside.Cms.Services.Element.Client.IShareElementService, Riverside.Cms.Services.Element.Client.ShareElementService>();
+            services.AddTransient<Riverside.Cms.Services.Element.Client.ISocialBarElementService, Riverside.Cms.Services.Element.Client.SocialBarElementService>();
+            services.AddTransient<Riverside.Cms.Services.Element.Client.ITagCloudElementService, Riverside.Cms.Services.Element.Client.TagCloudElementService>();
 
-            // Element factory
+            // Element service factory
             services.AddTransient<IElementServiceFactory, ElementServiceFactory>();
+        }
+
+        private void ConfigureDependencyInjectionCoreServices(IServiceCollection services)
+        {
+            // Core domain services
+            services.AddTransient<Riverside.Cms.Services.Core.Domain.IDomainService, Riverside.Cms.Services.Core.Domain.DomainService>();
+            services.AddTransient<Riverside.Cms.Services.Core.Domain.IForumService, Riverside.Cms.Services.Core.Domain.ForumService>();
+            services.AddTransient<Riverside.Cms.Services.Core.Domain.IMasterPageService, Riverside.Cms.Services.Core.Domain.MasterPageService>();
+            services.AddTransient<Riverside.Cms.Services.Core.Domain.IPageService, Riverside.Cms.Services.Core.Domain.PageService>();
+            services.AddTransient<Riverside.Cms.Services.Core.Domain.IPageViewService, Riverside.Cms.Services.Core.Domain.PageViewService>();
+            services.AddTransient<Riverside.Cms.Services.Core.Domain.ITagService, Riverside.Cms.Services.Core.Domain.TagService>();
+            services.AddTransient<Riverside.Cms.Services.Core.Domain.IUserService, Riverside.Cms.Services.Core.Domain.UserService>();
+
+            // Core infrastructure services
+            services.AddTransient<Riverside.Cms.Services.Core.Domain.IDomainRepository, Riverside.Cms.Services.Core.Infrastructure.SqlDomainRepository>();
+            services.AddTransient<Riverside.Cms.Services.Core.Domain.IForumRepository, Riverside.Cms.Services.Core.Infrastructure.SqlForumRepository>();
+            services.AddTransient<Riverside.Cms.Services.Core.Domain.IMasterPageRepository, Riverside.Cms.Services.Core.Infrastructure.SqlMasterPageRepository>();
+            services.AddTransient<Riverside.Cms.Services.Core.Domain.IPageRepository, Riverside.Cms.Services.Core.Infrastructure.SqlPageRepository>();
+            services.AddTransient<Riverside.Cms.Services.Core.Domain.ITagRepository, Riverside.Cms.Services.Core.Infrastructure.SqlTagRepository>();
+            services.AddTransient<Riverside.Cms.Services.Core.Domain.IUserRepository, Riverside.Cms.Services.Core.Infrastructure.SqlUserRepository>();
+        }
+
+        private void ConfigureDependencyInjectionElementServices(IServiceCollection services)
+        {
+            // Element domain services
+            services.AddTransient<Riverside.Cms.Services.Element.Domain.IAlbumElementService, Riverside.Cms.Services.Element.Domain.AlbumElementService>();
+            services.AddTransient<Riverside.Cms.Services.Element.Domain.ICarouselElementService, Riverside.Cms.Services.Element.Domain.CarouselElementService>();
+            services.AddTransient<Riverside.Cms.Services.Element.Domain.ICodeSnippetElementService, Riverside.Cms.Services.Element.Domain.CodeSnippetElementService>();
+            services.AddTransient<Riverside.Cms.Services.Element.Domain.IFooterElementService, Riverside.Cms.Services.Element.Domain.FooterElementService>();
+            services.AddTransient<Riverside.Cms.Services.Element.Domain.IHtmlElementService, Riverside.Cms.Services.Element.Domain.HtmlElementService>();
+            services.AddTransient<Riverside.Cms.Services.Element.Domain.ILatestThreadsElementService, Riverside.Cms.Services.Element.Domain.LatestThreadsElementService>();
+            services.AddTransient<Riverside.Cms.Services.Element.Domain.INavigationBarElementService, Riverside.Cms.Services.Element.Domain.NavigationBarElementService>();
+            services.AddTransient<Riverside.Cms.Services.Element.Domain.IPageHeaderElementService, Riverside.Cms.Services.Element.Domain.PageHeaderElementService>();
+            services.AddTransient<Riverside.Cms.Services.Element.Domain.IPageListElementService, Riverside.Cms.Services.Element.Domain.PageListElementService>();
+            services.AddTransient<Riverside.Cms.Services.Element.Domain.IShareElementService, Riverside.Cms.Services.Element.Domain.ShareElementService>();
+            services.AddTransient<Riverside.Cms.Services.Element.Domain.ISocialBarElementService, Riverside.Cms.Services.Element.Domain.SocialBarElementService>();
+            services.AddTransient<Riverside.Cms.Services.Element.Domain.ITagCloudElementService, Riverside.Cms.Services.Element.Domain.TagCloudElementService>();
+
+            // Element infrastructure services
+            services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Element.Domain.AlbumElementSettings>, Riverside.Cms.Services.Element.Infrastructure.SqlAlbumElementRepository>();
+            services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Element.Domain.CarouselElementSettings>, Riverside.Cms.Services.Element.Infrastructure.SqlCarouselElementRepository>();
+            services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Element.Domain.CodeSnippetElementSettings>, Riverside.Cms.Services.Element.Infrastructure.SqlCodeSnippetElementRepository>();
+            services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Element.Domain.FooterElementSettings>, Riverside.Cms.Services.Element.Infrastructure.SqlFooterElementRepository>();
+            services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Element.Domain.HtmlElementSettings>, Riverside.Cms.Services.Element.Infrastructure.SqlHtmlElementRepository>();
+            services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Element.Domain.LatestThreadsElementSettings>, Riverside.Cms.Services.Element.Infrastructure.SqlLatestThreadsElementRepository>();
+            services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Element.Domain.NavigationBarElementSettings>, Riverside.Cms.Services.Element.Infrastructure.SqlNavigationBarElementRepository>();
+            services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Element.Domain.PageHeaderElementSettings>, Riverside.Cms.Services.Element.Infrastructure.SqlPageHeaderElementRepository>();
+            services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Element.Domain.PageListElementSettings>, Riverside.Cms.Services.Element.Infrastructure.SqlPageListElementRepository>();
+            services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Element.Domain.ShareElementSettings>, Riverside.Cms.Services.Element.Infrastructure.SqlShareElementRepository>();
+            services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Element.Domain.SocialBarElementSettings>, Riverside.Cms.Services.Element.Infrastructure.SqlSocialBarElementRepository>();
+            services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Element.Domain.TagCloudElementSettings>, Riverside.Cms.Services.Element.Infrastructure.SqlTagCloudElementRepository>();
+        }
+
+        private void ConfigureDependencyInjectionStorageServices(IServiceCollection services)
+        {
+            // Storage domain services
+            services.AddTransient<Riverside.Cms.Services.Storage.Domain.IStorageService, Riverside.Cms.Services.Storage.Domain.StorageService>();
+
+            // Storage infrastructure services
+            services.AddTransient<Riverside.Cms.Services.Storage.Domain.IBlobService, AzureBlobService>();
+            services.AddTransient<Riverside.Cms.Services.Storage.Domain.IImageService, ImageService>();
+            services.AddTransient<Riverside.Cms.Services.Storage.Domain.IStorageRepository, SqlStorageRepository>();
+        }
+
+        private void ConfigureOptionClientServices(IServiceCollection services)
+        {
+            services.Configure<Riverside.Cms.Services.Core.Client.CoreApiOptions>(Configuration);
+            services.Configure<Riverside.Cms.Services.Element.Client.ElementApiOptions>(Configuration);
+            services.Configure<Riverside.Cms.Services.Storage.Client.StorageApiOptions>(Configuration);
         }
 
         private void ConfigureOptionServices(IServiceCollection services)
         {
-            services.Configure<CoreApiOptions>(Configuration);
-            services.Configure<ElementApiOptions>(Configuration);
-            services.Configure<StorageApiOptions>(Configuration);
+            services.Configure<Riverside.Cms.Services.Core.Infrastructure.SqlOptions>(Configuration);
+            services.Configure<Riverside.Cms.Services.Element.Infrastructure.SqlOptions>(Configuration);
+            services.Configure<Riverside.Cms.Services.Storage.Infrastructure.SqlOptions>(Configuration);
+            services.Configure<AzureBlobOptions>(Configuration);
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -61,7 +139,12 @@ namespace RiversideCms.Mvc
         {
             services.AddMvc();
 
-            ConfigureDependencyInjectionServices(services);
+            ConfigureDependencyInjectionSharedServices(services);
+            ConfigureDependencyInjectionClientServices(services);
+            ConfigureDependencyInjectionCoreServices(services);
+            ConfigureDependencyInjectionElementServices(services);
+            ConfigureDependencyInjectionStorageServices(services);
+            ConfigureOptionClientServices(services);
             ConfigureOptionServices(services);
         }
 
