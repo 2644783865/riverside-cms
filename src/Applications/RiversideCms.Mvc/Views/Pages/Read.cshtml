@@ -20,7 +20,7 @@
     <title>@Model.View.Title</title>
     <link href="@Url.Content("~/css/bootstrap.min.css")" rel="stylesheet" type="text/css" />
     <link href="@Url.Content("~/css/font-awesome.min.css")" rel="stylesheet" type="text/css" />
-    <link href="@Url.Content("~/css/site.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content($"~/webs/{Model.View.TenantId}/assets/site.css")" rel="stylesheet" type="text/css" />
 </head>
 <body>
     @Html.Raw(Model.View.BeginRender)
