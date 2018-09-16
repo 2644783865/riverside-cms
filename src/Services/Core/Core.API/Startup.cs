@@ -28,6 +28,7 @@ namespace Core.API
         {
             services.AddTransient<IStorageService, StorageService>();
 
+            services.AddTransient<IDomainService, DomainService>();
             services.AddTransient<IForumService, ForumService>();
             services.AddTransient<IMasterPageService, MasterPageService>();
             services.AddTransient<IPageService, PageService>();
@@ -35,6 +36,7 @@ namespace Core.API
             services.AddTransient<ITagService, TagService>();
             services.AddTransient<IUserService, UserService>();
 
+            services.AddTransient<IDomainRepository, SqlDomainRepository>();
             services.AddTransient<IForumRepository, SqlForumRepository>();
             services.AddTransient<IMasterPageRepository, SqlMasterPageRepository>();
             services.AddTransient<IPageRepository, SqlPageRepository>();

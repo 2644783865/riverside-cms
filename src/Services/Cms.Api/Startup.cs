@@ -34,6 +34,7 @@ namespace Cms.Api
         private void ConfigureDependencyInjectionCoreServices(IServiceCollection services)
         {
             // Core domain services
+            services.AddTransient<IDomainService, DomainService>();
             services.AddTransient<IForumService, ForumService>();
             services.AddTransient<IMasterPageService, MasterPageService>();
             services.AddTransient<IPageService, PageService>();
@@ -42,6 +43,7 @@ namespace Cms.Api
             services.AddTransient<IUserService, UserService>();
 
             // Core infrastructure services
+            services.AddTransient<IDomainRepository, SqlDomainRepository>();
             services.AddTransient<IForumRepository, SqlForumRepository>();
             services.AddTransient<IMasterPageRepository, SqlMasterPageRepository>();
             services.AddTransient<IPageRepository, SqlPageRepository>();

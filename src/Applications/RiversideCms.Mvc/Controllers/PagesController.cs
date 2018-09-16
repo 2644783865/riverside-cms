@@ -13,22 +13,40 @@ namespace RiversideCms.Mvc.Controllers
 {
     public class PagesController : Controller
     {
+        private readonly IDomainService _domainService;
         private readonly IElementServiceFactory _elementServiceFactory;
         private readonly IPageService _pageService;
         private readonly IPageViewService _pageViewService;
         private readonly ITagService _tagService;
+        private readonly IUserService _userService;
 
-        private const long TenantId = 6;
-
-        public PagesController(IElementServiceFactory elementServiceFactory, IPageService pageService, IPageViewService pageViewService, ITagService tagService)
+        public PagesController(IDomainService domainService, IElementServiceFactory elementServiceFactory, IPageService pageService, IPageViewService pageViewService, ITagService tagService, IUserService userService)
         {
+            _domainService = domainService;
             _elementServiceFactory = elementServiceFactory;
             _pageService = pageService;
             _pageViewService = pageViewService;
             _tagService = tagService;
+            _userService = userService;
         }
 
-        private async Task<ElementRender> GetElementRender(long tenantId, Guid elementTypeId, long elementId, PageContext context)
+        /// <summary>
+        /// Returns root URL of current request. For example, the URI "http://localhost:7823/article/1" has root URI "http://localhost:7823".
+        /// </summary>
+        /// <returns>Root URL of current request.</returns>
+        public string GetRootUrl()
+        {
+            return string.Format("{0}://{1}", HttpContext.Request.Scheme, HttpContext.Request.Host);
+        }
+
+        private async Task<long> GetTenantIdAsync()
+        {
+            string url = GetRootUrl();
+            WebDomain domain = await _domainService.ReadDomainByUrlAsync(url);
+            return domain.TenantId;
+        }
+
+        private async Task<ElementRender> GetElementRenderAsync(long tenantId, Guid elementTypeId, long elementId, PageContext context)
         {
             IElementView elementView = await _elementServiceFactory.GetElementViewAsync(tenantId, elementTypeId, elementId, context);
             if (elementView == null)
@@ -41,7 +59,7 @@ namespace RiversideCms.Mvc.Controllers
             };
         }
 
-        private async Task<IEnumerable<long>> GetTagIds(long tenantId, string tagNames)
+        private async Task<IEnumerable<long>> GetTagIdsAsync(long tenantId, string tagNames)
         {
             if (string.IsNullOrWhiteSpace(tagNames))
                 return null;
@@ -50,22 +68,22 @@ namespace RiversideCms.Mvc.Controllers
             return tags.Select(t => t.TagId);
         }
 
-        private async Task<PageContext> GetPageContext(long tenantId, long pageId, string tags)
+        private async Task<PageContext> GetPageContextAsync(long tenantId, long pageId, string tags)
         {
             return new PageContext
             {
                 PageId = pageId,
                 Parameters = HttpContext.Request.Query.ToDictionary(q => q.Key, q => q.Value.First()),
-                TagIds = await GetTagIds(tenantId, tags)
+                TagIds = await GetTagIdsAsync(tenantId, tags)
             };
         }
 
         [HttpGet]
-        public async Task<IActionResult> ReadTagged(long pageId, string tags)
+        public async Task<IActionResult> ReadTaggedAsync(long pageId, string tags)
         {
-            long tenantId = TenantId;
+            long tenantId = await GetTenantIdAsync();
 
-            PageContext context = await GetPageContext(tenantId, pageId, tags);
+            PageContext context = await GetPageContextAsync(tenantId, pageId, tags);
 
             PageView pageView = await _pageViewService.ReadPageViewAsync(tenantId, pageId);
             pageView.PageViewZones = await _pageViewService.SearchPageViewZonesAsync(tenantId, pageId);
@@ -78,7 +96,7 @@ namespace RiversideCms.Mvc.Controllers
                 foreach (PageViewZoneElement pageViewZoneElement in pageViewZone.PageViewZoneElements)
                 {
                     if (!elements.ContainsKey(pageViewZoneElement.ElementId))
-                        elements.Add(pageViewZoneElement.ElementId, await GetElementRender(tenantId, pageViewZoneElement.ElementTypeId, pageViewZoneElement.ElementId, context));
+                        elements.Add(pageViewZoneElement.ElementId, await GetElementRenderAsync(tenantId, pageViewZoneElement.ElementTypeId, pageViewZoneElement.ElementId, context));
                 }
             }
 
@@ -92,15 +110,15 @@ namespace RiversideCms.Mvc.Controllers
         }
 
         [HttpGet]
-        public Task<IActionResult> Read(long pageId)
+        public Task<IActionResult> ReadAsync(long pageId)
         {
-            return ReadTagged(pageId, null);
+            return ReadTaggedAsync(pageId, null);
         }
 
         [HttpGet]
-        public async Task<IActionResult> ReadPageImage(long pageId, PageImageType pageImageType)
+        public async Task<IActionResult> ReadPageImageAsync(long pageId, PageImageType pageImageType)
         {
-            long tenantId = TenantId;
+            long tenantId = await GetTenantIdAsync();
 
             BlobContent blobContent = await _pageService.ReadPageImageAsync(tenantId, pageId, pageImageType);
 
@@ -108,11 +126,21 @@ namespace RiversideCms.Mvc.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> ReadElementBlob(Guid elementTypeId, long elementId, long blobSetId, string blobLabel)
+        public async Task<IActionResult> ReadElementBlobAsync(Guid elementTypeId, long elementId, long blobSetId, string blobLabel)
         {
-            long tenantId = TenantId;
+            long tenantId = await GetTenantIdAsync();
 
             BlobContent blobContent = await _elementServiceFactory.GetElementBlobContentAsync(tenantId, elementTypeId, elementId, blobSetId, blobLabel);
+
+            return File(blobContent.Stream, blobContent.Type, blobContent.Name);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ReadUserBlobAsync(long userId, UserImageType userImageType)
+        {
+            long tenantId = await GetTenantIdAsync();
+
+            BlobContent blobContent = await _userService.ReadUserImageAsync(tenantId, userId, userImageType);
 
             return File(blobContent.Stream, blobContent.Type, blobContent.Name);
         }
