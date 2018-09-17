@@ -19,9 +19,10 @@ namespace RiversideCms.Mvc.Services
         private readonly IPageListElementService _pageListElementService;
         private readonly IShareElementService _shareElementService;
         private readonly ISocialBarElementService _socialBarElementService;
+        private readonly ITableElementService _tableElementService;
         private readonly ITagCloudElementService _tagCloudElementService;
 
-        public ElementServiceFactory(IAlbumElementService albumElementService, ICarouselElementService carouselElementService, ICodeSnippetElementService codeSnippetElementService, IFooterElementService footerElementService, IHtmlElementService htmlElementService, ILatestThreadsElementService latestThreadsElementService, INavigationBarElementService navigationBarElementService, IPageHeaderElementService pageHeaderElementService, IPageListElementService pageListElementService, IShareElementService shareElementService, ISocialBarElementService socialBarElementService, ITagCloudElementService tagCloudElementService)
+        public ElementServiceFactory(IAlbumElementService albumElementService, ICarouselElementService carouselElementService, ICodeSnippetElementService codeSnippetElementService, IFooterElementService footerElementService, IHtmlElementService htmlElementService, ILatestThreadsElementService latestThreadsElementService, INavigationBarElementService navigationBarElementService, IPageHeaderElementService pageHeaderElementService, IPageListElementService pageListElementService, IShareElementService shareElementService, ISocialBarElementService socialBarElementService, ITableElementService tableElementService, ITagCloudElementService tagCloudElementService)
         {
             _albumElementService = albumElementService;
             _carouselElementService = carouselElementService;
@@ -34,6 +35,7 @@ namespace RiversideCms.Mvc.Services
             _pageListElementService = pageListElementService;
             _shareElementService = shareElementService;
             _socialBarElementService = socialBarElementService;
+            _tableElementService = tableElementService;
             _tagCloudElementService = tagCloudElementService;
         }
 
@@ -73,6 +75,9 @@ namespace RiversideCms.Mvc.Services
 
                 case "4e6b936d-e8a1-4ff2-9576-9f9b78f82895":
                     return await _socialBarElementService.ReadElementViewAsync(tenantId, elementId, context);
+
+                case "252ca19c-d085-4e0d-b70b-da3e1098f51b":
+                    return await _tableElementService.ReadElementViewAsync(tenantId, elementId, context);
 
                 case "b910c231-7dbd-4cad-92ef-775981e895b4":
                     return await _tagCloudElementService.ReadElementViewAsync(tenantId, elementId, context);

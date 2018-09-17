@@ -15,7 +15,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Utilities\Text\Text.Csv\Text.Csv.csproj" />
     <ProjectReference Include="..\..\..\Utilities\Text\Text.Formatting\Text.Formatting.csproj" />
+    <ProjectReference Include="..\..\Core\Core.Domain\Core.Domain.csproj" />
+    <ProjectReference Include="..\..\Core\Core.Infrastructure\Core.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Storage\Storage.Domain\Storage.Domain.csproj" />
+    <ProjectReference Include="..\..\Storage\Storage.Infrastructure\Storage.Infrastructure.csproj" />
     <ProjectReference Include="..\Element.Domain\Element.Domain.csproj" />
     <ProjectReference Include="..\Element.Infrastructure\Element.Infrastructure.csproj" />
     <ProjectReference Include="..\Element.Mvc\Element.Mvc.csproj" />

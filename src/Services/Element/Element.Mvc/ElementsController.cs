@@ -22,9 +22,10 @@ namespace Riverside.Cms.Services.Element.Mvc
         private readonly IPageListElementService _pageListElementService;
         private readonly IShareElementService _shareElementService;
         private readonly ISocialBarElementService _socialBarElementService;
+        private readonly ITableElementService _tableElementService;
         private readonly ITagCloudElementService _tagCloudElementService;
 
-        public ElementsController(IAlbumElementService albumElementService, ICarouselElementService carouselElementService, ICodeSnippetElementService codeSnippetElementService, IFooterElementService footerElementService, IHtmlElementService htmlElementService, ILatestThreadsElementService latestThreadsElementService, INavigationBarElementService navigationBarElementService, IPageHeaderElementService pageHeaderElementService, IPageListElementService pageListElementService, IShareElementService shareElementService, ISocialBarElementService socialBarElementService, ITagCloudElementService tagCloudElementService)
+        public ElementsController(IAlbumElementService albumElementService, ICarouselElementService carouselElementService, ICodeSnippetElementService codeSnippetElementService, IFooterElementService footerElementService, IHtmlElementService htmlElementService, ILatestThreadsElementService latestThreadsElementService, INavigationBarElementService navigationBarElementService, IPageHeaderElementService pageHeaderElementService, IPageListElementService pageListElementService, IShareElementService shareElementService, ISocialBarElementService socialBarElementService, ITableElementService tableElementService, ITagCloudElementService tagCloudElementService)
         {
             _albumElementService = albumElementService;
             _carouselElementService = carouselElementService;
@@ -37,6 +38,7 @@ namespace Riverside.Cms.Services.Element.Mvc
             _pageListElementService = pageListElementService;
             _shareElementService = shareElementService;
             _socialBarElementService = socialBarElementService;
+            _tableElementService = tableElementService;
             _tagCloudElementService = tagCloudElementService;
         }
 
@@ -367,6 +369,33 @@ namespace Riverside.Cms.Services.Element.Mvc
         {
             PageContext context = new PageContext { PageId = pageId };
             IElementView<SocialBarElementSettings, SocialBarElementContent> view = await _socialBarElementService.ReadElementViewAsync(tenantId, elementId, context);
+            if (view == null)
+                return NotFound();
+            return Ok(view);
+        }
+
+        // TABLE
+
+        [HttpGet]
+        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/252ca19c-d085-4e0d-b70b-da3e1098f51b/elements/{elementId:int}")]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(TableElementSettings), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> ReadTableElementSettingsAsync(long tenantId, long elementId)
+        {
+            TableElementSettings settings = await _tableElementService.ReadElementSettingsAsync(tenantId, elementId);
+            if (settings == null)
+                return NotFound();
+            return Ok(settings);
+        }
+
+        [HttpGet]
+        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/252ca19c-d085-4e0d-b70b-da3e1098f51b/elements/{elementId:int}/view")]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(IElementView<TableElementSettings, TableElementContent>), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> ReadTableElementViewAsync(long tenantId, long elementId, [FromQuery]long pageId)
+        {
+            PageContext context = new PageContext { PageId = pageId };
+            IElementView<TableElementSettings, TableElementContent> view = await _tableElementService.ReadElementViewAsync(tenantId, elementId, context);
             if (view == null)
                 return NotFound();
             return Ok(view);

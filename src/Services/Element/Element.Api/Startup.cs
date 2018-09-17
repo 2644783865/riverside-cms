@@ -9,9 +9,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Riverside.Cms.Services.Core.Domain;
+using Riverside.Cms.Services.Core.Infrastructure;
 using Riverside.Cms.Services.Element.Domain;
 using Riverside.Cms.Services.Element.Infrastructure;
 using Riverside.Cms.Services.Storage.Domain;
+using Riverside.Cms.Services.Storage.Infrastructure;
+using Riverside.Cms.Utilities.Text.Csv;
 using Riverside.Cms.Utilities.Text.Formatting;
 using Swashbuckle.AspNetCore.Swagger;
 
@@ -26,13 +29,44 @@ namespace Element.Api
 
         public IConfiguration Configuration { get; }
 
+        private void ConfigureDependencyInjectionStorageServices(IServiceCollection services)
+        {
+            // Storage domain services
+            services.AddTransient<IStorageService, StorageService>();
+
+            // Storage infrastructure services
+            services.AddTransient<IBlobService, AzureBlobService>();
+            services.AddTransient<IImageService, ImageService>();
+            services.AddTransient<IStorageRepository, SqlStorageRepository>();
+        }
+
+        private void ConfigureDependencyInjectionCoreServices(IServiceCollection services)
+        {
+            // Core domain services
+            services.AddTransient<IDomainService, DomainService>();
+            services.AddTransient<IForumService, ForumService>();
+            services.AddTransient<IMasterPageService, MasterPageService>();
+            services.AddTransient<IPageService, PageService>();
+            services.AddTransient<IPageViewService, PageViewService>();
+            services.AddTransient<ITagService, TagService>();
+            services.AddTransient<IUserService, UserService>();
+
+            // Core infrastructure services
+            services.AddTransient<IDomainRepository, SqlDomainRepository>();
+            services.AddTransient<IForumRepository, SqlForumRepository>();
+            services.AddTransient<IMasterPageRepository, SqlMasterPageRepository>();
+            services.AddTransient<IPageRepository, SqlPageRepository>();
+            services.AddTransient<ITagRepository, SqlTagRepository>();
+            services.AddTransient<IUserRepository, SqlUserRepository>();
+        }
+
         private void ConfigureDependencyInjectionServices(IServiceCollection services)
         {
+            services.AddTransient<ICsvService, CsvService>();
             services.AddTransient<IStringUtilities, StringUtilities>();
 
             services.AddTransient<IForumService, ForumService>();
             services.AddTransient<IPageService, PageService>();
-            services.AddTransient<IStorageService, StorageService>();
             services.AddTransient<ITagService, TagService>();
             services.AddTransient<IUserService, UserService>();
 
@@ -47,6 +81,7 @@ namespace Element.Api
             services.AddTransient<IPageListElementService, PageListElementService>();
             services.AddTransient<IShareElementService, ShareElementService>();
             services.AddTransient<ISocialBarElementService, SocialBarElementService>();
+            services.AddTransient<ITableElementService, TableElementService>();
             services.AddTransient<ITagCloudElementService, TagCloudElementService>();
 
             services.AddTransient<IElementRepository<AlbumElementSettings>, SqlAlbumElementRepository>();
@@ -60,12 +95,16 @@ namespace Element.Api
             services.AddTransient<IElementRepository<PageListElementSettings>, SqlPageListElementRepository>();
             services.AddTransient<IElementRepository<ShareElementSettings>, SqlShareElementRepository>();
             services.AddTransient<IElementRepository<SocialBarElementSettings>, SqlSocialBarElementRepository>();
+            services.AddTransient<IElementRepository<TableElementSettings>, SqlTableElementRepository>();
             services.AddTransient<IElementRepository<TagCloudElementSettings>, SqlTagCloudElementRepository>();
         }
 
         private void ConfigureOptionServices(IServiceCollection services)
         {
-            services.Configure<SqlOptions>(Configuration);
+            services.Configure<Riverside.Cms.Services.Core.Infrastructure.SqlOptions>(Configuration);
+            services.Configure<Riverside.Cms.Services.Element.Infrastructure.SqlOptions>(Configuration);
+            services.Configure<Riverside.Cms.Services.Storage.Infrastructure.SqlOptions>(Configuration);
+            services.Configure<AzureBlobOptions>(Configuration);
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -78,6 +117,8 @@ namespace Element.Api
                 c.SwaggerDoc("v1", new Info { Title = "Element HTTP API", Version = "v1" });
             });
 
+            ConfigureDependencyInjectionStorageServices(services);
+            ConfigureDependencyInjectionCoreServices(services);
             ConfigureDependencyInjectionServices(services);
             ConfigureOptionServices(services);
         }

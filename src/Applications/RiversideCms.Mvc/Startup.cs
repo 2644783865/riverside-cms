@@ -10,6 +10,7 @@ using Riverside.Cms.Services.Core.Client;
 using Riverside.Cms.Services.Element.Client;
 using Riverside.Cms.Services.Storage.Client;
 using Riverside.Cms.Services.Storage.Infrastructure;
+using Riverside.Cms.Utilities.Text.Csv;
 using Riverside.Cms.Utilities.Text.Formatting;
 using RiversideCms.Mvc.Services;
 
@@ -27,6 +28,7 @@ namespace RiversideCms.Mvc
         private void ConfigureDependencyInjectionSharedServices(IServiceCollection services)
         {
             // Utilities
+            services.AddTransient<ICsvService, CsvService>();
             services.AddTransient<IStringUtilities, StringUtilities>();
         }
 
@@ -51,6 +53,7 @@ namespace RiversideCms.Mvc
             services.AddTransient<Riverside.Cms.Services.Element.Client.IPageListElementService, Riverside.Cms.Services.Element.Client.PageListElementService>();
             services.AddTransient<Riverside.Cms.Services.Element.Client.IShareElementService, Riverside.Cms.Services.Element.Client.ShareElementService>();
             services.AddTransient<Riverside.Cms.Services.Element.Client.ISocialBarElementService, Riverside.Cms.Services.Element.Client.SocialBarElementService>();
+            services.AddTransient<Riverside.Cms.Services.Element.Client.ITableElementService, Riverside.Cms.Services.Element.Client.TableElementService>();
             services.AddTransient<Riverside.Cms.Services.Element.Client.ITagCloudElementService, Riverside.Cms.Services.Element.Client.TagCloudElementService>();
 
             // Element service factory
@@ -91,6 +94,7 @@ namespace RiversideCms.Mvc
             services.AddTransient<Riverside.Cms.Services.Element.Domain.IPageListElementService, Riverside.Cms.Services.Element.Domain.PageListElementService>();
             services.AddTransient<Riverside.Cms.Services.Element.Domain.IShareElementService, Riverside.Cms.Services.Element.Domain.ShareElementService>();
             services.AddTransient<Riverside.Cms.Services.Element.Domain.ISocialBarElementService, Riverside.Cms.Services.Element.Domain.SocialBarElementService>();
+            services.AddTransient<Riverside.Cms.Services.Element.Domain.ITableElementService, Riverside.Cms.Services.Element.Domain.TableElementService>();
             services.AddTransient<Riverside.Cms.Services.Element.Domain.ITagCloudElementService, Riverside.Cms.Services.Element.Domain.TagCloudElementService>();
 
             // Element infrastructure services
@@ -105,6 +109,7 @@ namespace RiversideCms.Mvc
             services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Element.Domain.PageListElementSettings>, Riverside.Cms.Services.Element.Infrastructure.SqlPageListElementRepository>();
             services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Element.Domain.ShareElementSettings>, Riverside.Cms.Services.Element.Infrastructure.SqlShareElementRepository>();
             services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Element.Domain.SocialBarElementSettings>, Riverside.Cms.Services.Element.Infrastructure.SqlSocialBarElementRepository>();
+            services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Element.Domain.TableElementSettings>, Riverside.Cms.Services.Element.Infrastructure.SqlTableElementRepository>();
             services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Element.Domain.TagCloudElementSettings>, Riverside.Cms.Services.Element.Infrastructure.SqlTagCloudElementRepository>();
         }
 

@@ -12,6 +12,7 @@ using Riverside.Cms.Services.Element.Domain;
 using Riverside.Cms.Services.Element.Infrastructure;
 using Riverside.Cms.Services.Storage.Domain;
 using Riverside.Cms.Services.Storage.Infrastructure;
+using Riverside.Cms.Utilities.Text.Csv;
 using Riverside.Cms.Utilities.Text.Formatting;
 
 namespace Cms.Api
@@ -28,6 +29,7 @@ namespace Cms.Api
         private void ConfigureDependencyInjectionSharedServices(IServiceCollection services)
         {
             // Utilities
+            services.AddTransient<ICsvService, CsvService>();
             services.AddTransient<IStringUtilities, StringUtilities>();
         }
 
@@ -65,6 +67,7 @@ namespace Cms.Api
             services.AddTransient<IPageListElementService, PageListElementService>();
             services.AddTransient<IShareElementService, ShareElementService>();
             services.AddTransient<ISocialBarElementService, SocialBarElementService>();
+            services.AddTransient<ITableElementService, TableElementService>();
             services.AddTransient<ITagCloudElementService, TagCloudElementService>();
 
             // Element infrastructure services
@@ -79,6 +82,7 @@ namespace Cms.Api
             services.AddTransient<IElementRepository<PageListElementSettings>, SqlPageListElementRepository>();
             services.AddTransient<IElementRepository<ShareElementSettings>, SqlShareElementRepository>();
             services.AddTransient<IElementRepository<SocialBarElementSettings>, SqlSocialBarElementRepository>();
+            services.AddTransient<IElementRepository<TableElementSettings>, SqlTableElementRepository>();
             services.AddTransient<IElementRepository<TagCloudElementSettings>, SqlTagCloudElementRepository>();
         }
 
