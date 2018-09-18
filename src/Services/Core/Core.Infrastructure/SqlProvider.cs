@@ -6,9 +6,37 @@ namespace Riverside.Cms.Services.Core.Infrastructure
 {
     public static class SqlProvider
     {
-        public static string GetFoldersRecursiveSql()
+        public static string GetParentPageClause(long? parentPageId)
+        {
+            return parentPageId.HasValue ? "cms.[Page].ParentPageId = @ParentPageId" : "cms.[Page].ParentPageId IS NULL";
+        }
+
+        private static string GetInsertParentPageSql()
         {
             return @"
+                -- Record the page that is passed to this stored procedure
+
+	            INSERT INTO
+		            @Folders (PageId)
+	            SELECT
+		            cms.[Page].PageId
+	            FROM
+		            cms.[Page]
+	            INNER JOIN
+		            cms.[MasterPage]
+	            ON
+		            cms.[Page].TenantId = cms.[MasterPage].TenantId AND
+		            cms.[Page].MasterPageId = cms.[MasterPage].MasterPageId
+	            WHERE
+		            cms.[Page].TenantId = @TenantId AND
+		            cms.[Page].PageId = @ParentPageId AND
+		            cms.[MasterPage].PageType = 0 /* PageType.Folder */
+            ";
+        }
+
+        public static string GetFoldersRecursiveSql(long? parentPageId)
+        {
+            string sql = $@"
                 DECLARE @Folders TABLE(
                     PageId [bigint] NOT NULL PRIMARY KEY CLUSTERED
                 )
@@ -28,7 +56,7 @@ namespace Riverside.Cms.Services.Core.Infrastructure
 		                cms.[Page].MasterPageId = cms.[MasterPage].MasterPageId
                     WHERE
 		                cms.[Page].TenantId = @TenantId AND
-                        cms.[Page].ParentPageId = @ParentPageId AND
+                        {GetParentPageClause(parentPageId)} AND
 		                cms.[MasterPage].PageType = 0 /* PageType.Folder */
 	                UNION ALL
 	                SELECT
@@ -55,55 +83,28 @@ namespace Riverside.Cms.Services.Core.Infrastructure
 	                [Folders].PageId
                 FROM
 	                [Folders]
+                ";
 
-                -- Record the page that is passed to this stored procedure
+            if (parentPageId.HasValue)
+                sql += GetInsertParentPageSql();
 
-	            INSERT INTO
-		            @Folders (PageId)
-	            SELECT
-		            cms.[Page].PageId
-	            FROM
-		            cms.[Page]
-	            INNER JOIN
-		            cms.[MasterPage]
-	            ON
-		            cms.[Page].TenantId = cms.[MasterPage].TenantId AND
-		            cms.[Page].MasterPageId = cms.[MasterPage].MasterPageId
-	            WHERE
-		            cms.[Page].TenantId = @TenantId AND
-		            cms.[Page].PageId = @ParentPageId AND
-		            cms.[MasterPage].PageType = 0 /* PageType.Folder */
-            ";
+            return sql;
         }
 
-        public static string GetFoldersSql()
+        public static string GetFoldersSql(long? parentPageId)
         {
-            return @"
+            string sql = @"
                 DECLARE @Folders TABLE(
                     PageId [bigint] NOT NULL PRIMARY KEY CLUSTERED
-                )
+                )";
 
-                -- Record the page that is passed to this stored procedure
+            if (parentPageId.HasValue)
+                sql += GetInsertParentPageSql();
 
-	            INSERT INTO
-		            @Folders (PageId)
-	            SELECT
-		            cms.[Page].PageId
-	            FROM
-		            cms.[Page]
-	            INNER JOIN
-		            cms.[MasterPage]
-	            ON
-		            cms.[Page].TenantId = cms.[MasterPage].TenantId AND
-		            cms.[Page].MasterPageId = cms.[MasterPage].MasterPageId
-	            WHERE
-		            cms.[Page].TenantId = @TenantId AND
-		            cms.[Page].PageId = @ParentPageId AND
-		            cms.[MasterPage].PageType = 0 /* PageType.Folder */
-            ";
+            return sql;
         }
 
-        public static string GetTaggedPagesSql(string pagesTableName)
+        public static string GetTaggedPagesSql(long? parentPageId, string pagesTableName)
         {
             return $@"
                 DECLARE @{pagesTableName} TABLE (
@@ -130,7 +131,7 @@ namespace Riverside.Cms.Services.Core.Infrastructure
 	                cms.TagPage.TagId = Tags.TagId
                 WHERE
 	                cms.[Page].TenantId = @TenantId AND
-                    cms.[Page].ParentPageId = @ParentPageId
+                    {GetParentPageClause(parentPageId)}
                 GROUP BY
 	                cms.[Page].PageId
                 HAVING

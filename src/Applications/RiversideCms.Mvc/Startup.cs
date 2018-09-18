@@ -173,12 +173,12 @@ namespace RiversideCms.Mvc
 
             app.UseMvc(routes =>
             {
-                routes.MapRoute("Home", "", new { controller = "cms", action = "home" });
-                routes.MapRoute("HomeTagged", "tagged/{*tags}", new { controller = "cms", action = "hometagged" });
+                routes.MapRoute("Home", "", new { controller = "cms", action = "readhomeasync" });
+                routes.MapRoute("HomeTagged", "tagged/{*tags}", new { controller = "cms", action = "readhometaggedasync" });
                 routes.MapRoute("PageImage", "pages/{pageId}/images/{pageImageType}/{*description}", new { controller = "cms", action = "readpageimageasync" });
                 routes.MapRoute(RouteNames.ElementBlobContent, "elementtypes/{elementTypeId}/elements/{elementId}/blobsets/{blobSetId}/content", new { controller = "cms", action = "readelementblobasync" });
-                routes.MapRoute("PageTagged", "pages/{pageId}/{description}/tagged/{*tags}", new { controller = "cms", action = "readtaggedasync" });
-                routes.MapRoute("Page", "pages/{pageId}/{*description}", new { controller = "cms", action = "readasync" });
+                routes.MapRoute("PageTagged", "pages/{pageId}/{description}/tagged/{*tags}", new { controller = "cms", action = "readpagetaggedasync" });
+                routes.MapRoute("Page", "pages/{pageId}/{*description}", new { controller = "cms", action = "readpageasync" });
                 routes.MapRoute("UserImage", "users/{userId}/images/{userImageType}/{*description}", new { controller = "cms", action = "readuserblobasync" });
                 routes.MapRoute("Login", "account/login", new { controller = "account", action = "login" });
                 routes.MapRoute("Logout", "account/logout", new { controller = "account", action = "logout" });

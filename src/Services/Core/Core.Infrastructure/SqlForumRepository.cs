@@ -25,14 +25,12 @@ namespace Riverside.Cms.Services.Core.Infrastructure
         {
             return @"
                 DECLARE @Forums TABLE ([PageId] [bigint] NOT NULL PRIMARY KEY CLUSTERED, ElementId bigint NOT NULL)
-                IF (@ParentPageId IS NULL)
-	                SET @ParentPageId = (SELECT PageId FROM cms.[Page] WHERE cms.[Page].TenantId = @TenantId AND cms.[Page].ParentPageId IS NULL)
             ";
         }
 
-        private string GetListLatestThreadsPagesSql()
+        private string GetListLatestThreadsPagesSql(long? parentPageId)
         {
-            return @"
+            return $@"
                 DECLARE @Pages TABLE ([PageId] [bigint] NOT NULL PRIMARY KEY CLUSTERED)
                 INSERT INTO
 	                @Pages (PageId)
@@ -42,7 +40,7 @@ namespace Riverside.Cms.Services.Core.Infrastructure
 	                cms.[Page]
                 WHERE
 	                cms.[Page].TenantId = @TenantId AND
-                    cms.[Page].ParentPageId = @ParentPageId
+                    {SqlProvider.GetParentPageClause(parentPageId)}
             ";
         }
 
@@ -180,43 +178,43 @@ namespace Riverside.Cms.Services.Core.Infrastructure
             ";
         }
 
-        private string GetListLatestThreadsSql()
+        private string GetListLatestThreadsSql(long? parentPageId)
         {
             return $@"
                 {GetListLatestThreadsSetupSql()}
-                {GetListLatestThreadsPagesSql()}
+                {GetListLatestThreadsPagesSql(parentPageId)}
                 {GetListLatestThreadsForumsSql()}
                 {GetListLatestThreadsThreadsSql()}
             ";
         }
 
-        private string GetListLatestThreadsRecursiveSql()
+        private string GetListLatestThreadsRecursiveSql(long? parentPageId)
         {
             return $@"
                 {GetListLatestThreadsSetupSql()}
-                {SqlProvider.GetFoldersRecursiveSql()}
+                {SqlProvider.GetFoldersRecursiveSql(parentPageId)}
                 {GetListLatestThreadsPagesRecursiveSql()}
                 {GetListLatestThreadsForumsSql()}
                 {GetListLatestThreadsThreadsSql()}
             ";
         }
 
-        private string GetListTaggedLatestThreadsSql()
+        private string GetListTaggedLatestThreadsSql(long? parentPageId)
         {
             return $@"
                 {GetListLatestThreadsSetupSql()}
                 {SqlProvider.GetTagsSql()}
-                {SqlProvider.GetTaggedPagesSql(TaggedPagesTableName)}
+                {SqlProvider.GetTaggedPagesSql(parentPageId, TaggedPagesTableName)}
                 {GetListLatestThreadsForumsSql()}
                 {GetListLatestThreadsThreadsSql()}
             ";
         }
 
-        private string GetListTaggedLatestThreadsRecursiveSql()
+        private string GetListTaggedLatestThreadsRecursiveSql(long? parentPageId)
         {
             return $@"
                 {GetListLatestThreadsSetupSql()}
-                {SqlProvider.GetFoldersRecursiveSql()}
+                {SqlProvider.GetFoldersRecursiveSql(parentPageId)}
                 {SqlProvider.GetTagsSql()}
                 {SqlProvider.GetTaggedPagesRecursiveSql(TaggedPagesTableName)}
                 {GetListLatestThreadsForumsSql()}
@@ -224,23 +222,23 @@ namespace Riverside.Cms.Services.Core.Infrastructure
             ";
         }
 
-        private string GetListLatestThreadsSql(bool recursive, IEnumerable<long> tagIds)
+        private string GetListLatestThreadsSql(long? parentPageId, bool recursive, IEnumerable<long> tagIds)
         {
             string sql = null;
             bool filterByTags = tagIds != null && tagIds.Count() > 0;
             if (filterByTags)
             {
                 if (recursive)
-                    sql = GetListTaggedLatestThreadsRecursiveSql();
+                    sql = GetListTaggedLatestThreadsRecursiveSql(parentPageId);
                 else
-                    sql = GetListTaggedLatestThreadsSql();
+                    sql = GetListTaggedLatestThreadsSql(parentPageId);
             }
             else
             {
                 if (recursive)
-                    sql = GetListLatestThreadsRecursiveSql();
+                    sql = GetListLatestThreadsRecursiveSql(parentPageId);
                 else
-                    sql = GetListLatestThreadsSql();
+                    sql = GetListLatestThreadsSql(parentPageId);
             }
             return sql;
         }
@@ -251,7 +249,7 @@ namespace Riverside.Cms.Services.Core.Infrastructure
             {
                 connection.Open();
                 return await connection.QueryAsync<ForumThread>(
-                    GetListLatestThreadsSql(recursive, tagIds),
+                    GetListLatestThreadsSql(parentPageId, recursive, tagIds),
                     new
                     {
                         TenantId = tenantId,

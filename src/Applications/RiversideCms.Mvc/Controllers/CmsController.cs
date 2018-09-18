@@ -78,11 +78,8 @@ namespace RiversideCms.Mvc.Controllers
             };
         }
 
-        [HttpGet]
-        public async Task<IActionResult> ReadTaggedAsync(long pageId, string tags)
+        private async Task<IActionResult> ReadPageTaggedAsync(long tenantId, long pageId, string tags)
         {
-            long tenantId = await GetTenantIdAsync();
-
             PageContext context = await GetPageContextAsync(tenantId, pageId, tags);
 
             PageView pageView = await _pageViewService.ReadPageViewAsync(tenantId, pageId);
@@ -109,10 +106,32 @@ namespace RiversideCms.Mvc.Controllers
             return View("Read", pageRender);
         }
 
+
         [HttpGet]
-        public Task<IActionResult> ReadAsync(long pageId)
+        public async Task<IActionResult> ReadPageTaggedAsync(long pageId, string tags)
         {
-            return ReadTaggedAsync(pageId, null);
+            long tenantId = await GetTenantIdAsync();
+            return await ReadPageTaggedAsync(tenantId, pageId, tags);
+        }
+
+        [HttpGet]
+        public Task<IActionResult> ReadPageAsync(long pageId)
+        {
+            return ReadPageTaggedAsync(pageId, null);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ReadHomeTaggedAsync(string tags)
+        {
+            long tenantId = await GetTenantIdAsync();
+            PageListResult result = await _pageService.ListPagesAsync(tenantId, null, false, PageType.Folder, null, SortBy.Created, true, 0, 1);
+            return await ReadPageTaggedAsync(tenantId, result.Pages.First().PageId, tags);
+        }
+
+        [HttpGet]
+        public Task<IActionResult> ReadHomeAsync()
+        {
+            return ReadHomeTaggedAsync(null);
         }
 
         [HttpGet]

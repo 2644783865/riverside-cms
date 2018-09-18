@@ -94,14 +94,6 @@ namespace Riverside.Cms.Services.Core.Infrastructure
             }
         }
 
-        private string GetListTagsSetupSql()
-        {
-            return @"
-                IF (@ParentPageId IS NULL)
-	                SET @ParentPageId = (SELECT PageId FROM cms.[Page] WHERE cms.[Page].TenantId = @TenantId AND cms.[Page].ParentPageId IS NULL)
-            ";
-        }
-
         private string GetListTagsSelectSql()
         {
             return @"
@@ -141,30 +133,28 @@ namespace Riverside.Cms.Services.Core.Infrastructure
             ";
         }
 
-        private string GetListTagsRecursiveSql()
+        private string GetListTagsRecursiveSql(long? parentPageId)
         {
             return $@"
-                {GetListTagsSetupSql()}
-                {SqlProvider.GetFoldersRecursiveSql()}
+                {SqlProvider.GetFoldersRecursiveSql(parentPageId)}
                 {GetListTagsSelectSql()}
             ";
         }
 
-        private string GetListTagsSql()
+        private string GetListTagsSql(long? parentPageId)
         {
             return $@"
-                {GetListTagsSetupSql()}
-                {SqlProvider.GetFoldersSql()}
+                {SqlProvider.GetFoldersSql(parentPageId)}
                 {GetListTagsSelectSql()}
             ";
         }
 
-        private string GetListTagsSql(bool recursive)
+        private string GetListTagsSql(long? parentPageId, bool recursive)
         {
             if (recursive)
-                return GetListTagsRecursiveSql();
+                return GetListTagsRecursiveSql(parentPageId);
             else
-                return GetListTagsSql();
+                return GetListTagsSql(parentPageId);
         }
 
         public async Task<IEnumerable<TagCount>> ListTagCountsAsync(long tenantId, long? parentPageId, bool recursive)
@@ -173,7 +163,7 @@ namespace Riverside.Cms.Services.Core.Infrastructure
             {
                 connection.Open();
                 return await connection.QueryAsync<TagCount>(
-                    GetListTagsSql(recursive),
+                    GetListTagsSql(parentPageId, recursive),
                     new
                     {
                         TenantId = tenantId,
@@ -227,34 +217,32 @@ namespace Riverside.Cms.Services.Core.Infrastructure
             ";
         }
 
-        private string GetListRelatedTagsSql()
+        private string GetListRelatedTagsSql(long? parentPageId)
         {
             return $@"
-                {GetListTagsSetupSql()}
                 {SqlProvider.GetTagsSql()}
-                {SqlProvider.GetFoldersSql()}
+                {SqlProvider.GetFoldersSql(parentPageId)}
                 {SqlProvider.GetTaggedPagesRecursiveSql(TaggedPagesTableName)}
                 {GetListRelatedTagsSelectSql()}
             ";
         }
 
-        private string GetListRelatedTagsRecursiveSql()
+        private string GetListRelatedTagsRecursiveSql(long? parentPageId)
         {
             return $@"
-                {GetListTagsSetupSql()}
                 {SqlProvider.GetTagsSql()}
-                {SqlProvider.GetFoldersRecursiveSql()}
+                {SqlProvider.GetFoldersRecursiveSql(parentPageId)}
                 {SqlProvider.GetTaggedPagesRecursiveSql(TaggedPagesTableName)}
                 {GetListRelatedTagsSelectSql()}
             ";
         }
 
-        private string GetListRelatedTagsSql(bool recursive)
+        private string GetListRelatedTagsSql(long? parentPageId, bool recursive)
         {
             if (recursive)
-                return GetListRelatedTagsRecursiveSql();
+                return GetListRelatedTagsRecursiveSql(parentPageId);
             else
-                return GetListRelatedTagsSql();
+                return GetListRelatedTagsSql(parentPageId);
         }
 
         public async Task<IEnumerable<TagCount>> ListRelatedTagCountsAsync(long tenantId, IEnumerable<long> tagIds, long? parentPageId, bool recursive)
@@ -263,7 +251,7 @@ namespace Riverside.Cms.Services.Core.Infrastructure
             {
                 connection.Open();
                 return await connection.QueryAsync<TagCount>(
-                    GetListRelatedTagsSql(recursive),
+                    GetListRelatedTagsSql(parentPageId, recursive),
                     new
                     {
                         TenantId = tenantId,

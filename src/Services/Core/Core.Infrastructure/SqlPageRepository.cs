@@ -179,9 +179,9 @@ namespace Riverside.Cms.Services.Core.Infrastructure
             }
         }
 
-        private string GetListPagesCteSql()
+        private string GetListPagesCteSql(long? parentPageId)
         {
-            return @"
+            return $@"
                 ;WITH [Pages] AS
                 (
                     SELECT TOP (@RowNumberUpperBound)
@@ -204,7 +204,7 @@ namespace Riverside.Cms.Services.Core.Infrastructure
 		                cms.[Page].MasterPageId = cms.MasterPage.MasterPageId
                     WHERE
 		                cms.[Page].TenantId = @TenantId AND
-                        cms.[Page].ParentPageId = @ParentPageId AND
+                        {SqlProvider.GetParentPageClause(parentPageId)} AND
 		                cms.MasterPage.PageType = @PageType
                 )
             ";
@@ -246,9 +246,9 @@ namespace Riverside.Cms.Services.Core.Infrastructure
             ";
         }
 
-        private string GetListPagesTotalSql()
+        private string GetListPagesTotalSql(long? parentPageId)
         {
-            return @"
+            return $@"
                 SELECT
 	                COUNT(*) AS Total
                 FROM
@@ -260,7 +260,7 @@ namespace Riverside.Cms.Services.Core.Infrastructure
 	                cms.[Page].MasterPageId = cms.MasterPage.MasterPageId
                 WHERE
 	                cms.[Page].TenantId = @TenantId AND
-                    cms.[Page].ParentPageId = @ParentPageId AND
+                    {SqlProvider.GetParentPageClause(parentPageId)} AND
 	                cms.MasterPage.PageType = @PageType
             ";
         }
@@ -295,9 +295,6 @@ namespace Riverside.Cms.Services.Core.Infrastructure
                 DECLARE @RowNumberUpperBound int
                 SET @RowNumberLowerBound = @PageSize * @PageIndex
                 SET @RowNumberUpperBound = @RowNumberLowerBound + @PageSize + 1;
-
-                IF (@ParentPageId IS NULL)
-	                SET @ParentPageId = (SELECT PageId FROM cms.[Page] WHERE cms.[Page].TenantId = @TenantId AND cms.[Page].ParentPageId IS NULL)
             ";
         }
 
@@ -362,21 +359,21 @@ namespace Riverside.Cms.Services.Core.Infrastructure
             ";
         }
 
-        private string GetListPagesSql()
+        private string GetListPagesSql(long? parentPageId)
         {
             return $@"
                 {GetListPagesSetupSql()}
-                {GetListPagesCteSql()}
+                {GetListPagesCteSql(parentPageId)}
                 {GetListPagesSelectSql()}
-                {GetListPagesTotalSql()}
+                {GetListPagesTotalSql(parentPageId)}
             ";
         }
 
-        private string GetListPagesRecursiveSql()
+        private string GetListPagesRecursiveSql(long? parentPageId)
         {
             return $@"
                 {GetListPagesSetupSql()}
-                {SqlProvider.GetFoldersRecursiveSql()}
+                {SqlProvider.GetFoldersRecursiveSql(parentPageId)}
                 {GetListPagesCteRecursiveSql()}
                 {GetListPagesSelectSql()}
                 {GetListPagesTotalRecursiveSql()}
@@ -440,12 +437,12 @@ namespace Riverside.Cms.Services.Core.Infrastructure
             ";
         }
 
-        private string GetListTaggedPagesSql()
+        private string GetListTaggedPagesSql(long? parentPageId)
         {
             return $@"
                 {GetListPagesSetupSql()}
                 {SqlProvider.GetTagsSql()}
-                {SqlProvider.GetTaggedPagesSql(TaggedPagesTableName)}
+                {SqlProvider.GetTaggedPagesSql(parentPageId, TaggedPagesTableName)}
                 {GetListPagesTaggedPagesCteSql()}
                 {GetListPagesSelectSql()}
                 {GetListPagesTaggedPagesTotalSql()}
@@ -511,11 +508,11 @@ namespace Riverside.Cms.Services.Core.Infrastructure
             ";
         }
 
-        private string GetListTaggedPagesRecursiveSql()
+        private string GetListTaggedPagesRecursiveSql(long? parentPageId)
         {
             return $@"
                 {GetListPagesSetupSql()}
-                {SqlProvider.GetFoldersRecursiveSql()}
+                {SqlProvider.GetFoldersRecursiveSql(parentPageId)}
                 {SqlProvider.GetTagsSql()}
                 {SqlProvider.GetTaggedPagesRecursiveSql(TaggedPagesTableName)}
                 {GetListPagesTaggedPagesCteRecursiveSql()}
@@ -524,23 +521,23 @@ namespace Riverside.Cms.Services.Core.Infrastructure
             ";
         }
 
-        private string GetListPagesSql(bool recursive, IEnumerable<long> tagIds)
+        private string GetListPagesSql(long? parentPageId, bool recursive, IEnumerable<long> tagIds)
         {
             string sql = null;
             bool filterByTags = tagIds != null && tagIds.Count() > 0;
             if (filterByTags)
             {
                 if (recursive)
-                    sql = GetListTaggedPagesRecursiveSql();
+                    sql = GetListTaggedPagesRecursiveSql(parentPageId);
                 else
-                    sql = GetListTaggedPagesSql();
+                    sql = GetListTaggedPagesSql(parentPageId);
             }
             else
             {
                 if (recursive)
-                    sql = GetListPagesRecursiveSql();
+                    sql = GetListPagesRecursiveSql(parentPageId);
                 else
-                    sql = GetListPagesSql();
+                    sql = GetListPagesSql(parentPageId);
             }
             return sql;
         }
@@ -551,7 +548,7 @@ namespace Riverside.Cms.Services.Core.Infrastructure
             {
                 connection.Open();
                 using (GridReader gr = await connection.QueryMultipleAsync(
-                    GetListPagesSql(recursive, tagIds),
+                    GetListPagesSql(parentPageId, recursive, tagIds),
                     new
                     {
                         TenantId = tenantId,
