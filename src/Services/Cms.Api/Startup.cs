@@ -69,6 +69,7 @@ namespace Cms.Api
             services.AddTransient<ISocialBarElementService, SocialBarElementService>();
             services.AddTransient<ITableElementService, TableElementService>();
             services.AddTransient<ITagCloudElementService, TagCloudElementService>();
+            services.AddTransient<ITestimonialElementService, TestimonialElementService>();
 
             // Element infrastructure services
             services.AddTransient<IElementRepository<AlbumElementSettings>, SqlAlbumElementRepository>();
@@ -84,6 +85,7 @@ namespace Cms.Api
             services.AddTransient<IElementRepository<SocialBarElementSettings>, SqlSocialBarElementRepository>();
             services.AddTransient<IElementRepository<TableElementSettings>, SqlTableElementRepository>();
             services.AddTransient<IElementRepository<TagCloudElementSettings>, SqlTagCloudElementRepository>();
+            services.AddTransient<IElementRepository<TestimonialElementSettings>, SqlTestimonialElementRepository>();
         }
 
         private void ConfigureDependencyInjectionStorageServices(IServiceCollection services)

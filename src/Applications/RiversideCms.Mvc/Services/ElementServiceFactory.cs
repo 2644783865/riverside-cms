@@ -21,8 +21,9 @@ namespace RiversideCms.Mvc.Services
         private readonly ISocialBarElementService _socialBarElementService;
         private readonly ITableElementService _tableElementService;
         private readonly ITagCloudElementService _tagCloudElementService;
+        private readonly ITestimonialElementService _testimonialElementService;
 
-        public ElementServiceFactory(IAlbumElementService albumElementService, ICarouselElementService carouselElementService, ICodeSnippetElementService codeSnippetElementService, IFooterElementService footerElementService, IHtmlElementService htmlElementService, ILatestThreadsElementService latestThreadsElementService, INavigationBarElementService navigationBarElementService, IPageHeaderElementService pageHeaderElementService, IPageListElementService pageListElementService, IShareElementService shareElementService, ISocialBarElementService socialBarElementService, ITableElementService tableElementService, ITagCloudElementService tagCloudElementService)
+        public ElementServiceFactory(IAlbumElementService albumElementService, ICarouselElementService carouselElementService, ICodeSnippetElementService codeSnippetElementService, IFooterElementService footerElementService, IHtmlElementService htmlElementService, ILatestThreadsElementService latestThreadsElementService, INavigationBarElementService navigationBarElementService, IPageHeaderElementService pageHeaderElementService, IPageListElementService pageListElementService, IShareElementService shareElementService, ISocialBarElementService socialBarElementService, ITableElementService tableElementService, ITagCloudElementService tagCloudElementService, ITestimonialElementService testimonialElementService)
         {
             _albumElementService = albumElementService;
             _carouselElementService = carouselElementService;
@@ -37,6 +38,7 @@ namespace RiversideCms.Mvc.Services
             _socialBarElementService = socialBarElementService;
             _tableElementService = tableElementService;
             _tagCloudElementService = tagCloudElementService;
+            _testimonialElementService = testimonialElementService;
         }
 
         public async Task<IElementView> GetElementViewAsync(long tenantId, Guid elementTypeId, long elementId, PageContext context)
@@ -81,6 +83,9 @@ namespace RiversideCms.Mvc.Services
 
                 case "b910c231-7dbd-4cad-92ef-775981e895b4":
                     return await _tagCloudElementService.ReadElementViewAsync(tenantId, elementId, context);
+
+                case "eb479ac9-8c79-4fae-817a-e77fd3dbf05b":
+                    return await _testimonialElementService.ReadElementViewAsync(tenantId, elementId, context);
 
                 default:
                     return null;

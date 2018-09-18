@@ -24,8 +24,9 @@ namespace Riverside.Cms.Services.Element.Mvc
         private readonly ISocialBarElementService _socialBarElementService;
         private readonly ITableElementService _tableElementService;
         private readonly ITagCloudElementService _tagCloudElementService;
+        private readonly ITestimonialElementService _testimonialElementService;
 
-        public ElementsController(IAlbumElementService albumElementService, ICarouselElementService carouselElementService, ICodeSnippetElementService codeSnippetElementService, IFooterElementService footerElementService, IHtmlElementService htmlElementService, ILatestThreadsElementService latestThreadsElementService, INavigationBarElementService navigationBarElementService, IPageHeaderElementService pageHeaderElementService, IPageListElementService pageListElementService, IShareElementService shareElementService, ISocialBarElementService socialBarElementService, ITableElementService tableElementService, ITagCloudElementService tagCloudElementService)
+        public ElementsController(IAlbumElementService albumElementService, ICarouselElementService carouselElementService, ICodeSnippetElementService codeSnippetElementService, IFooterElementService footerElementService, IHtmlElementService htmlElementService, ILatestThreadsElementService latestThreadsElementService, INavigationBarElementService navigationBarElementService, IPageHeaderElementService pageHeaderElementService, IPageListElementService pageListElementService, IShareElementService shareElementService, ISocialBarElementService socialBarElementService, ITableElementService tableElementService, ITagCloudElementService tagCloudElementService, ITestimonialElementService testimonialElementService)
         {
             _albumElementService = albumElementService;
             _carouselElementService = carouselElementService;
@@ -40,6 +41,7 @@ namespace Riverside.Cms.Services.Element.Mvc
             _socialBarElementService = socialBarElementService;
             _tableElementService = tableElementService;
             _tagCloudElementService = tagCloudElementService;
+            _testimonialElementService = testimonialElementService;
         }
 
         // ALBUM
@@ -424,6 +426,33 @@ namespace Riverside.Cms.Services.Element.Mvc
             IEnumerable<long> tagIdCollection = !string.IsNullOrWhiteSpace(tagIds) ? tagIds.Split(',').Select(long.Parse) : null;
             PageContext context = new PageContext { PageId = pageId, TagIds = tagIdCollection };
             IElementView<TagCloudElementSettings, TagCloudElementContent> view = await _tagCloudElementService.ReadElementViewAsync(tenantId, elementId, context);
+            if (view == null)
+                return NotFound();
+            return Ok(view);
+        }
+
+        // TESTIMONIAL
+
+        [HttpGet]
+        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/eb479ac9-8c79-4fae-817a-e77fd3dbf05b/elements/{elementId:int}")]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(TestimonialElementSettings), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> ReadTestimonialElementSettingsAsync(long tenantId, long elementId)
+        {
+            TestimonialElementSettings settings = await _testimonialElementService.ReadElementSettingsAsync(tenantId, elementId);
+            if (settings == null)
+                return NotFound();
+            return Ok(settings);
+        }
+
+        [HttpGet]
+        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/eb479ac9-8c79-4fae-817a-e77fd3dbf05b/elements/{elementId:int}/view")]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(IElementView<TestimonialElementSettings, object>), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> ReadTestimonialElementViewAsync(long tenantId, long elementId, [FromQuery]long pageId)
+        {
+            PageContext context = new PageContext { PageId = pageId };
+            IElementView<TestimonialElementSettings, object> view = await _testimonialElementService.ReadElementViewAsync(tenantId, elementId, context);
             if (view == null)
                 return NotFound();
             return Ok(view);

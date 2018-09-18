@@ -83,6 +83,7 @@ namespace Element.Api
             services.AddTransient<ISocialBarElementService, SocialBarElementService>();
             services.AddTransient<ITableElementService, TableElementService>();
             services.AddTransient<ITagCloudElementService, TagCloudElementService>();
+            services.AddTransient<ITestimonialElementService, TestimonialElementService>();
 
             services.AddTransient<IElementRepository<AlbumElementSettings>, SqlAlbumElementRepository>();
             services.AddTransient<IElementRepository<CarouselElementSettings>, SqlCarouselElementRepository>();
@@ -97,6 +98,7 @@ namespace Element.Api
             services.AddTransient<IElementRepository<SocialBarElementSettings>, SqlSocialBarElementRepository>();
             services.AddTransient<IElementRepository<TableElementSettings>, SqlTableElementRepository>();
             services.AddTransient<IElementRepository<TagCloudElementSettings>, SqlTagCloudElementRepository>();
+            services.AddTransient<IElementRepository<TestimonialElementSettings>, SqlTestimonialElementRepository>();
         }
 
         private void ConfigureOptionServices(IServiceCollection services)

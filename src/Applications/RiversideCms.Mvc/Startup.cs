@@ -55,6 +55,7 @@ namespace RiversideCms.Mvc
             services.AddTransient<Riverside.Cms.Services.Element.Client.ISocialBarElementService, Riverside.Cms.Services.Element.Client.SocialBarElementService>();
             services.AddTransient<Riverside.Cms.Services.Element.Client.ITableElementService, Riverside.Cms.Services.Element.Client.TableElementService>();
             services.AddTransient<Riverside.Cms.Services.Element.Client.ITagCloudElementService, Riverside.Cms.Services.Element.Client.TagCloudElementService>();
+            services.AddTransient<Riverside.Cms.Services.Element.Client.ITestimonialElementService, Riverside.Cms.Services.Element.Client.TestimonialElementService>();
 
             // Element service factory
             services.AddTransient<IElementServiceFactory, ElementServiceFactory>();
@@ -96,6 +97,7 @@ namespace RiversideCms.Mvc
             services.AddTransient<Riverside.Cms.Services.Element.Domain.ISocialBarElementService, Riverside.Cms.Services.Element.Domain.SocialBarElementService>();
             services.AddTransient<Riverside.Cms.Services.Element.Domain.ITableElementService, Riverside.Cms.Services.Element.Domain.TableElementService>();
             services.AddTransient<Riverside.Cms.Services.Element.Domain.ITagCloudElementService, Riverside.Cms.Services.Element.Domain.TagCloudElementService>();
+            services.AddTransient<Riverside.Cms.Services.Element.Domain.ITestimonialElementService, Riverside.Cms.Services.Element.Domain.TestimonialElementService>();
 
             // Element infrastructure services
             services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Element.Domain.AlbumElementSettings>, Riverside.Cms.Services.Element.Infrastructure.SqlAlbumElementRepository>();
@@ -111,6 +113,7 @@ namespace RiversideCms.Mvc
             services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Element.Domain.SocialBarElementSettings>, Riverside.Cms.Services.Element.Infrastructure.SqlSocialBarElementRepository>();
             services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Element.Domain.TableElementSettings>, Riverside.Cms.Services.Element.Infrastructure.SqlTableElementRepository>();
             services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Element.Domain.TagCloudElementSettings>, Riverside.Cms.Services.Element.Infrastructure.SqlTagCloudElementRepository>();
+            services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Element.Domain.TestimonialElementSettings>, Riverside.Cms.Services.Element.Infrastructure.SqlTestimonialElementRepository>();
         }
 
         private void ConfigureDependencyInjectionStorageServices(IServiceCollection services)
