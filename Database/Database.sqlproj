@@ -68,6 +68,7 @@
     <Folder Include="Scripts" />
     <Folder Include="Scripts\PostDeployment" />
     <Folder Include="Scripts\Templates" />
+    <Folder Include="Scripts\Updates" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="cms\Stored Procedures\CopyElement.sql" />
@@ -186,5 +187,6 @@
     <Build Include="cms\Tables\Blob.sql" />
     <Build Include="cms\Tables\AssetElementType.sql" />
     <Build Include="cms\Tables\TenantPlace.sql" />
+    <None Include="Scripts\Updates\update-00001.sql" />
   </ItemGroup>
 </Project>

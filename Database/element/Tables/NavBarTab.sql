@@ -5,7 +5,9 @@
 	[Name] [nvarchar](50) NOT NULL,
 	[SortOrder] [int] NOT NULL,
 	[PageId] [bigint] NOT NULL,
+	[ParentNavBarTabId] [bigint] NULL,
  CONSTRAINT [PK_NavBarTab] PRIMARY KEY CLUSTERED ([TenantId] ASC, [ElementId] ASC, [NavBarTabId] ASC),
+ CONSTRAINT [FK_NavBarTab_NavBarTab] FOREIGN KEY([TenantId], [ElementId], [ParentNavBarTabId]) REFERENCES [element].[NavBarTab] ([TenantId], [ElementId], [NavBarTabId]),
  CONSTRAINT [FK_NavBarTab_NavBar] FOREIGN KEY([TenantId], [ElementId]) REFERENCES [element].[NavBar] ([TenantId], [ElementId]),
  CONSTRAINT [FK_NavBarTab_Page] FOREIGN KEY([TenantId], [PageId]) REFERENCES [cms].[Page] ([TenantId], [PageId])
 )

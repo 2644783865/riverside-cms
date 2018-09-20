@@ -9,7 +9,7 @@
     bool showLoggedOffUserOptions = Model.Settings.ShowLoggedOffUserOptions && !userLoggedOn;
     bool showLoggedOnUserOptions = Model.Settings.ShowLoggedOnUserOptions && userLoggedOn;
     bool adminTabs = showLoggedOnUserOptions || showLoggedOffUserOptions;
-    bool pageTabs = Model.Content.Tabs.Count() > 0;
+    bool pageTabs = Model.Content.Tabs.Any();
 }
 
 <div class="rcms-nav-bar">
@@ -38,7 +38,22 @@
                         <ul class="nav navbar-nav">
                             @foreach (NavigationBarContentTab tab in Model.Content.Tabs)
                             {
-                                <li class="@if (tab.Active) {<text>active</text>}">@Html.PageLink(tab.Name, tab.PageId, tab.PageName, tab.Home, null, null)</li>
+                                if (tab.Tabs.Any())
+                                {
+                                    <li class="dropdown @if (tab.Active) {<text>active</text>}">
+                                        <a href="@Url.PageUrl(tab.PageId, tab.PageName, tab.Home, null, null)" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">@tab.Name <span class="caret"></span></a>
+                                        <ul class="dropdown-menu">
+                                            @foreach (NavigationBarContentTab subTab in tab.Tabs)
+                                            {
+                                                <li class="@if (subTab.Active) {<text>active</text>}">@Html.PageLink(subTab.Name, subTab.PageId, subTab.PageName, subTab.Home, null, null)</li>
+                                            }
+                                        </ul>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li class="@if (tab.Active) {<text>active</text>}">@Html.PageLink(tab.Name, tab.PageId, tab.PageName, tab.Home, null, null)</li>
+                                }
                             }
                         </ul>
                     }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Riverside.Cms.Services.Core.Domain;
 
@@ -9,6 +10,7 @@ namespace Riverside.Cms.Services.Element.Domain
         public long PageId { get; set; }
         public long TabId { get; set; }
         public string Name { get; set; }
+        public IEnumerable<NavigationBarTab> Tabs { get; set; }
     }
 
     public class NavigationBarContentTab
@@ -18,6 +20,7 @@ namespace Riverside.Cms.Services.Element.Domain
         public long PageId { get; set; }
         public string Name { get; set; }
         public string PageName { get; set; }
+        public IEnumerable<NavigationBarContentTab> Tabs { get; set; }
     }
 
     public class NavigationBarElementSettings : ElementSettings
@@ -63,30 +66,41 @@ namespace Riverside.Cms.Services.Element.Domain
             return false;
         }
 
-        private async Task<List<NavigationBarContentTab>> GetContentTabs(NavigationBarElementSettings elementSettings, long pageId)
+        private IEnumerable<NavigationBarContentTab> GetContentTabs(IDictionary<long, Page> pagesById, IEnumerable<Page> currentPageHierarchy, IEnumerable<NavigationBarTab> tabs)
         {
-            List<NavigationBarContentTab> tabs = new List<NavigationBarContentTab>();
-            IEnumerable<Page> currentPageHierarchy = null;
-            foreach (NavigationBarTab tab in elementSettings.Tabs)
+            foreach (NavigationBarTab tab in tabs)
             {
-                Page tabPage = await _pageService.ReadPageAsync(elementSettings.TenantId, tab.PageId);
-                if (tabPage != null)
+                if (pagesById.ContainsKey(tab.PageId))
                 {
-                    if (currentPageHierarchy == null)
-                        currentPageHierarchy = await _pageService.ListPagesInHierarchyAsync(elementSettings.TenantId, pageId);
+                    Page tabPage = pagesById[tab.PageId];
                     bool home = tabPage.ParentPageId == null;
                     bool active = !home && TabIsActive(tabPage, currentPageHierarchy);
-                    tabs.Add(new NavigationBarContentTab
+                    NavigationBarContentTab contentTab = new NavigationBarContentTab
                     {
                         Active = active,
                         Name = tab.Name == string.Empty ? tabPage.Name : tab.Name,
                         PageId = tab.PageId,
                         PageName = tabPage.Name,
                         Home = home
-                    });
+                    };
+                    contentTab.Tabs = GetContentTabs(pagesById, currentPageHierarchy, tab.Tabs);
+                    yield return contentTab;
                 }
             }
-            return tabs;
+        }
+
+        private async Task<IEnumerable<NavigationBarContentTab>> GetContentTabs(NavigationBarElementSettings settings, long pageId)
+        {
+            // Get details of pages that are referenced by navigation tabs
+            IEnumerable<long> pageIds = Enumerable.Concat(settings.Tabs.Select(t => t.PageId), settings.Tabs.SelectMany(t => t.Tabs).Select(t => t.PageId)).Distinct();
+            IEnumerable<Page> pages = await _pageService.ListPagesAsync(settings.TenantId, pageIds);
+            IDictionary<long, Page> pagesById = pages.ToDictionary(p => p.PageId, p => p);
+
+            // Get the current page hierarchy
+            IEnumerable<Page> currentPageHierarchy = await _pageService.ListPagesInHierarchyAsync(settings.TenantId, pageId);
+
+            // Get content tabs
+            return GetContentTabs(pagesById, currentPageHierarchy, settings.Tabs);
         }
 
         public async Task<IElementView<NavigationBarElementSettings, NavigationBarElementContent>> ReadElementViewAsync(long tenantId, long elementId, PageContext context)
