@@ -3,7 +3,7 @@
 
 @model IElementView<AlbumElementSettings, AlbumElementContent>
 
-<div class="rcms-album" ng-app="albumApp" ng-controller="AlbumController" ng-keydown="keyDown($event)" ng-init="initialise(@Model.Settings.Photos.Count())">
+<div class="rcms-album">
 
     @if (!Model.Content.Photos.Any())
     {
@@ -23,7 +23,12 @@
                     AlbumContentPhoto contentPhoto = Model.Content.Photos.ContainsKey(photo.BlobSetId) ? Model.Content.Photos[photo.BlobSetId] : null;
                     string previewImageUrl = Url.RouteUrl(RouteNames.ElementBlobContent, new { elementtypeid = Model.Settings.ElementTypeId, elementid = Model.Settings.ElementId, blobsetid = photo.BlobSetId, bloblabel = "preview", t = photo.PreviewImageBlobId });
                     <div class="rcms-album-photo">
-                        <a data-index="@index" data-ng-click="$event.preventDefault();showPhoto($event)" title="@photo.Name" href="@previewImageUrl">
+                        <a
+                           data-index="@index"
+                           data-description="@photo.Description"
+                           title="@photo.Name"
+                           href="@previewImageUrl"
+                        >
                             <img width="@contentPhoto.ThumbnailWidth"
                                  height="@contentPhoto.ThumbnailHeight"
                                  alt="@photo.Name"
@@ -33,37 +38,11 @@
                 }
             }
         </div>
-
-        <div class="rcms-viewer" ng-show="visible" ng-cloak>
-            <div class="rcms-viewer-backdrop">
-            </div>
-            <div class="rcms-viewer-popup">
-                <div class="rcms-viewer-main-outer">
-                    <div visualiser class="rcms-viewer-main">
-                        <div class="spinner" ng-show="loadingVisual"></div>
-                        <img visual ng-src="{{selectedPhoto.imageUrl}}" ng-style="visualStyle()" ng-hide="loadingVisual" />
-                    </div>
-                </div>
-                <div class="rcms-viewer-side">
-                    <div class="rcms-viewer-options">
-                        <a ng-click="hideViewer()" href><i class="fa fa-times" aria-hidden="true"></i></a>
-                    </div>
-                    <div class="rcms-viewer-details">
-                        <h3 ng-show="selectedPhoto.name">{{selectedPhoto.name}}</h3>
-                        <p ng-show="selectedPhoto.description">{{selectedPhoto.description}}</p>
-                    </div>
-                    <div class="rcms-viewer-pager">
-                        <ul>
-                            <li><a ng-click="previous()" href>Previous</a></li>
-                            <li><a ng-click="next()" href>Next</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
     }
 
 </div>
 
-<script src="@Url.Content("~/js/angular.min.js")"></script>
-<script src="@Url.Content("~/js/album.js")"></script>
+@{
+    this.Context.Items["script_jquery"] = new ScriptInclude { Priority = 1, Name = "jquery.min.js" };
+    this.Context.Items["script_album"] = new ScriptInclude { Priority = 4, Name = "album.js" };
+}

@@ -1,108 +1,151 @@
-﻿angular
-    .module('albumApp', [])
-    .controller('AlbumController', ['$scope', '$http', function ($scope, $http) {
-        $scope.initialise = function (photoCount) {
-            $scope.photoCount = photoCount;
-        };
-        $scope.showViewer = function () {
-            $scope.visible = true;
-            $('body').addClass('rcms-no-scroll');
-        };
-        $scope.hideViewer = function () {
-            $scope.visible = false;
-            $('body').removeClass('rcms-no-scroll');
-            $scope.selectedPhoto = undefined;
-            $scope.selectedIndex = undefined;
-        };
-        $scope.previous = function () {
-            alert('previous');
-        };
-        $scope.next = function () {
-            if ($scope.selectedIndex != undefined) {
-                var index = $scope.selectedIndex + 1;
-                if (index > $scope.photoCount - 1)
-                    index = 0;
-                $scope.showPhoto(index);
-            }
-        };
+﻿var _rcmsAlbum = null;
+var _rcmsViewer = null;
+var _rcmsPhotoIndex = null;
+var _rcmsPhoto = null;
 
-        $scope.showPhoto = function (e) {
-            var imageUrl = $(e.currentTarget).attr('href');
-            var index = $(e.currentTarget).data('index');
-            var photo = { "imageUrl": imageUrl };
-            $scope.loadingVisual = true;
-            $scope.selectedPhoto = photo;
-            $scope.selectedIndex = index;
-            if (!$scope.visible)
-                $scope.showViewer();
-        };
-        $scope.keyDown = function (event) {
-            switch (event.which) {
-                case 27:
-                    $scope.hideViewer();
-                    break;
-                case 37:
-                    $scope.previous();
-                    break;
-                case 39:
-                    $scope.next();
-                    break;
-                default:
-                    return;
-            }
-            event.preventDefault();
-        };
-    }])
-    .directive('visual', function () {
-        return {
-            link: function (scope, element, attrs) {
-                element.bind("load", function (e) {
-                    scope.loadingVisual = false;
-                    scope.visualWidth = $(this)[0].naturalWidth;
-                    scope.visualHeight = $(this)[0].naturalHeight;
-                    scope.$apply();
-                    scope.$emit('visualLoaded');
-                });
-            }
-        };
-    })
-    .directive('visualiser', function () {
-        return function (scope, element, attrs) {
-            var w = $(element);
-            scope.getVisualiserDimensions = function () {
-                return { 'h': w.height(), 'w': w.width() };
-            };
-            scope.$watch(scope.getVisualiserDimensions, function (newValue, oldValue) {
-                scope.visualiserHeight = newValue.h;
-                scope.visualiserWidth = newValue.w;
-                scope.visualStyle = function () {
-                    if (scope.visualWidth == undefined || scope.visualHeight == undefined) {
-                        return {
-                            'display': 'none'
-                        };
-                    }
-                    var visualWidth = scope.visualWidth;
-                    var visualHeight = scope.visualHeight;
-                    var visualiserHeight = newValue.h;
-                    var visualiserWidth = newValue.w;
-                    var heightRatio = visualiserHeight / visualHeight;
-                    var widthRatio = visualiserWidth / visualWidth;
-                    var ratio = Math.min(heightRatio, widthRatio);
-                    var width = visualWidth * ratio;
-                    var height = visualHeight * ratio;
-                    var top = Math.max((visualiserHeight - height) / 2, 0);
-                    var left = Math.max((visualiserWidth - width) / 2, 0);
-                    scope.scale = ratio;
-                    return {
-                        'height': height + 'px',
-                        'width': width + 'px',
-                        'top': top + 'px',
-                        'left': left + 'px'
-                    };
-                };
-            }, true);
-            $(window).resize(function () {
-                scope.$apply();
-            });
-        };
+function GetViewerHtml() {
+    return '\
+        <div class="rcms-viewer">\
+            <div class="rcms-viewer-backdrop">\
+            </div>\
+            <div class="rcms-viewer-popup">\
+                <div class="rcms-viewer-main-outer">\
+                    <div class="rcms-viewer-main">\
+                        <div class="spinner"></div>\
+                    </div>\
+                </div>\
+                <div class="rcms-viewer-side">\
+                    <div class="rcms-viewer-options">\
+                        <a href="#"><i class="fa fa-times" aria-hidden="true"></i></a>\
+                    </div>\
+                    <div class="rcms-viewer-details">\
+                        <h3>Photo name</h3>\
+                        <p>Photo description</p>\
+                    </div>\
+                    <div class="rcms-viewer-pager">\
+                        <ul>\
+                            <li><a href="#">Previous</a></li>\
+                            <li><a href="#">Next</a></li>\
+                        </ul>\
+                    </div>\
+                </div>\
+            </div>\
+        </div>';
+}
+
+function HideViewer() {
+    if (_rcmsViewer === null)
+        return false;
+    $(_rcmsViewer).remove();
+    $('body').removeClass('rcms-no-scroll');
+    _rcmsViewer = null;
+    return false;
+}
+
+function GetPhotoSizes(photoWidth, photoHeight) {
+    var viewerWidth = $(_rcmsViewer).find('.rcms-viewer-main').width();
+    var viewerHeight = $(_rcmsViewer).find('.rcms-viewer-main').height();
+    var heightRatio = viewerHeight / photoHeight;
+    var widthRatio = viewerWidth / photoWidth;
+    var ratio = Math.min(heightRatio, widthRatio);
+    var width = photoWidth * ratio;
+    var height = photoHeight * ratio;
+    var top = Math.max((viewerHeight - height) / 2, 0);
+    var left = Math.max((viewerWidth - width) / 2, 0);
+    return {
+        width: width,
+        height: height,
+        top: top,
+        left: left
+    };
+}
+
+function PhotoLoaded() {
+    var photoWidth = $(this)[0].naturalWidth;
+    var photoHeight = $(this)[0].naturalHeight;
+    var photoSizes = GetPhotoSizes(photoWidth, photoHeight);
+    $(this).css('width', photoSizes.width + 'px').css('height', photoSizes.height + 'px').css('top', photoSizes.top + 'px').css('left', photoSizes.left + 'px');
+    $(_rcmsViewer).find('.rcms-viewer-main .spinner').hide();
+    $(_rcmsViewer).find('.rcms-viewer-main').append($(this));
+    _rcmsPhoto = null;
+}
+
+function UpdateViewer() {
+    if (_rcmsPhoto !== null) {
+        _rcmsPhoto.src = '';
+        _rcmsPhoto = null;
+    }
+    var selectedPhoto = $(_rcmsAlbum).find('.rcms-album-photo:nth-child(' + (_rcmsPhotoIndex + 1) + ') a');
+    var name = $(selectedPhoto).attr('title');
+    var description = $(selectedPhoto).data('description');
+    var previewUrl = $(selectedPhoto).attr('href');
+    $(_rcmsViewer).find('.rcms-viewer-details h3').text(name);
+    $(_rcmsViewer).find('.rcms-viewer-details p').text(description);
+    $(_rcmsViewer).find('.rcms-viewer-main .spinner').show();
+    $(_rcmsViewer).find('.rcms-viewer-main img').remove();
+    _rcmsPhoto = new Image();
+    $(_rcmsPhoto).bind("load", PhotoLoaded);
+    _rcmsPhoto.src = previewUrl;
+}
+
+function ShowViewer() {
+    _rcmsAlbum = $(this).parent().parent().parent();
+    _rcmsViewer = $(GetViewerHtml());
+    _rcmsPhotoIndex = parseInt($(this).data('index'));
+    _rcmsMaxPhotoIndex = $(_rcmsAlbum).find('.rcms-album-photo').length - 1;
+    $(_rcmsViewer).find('.rcms-viewer-options a').click(HideViewer);
+    $(_rcmsViewer).find('.rcms-viewer-pager li:first a').click(ShowPreviousPhoto);
+    $(_rcmsViewer).find('.rcms-viewer-pager li:last a').click(ShowNextPhoto);
+    UpdateViewer();
+    $(_rcmsAlbum).append(_rcmsViewer);
+    $('body').addClass('rcms-no-scroll');
+    return false;
+}
+
+function ShowPreviousPhoto() {
+    if (_rcmsViewer === null)
+        return false;
+    _rcmsPhotoIndex--;
+    if (_rcmsPhotoIndex < 0)
+        _rcmsPhotoIndex = _rcmsMaxPhotoIndex;
+    UpdateViewer();
+    return false;
+}
+
+function ShowNextPhoto() {
+    if (_rcmsViewer === null)
+        return false;
+    _rcmsPhotoIndex++;
+    if (_rcmsPhotoIndex > _rcmsMaxPhotoIndex)
+        _rcmsPhotoIndex = 0;
+    UpdateViewer();
+    return false;
+}
+
+function ResizeWindow() {
+    if (_rcmsViewer !== null) {
+        var image = $(_rcmsViewer).find('.rcms-viewer-main img');
+        if (image.length === 1) {
+            var photoSizes = GetPhotoSizes($(image)[0].naturalWidth, $(image)[0].naturalHeight);
+            $(image).css('width', photoSizes.width + 'px').css('height', photoSizes.height + 'px').css('top', photoSizes.top + 'px').css('left', photoSizes.left + 'px');
+        }
+    }
+}
+
+$(document).ready(function () {
+    $('.rcms-album-photo a').click(ShowViewer);
+    $(window).resize(ResizeWindow);
+    $(document).keyup(function (e) {
+        switch (e.keyCode) {
+            case 27:
+                HideViewer();
+                break;
+            case 37:
+                ShowPreviousPhoto();
+                break;
+            case 39:
+                ShowNextPhoto();
+                break;
+        }
     });
+});
