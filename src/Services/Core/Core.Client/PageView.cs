@@ -10,6 +10,7 @@ namespace Riverside.Cms.Services.Core.Client
         public long MasterPageId { get; set; }
         public long PageId { get; set; }
 
+        public long? PreviewImageBlobId { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
         public string Keywords { get; set; }

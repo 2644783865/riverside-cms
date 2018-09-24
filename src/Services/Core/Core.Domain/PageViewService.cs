@@ -27,6 +27,7 @@ namespace Riverside.Cms.Services.Core.Domain
             {
                 TenantId = tenantId,
                 MasterPageId = masterPage.MasterPageId,
+                PreviewImageBlobId = page.PreviewImageBlobId,
                 PageId = pageId,
                 Title = page.Name,
                 Description = page.Description ?? string.Empty,

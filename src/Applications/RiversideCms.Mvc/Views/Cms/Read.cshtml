@@ -24,26 +24,20 @@
 </head>
 <body>
     @Html.Raw(Model.View.BeginRender)
-
     @foreach (PageViewZone pageViewZone in Model.View.PageViewZones)
     {
-        @Html.Raw(pageViewZone.BeginRender)
-
+        @Html.FormatRaw(Model.View, pageViewZone.BeginRender)
         @foreach (PageViewZoneElement pageViewZoneElement in pageViewZone.PageViewZoneElements)
         {
-            @Html.Raw(pageViewZoneElement.BeginRender)
-
+            @Html.FormatRaw(Model.View, pageViewZoneElement.BeginRender)
             <div class="rcms-element" id="@(pageViewZoneElement.ElementTypeId + "_" + pageViewZoneElement.ElementId)">
                 @{ if (Model.Elements.ContainsKey(pageViewZoneElement.ElementId)) { Html.RenderPartial(Model.Elements[pageViewZoneElement.ElementId].PartialViewName, Model.Elements[pageViewZoneElement.ElementId].ElementView); } }
             </div>
-
-            @Html.Raw(pageViewZoneElement.EndRender)
+            @Html.FormatRaw(Model.View, pageViewZoneElement.EndRender)
         }
-
-        @Html.Raw(pageViewZone.EndRender)
+        @Html.FormatRaw(Model.View, pageViewZone.EndRender)
     }
-
-    @Html.Raw(Model.View.EndRender)
+    @Html.FormatRaw(Model.View, Model.View.EndRender)
 
     @{
         IEnumerable<ScriptInclude> includes = this.Context.Items
