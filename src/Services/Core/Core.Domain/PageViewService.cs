@@ -118,8 +118,8 @@ namespace Riverside.Cms.Services.Core.Domain
                     continue;
                 PageViewZoneElement pageViewZoneElement = new PageViewZoneElement
                 {
-                    ElementTypeId = masterPageZoneElement.ElementTypeId,
-                    ElementId = masterPageZoneElement.ElementId,
+                    ElementTypeId = pageZoneElement.ElementTypeId,
+                    ElementId = pageZoneElement.ElementId,
                     BeginRender = masterPageZoneElement.BeginRender,
                     EndRender = masterPageZoneElement.EndRender
                 };
