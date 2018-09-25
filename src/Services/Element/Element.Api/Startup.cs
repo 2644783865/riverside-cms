@@ -73,6 +73,7 @@ namespace Element.Api
             services.AddTransient<IAlbumElementService, AlbumElementService>();
             services.AddTransient<ICarouselElementService, CarouselElementService>();
             services.AddTransient<ICodeSnippetElementService, CodeSnippetElementService>();
+            services.AddTransient<IFormElementService, FormElementService>();
             services.AddTransient<IFooterElementService, FooterElementService>();
             services.AddTransient<IHtmlElementService, HtmlElementService>();
             services.AddTransient<ILatestThreadsElementService, LatestThreadsElementService>();
@@ -89,6 +90,7 @@ namespace Element.Api
             services.AddTransient<IElementRepository<CarouselElementSettings>, SqlCarouselElementRepository>();
             services.AddTransient<IElementRepository<CodeSnippetElementSettings>, SqlCodeSnippetElementRepository>();
             services.AddTransient<IElementRepository<FooterElementSettings>, SqlFooterElementRepository>();
+            services.AddTransient<IElementRepository<FormElementSettings>, SqlFormElementRepository>();
             services.AddTransient<IElementRepository<HtmlElementSettings>, SqlHtmlElementRepository>();
             services.AddTransient<IElementRepository<LatestThreadsElementSettings>, SqlLatestThreadsElementRepository>();
             services.AddTransient<IElementRepository<NavigationBarElementSettings>, SqlNavigationBarElementRepository>();

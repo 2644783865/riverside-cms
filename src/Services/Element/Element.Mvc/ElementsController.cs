@@ -15,6 +15,7 @@ namespace Riverside.Cms.Services.Element.Mvc
         private readonly ICarouselElementService _carouselElementService;
         private readonly ICodeSnippetElementService _codeSnippetElementService;
         private readonly IFooterElementService _footerElementService;
+        private readonly IFormElementService _formElementService;
         private readonly IHtmlElementService _htmlElementService;
         private readonly ILatestThreadsElementService _latestThreadsElementService;
         private readonly INavigationBarElementService _navigationBarElementService;
@@ -26,12 +27,13 @@ namespace Riverside.Cms.Services.Element.Mvc
         private readonly ITagCloudElementService _tagCloudElementService;
         private readonly ITestimonialElementService _testimonialElementService;
 
-        public ElementsController(IAlbumElementService albumElementService, ICarouselElementService carouselElementService, ICodeSnippetElementService codeSnippetElementService, IFooterElementService footerElementService, IHtmlElementService htmlElementService, ILatestThreadsElementService latestThreadsElementService, INavigationBarElementService navigationBarElementService, IPageHeaderElementService pageHeaderElementService, IPageListElementService pageListElementService, IShareElementService shareElementService, ISocialBarElementService socialBarElementService, ITableElementService tableElementService, ITagCloudElementService tagCloudElementService, ITestimonialElementService testimonialElementService)
+        public ElementsController(IAlbumElementService albumElementService, ICarouselElementService carouselElementService, ICodeSnippetElementService codeSnippetElementService, IFooterElementService footerElementService, IFormElementService formElementService, IHtmlElementService htmlElementService, ILatestThreadsElementService latestThreadsElementService, INavigationBarElementService navigationBarElementService, IPageHeaderElementService pageHeaderElementService, IPageListElementService pageListElementService, IShareElementService shareElementService, ISocialBarElementService socialBarElementService, ITableElementService tableElementService, ITagCloudElementService tagCloudElementService, ITestimonialElementService testimonialElementService)
         {
             _albumElementService = albumElementService;
             _carouselElementService = carouselElementService;
             _codeSnippetElementService = codeSnippetElementService;
             _footerElementService = footerElementService;
+            _formElementService = formElementService;
             _htmlElementService = htmlElementService;
             _latestThreadsElementService = latestThreadsElementService;
             _navigationBarElementService = navigationBarElementService;
@@ -169,6 +171,33 @@ namespace Riverside.Cms.Services.Element.Mvc
         {
             PageContext context = new PageContext { PageId = pageId };
             IElementView<FooterElementSettings, FooterElementContent> view = await _footerElementService.ReadElementViewAsync(tenantId, elementId, context);
+            if (view == null)
+                return NotFound();
+            return Ok(view);
+        }
+
+        // FORM
+
+        [HttpGet]
+        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/eafbd5ab-8c98-4edc-b8e1-42f5e8bfe2dc/elements/{elementId:int}")]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(FormElementSettings), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> ReadFormElementSettingsAsync(long tenantId, long elementId)
+        {
+            FormElementSettings settings = await _formElementService.ReadElementSettingsAsync(tenantId, elementId);
+            if (settings == null)
+                return NotFound();
+            return Ok(settings);
+        }
+
+        [HttpGet]
+        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/eafbd5ab-8c98-4edc-b8e1-42f5e8bfe2dc/elements/{elementId:int}/view")]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(IElementView<FormElementSettings, object>), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> ReadFormElementViewAsync(long tenantId, long elementId, [FromQuery]long pageId)
+        {
+            PageContext context = new PageContext { PageId = pageId };
+            IElementView<FormElementSettings, object> view = await _formElementService.ReadElementViewAsync(tenantId, elementId, context);
             if (view == null)
                 return NotFound();
             return Ok(view);

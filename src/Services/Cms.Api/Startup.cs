@@ -60,6 +60,7 @@ namespace Cms.Api
             services.AddTransient<ICarouselElementService, CarouselElementService>();
             services.AddTransient<ICodeSnippetElementService, CodeSnippetElementService>();
             services.AddTransient<IFooterElementService, FooterElementService>();
+            services.AddTransient<IFormElementService, FormElementService>();
             services.AddTransient<IHtmlElementService, HtmlElementService>();
             services.AddTransient<ILatestThreadsElementService, LatestThreadsElementService>();
             services.AddTransient<INavigationBarElementService, NavigationBarElementService>();
@@ -76,6 +77,7 @@ namespace Cms.Api
             services.AddTransient<IElementRepository<CarouselElementSettings>, SqlCarouselElementRepository>();
             services.AddTransient<IElementRepository<CodeSnippetElementSettings>, SqlCodeSnippetElementRepository>();
             services.AddTransient<IElementRepository<FooterElementSettings>, SqlFooterElementRepository>();
+            services.AddTransient<IElementRepository<FormElementSettings>, SqlFormElementRepository>();
             services.AddTransient<IElementRepository<HtmlElementSettings>, SqlHtmlElementRepository>();
             services.AddTransient<IElementRepository<LatestThreadsElementSettings>, SqlLatestThreadsElementRepository>();
             services.AddTransient<IElementRepository<NavigationBarElementSettings>, SqlNavigationBarElementRepository>();

@@ -12,6 +12,7 @@ namespace RiversideCms.Mvc.Services
         private readonly ICarouselElementService _carouselElementService;
         private readonly ICodeSnippetElementService _codeSnippetElementService;
         private readonly IFooterElementService _footerElementService;
+        private readonly IFormElementService _formElementService;
         private readonly IHtmlElementService _htmlElementService;
         private readonly ILatestThreadsElementService _latestThreadsElementService;
         private readonly INavigationBarElementService _navigationBarElementService;
@@ -23,12 +24,13 @@ namespace RiversideCms.Mvc.Services
         private readonly ITagCloudElementService _tagCloudElementService;
         private readonly ITestimonialElementService _testimonialElementService;
 
-        public ElementServiceFactory(IAlbumElementService albumElementService, ICarouselElementService carouselElementService, ICodeSnippetElementService codeSnippetElementService, IFooterElementService footerElementService, IHtmlElementService htmlElementService, ILatestThreadsElementService latestThreadsElementService, INavigationBarElementService navigationBarElementService, IPageHeaderElementService pageHeaderElementService, IPageListElementService pageListElementService, IShareElementService shareElementService, ISocialBarElementService socialBarElementService, ITableElementService tableElementService, ITagCloudElementService tagCloudElementService, ITestimonialElementService testimonialElementService)
+        public ElementServiceFactory(IAlbumElementService albumElementService, ICarouselElementService carouselElementService, ICodeSnippetElementService codeSnippetElementService, IFooterElementService footerElementService, IFormElementService formElementService, IHtmlElementService htmlElementService, ILatestThreadsElementService latestThreadsElementService, INavigationBarElementService navigationBarElementService, IPageHeaderElementService pageHeaderElementService, IPageListElementService pageListElementService, IShareElementService shareElementService, ISocialBarElementService socialBarElementService, ITableElementService tableElementService, ITagCloudElementService tagCloudElementService, ITestimonialElementService testimonialElementService)
         {
             _albumElementService = albumElementService;
             _carouselElementService = carouselElementService;
             _codeSnippetElementService = codeSnippetElementService;
             _footerElementService = footerElementService;
+            _formElementService = formElementService;
             _htmlElementService = htmlElementService;
             _latestThreadsElementService = latestThreadsElementService;
             _navigationBarElementService = navigationBarElementService;
@@ -56,6 +58,9 @@ namespace RiversideCms.Mvc.Services
 
                 case "f1c2b384-4909-47c8-ada7-cd3cc7f32620":
                     return await _footerElementService.ReadElementViewAsync(tenantId, elementId, context);
+
+                case "eafbd5ab-8c98-4edc-b8e1-42f5e8bfe2dc":
+                    return await _formElementService.ReadElementViewAsync(tenantId, elementId, context);
 
                 case "c92ee4c4-b133-44cc-8322-640e99c334dc":
                     return await _htmlElementService.ReadElementViewAsync(tenantId, elementId, context);
