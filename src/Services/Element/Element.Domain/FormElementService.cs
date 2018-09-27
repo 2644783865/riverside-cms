@@ -145,11 +145,14 @@ namespace Riverside.Cms.Services.Element.Domain
             foreach (FormField field in settings.Fields)
             {
                 FormFieldValue value = request.Fields.Where(f => f.FormFieldId == field.FormFieldId).FirstOrDefault();
-                yield return new FormFieldLabelValue
+                if (value != null)
                 {
-                    Label = field.Label,
-                    Value = value.Value
-                };
+                    yield return new FormFieldLabelValue
+                    {
+                        Label = field.Label,
+                        Value = value.Value
+                    };
+                }
             }
         }
 
