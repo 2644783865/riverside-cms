@@ -19,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Utilities\Net\Net.Mail\Net.Mail.csproj" />
     <ProjectReference Include="..\..\Utilities\Text\Text.Formatting\Text.Formatting.csproj" />
     <ProjectReference Include="..\Core\Core.Domain\Core.Domain.csproj" />
     <ProjectReference Include="..\Core\Core.Infrastructure\Core.Infrastructure.csproj" />

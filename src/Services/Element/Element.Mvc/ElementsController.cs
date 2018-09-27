@@ -203,6 +203,15 @@ namespace Riverside.Cms.Services.Element.Mvc
             return Ok(view);
         }
 
+        [HttpPost]
+        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/eafbd5ab-8c98-4edc-b8e1-42f5e8bfe2dc/elements/{elementId:int}/action")]
+        public async Task<IActionResult> PerformFormElementActionAsync(long tenantId, long elementId, [FromBody]FormElementActionRequest request, [FromQuery]long pageId)
+        {
+            PageContext context = new PageContext { PageId = pageId };
+            FormElementActionResponse response = await _formElementService.PerformElementActionAsync(tenantId, elementId, request, context);
+            return Ok(response);
+        }
+
         // HTML
 
         [HttpGet]

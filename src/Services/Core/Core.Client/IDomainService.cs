@@ -8,5 +8,6 @@ namespace Riverside.Cms.Services.Core.Client
     public interface IDomainService
     {
         Task<WebDomain> ReadDomainByUrlAsync(string url);
+        Task<WebDomain> ReadDomainByRedirectUrlAsync(long tenantId, string redirectUrl);
     }
 }

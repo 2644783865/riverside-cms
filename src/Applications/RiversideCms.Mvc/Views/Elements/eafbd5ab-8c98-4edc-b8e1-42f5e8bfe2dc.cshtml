@@ -42,7 +42,7 @@
             </div>
         }
 
-        <button class="btn btn-primary" type="submit" @if (Model.Settings.Fields.Where(f => f.Required).Any()) {<text>disabled="disabled"</text>}>@Model.Settings.SubmitButtonLabel</button>
+        <button class="btn btn-primary" type="submit" disabled="disabled">@Model.Settings.SubmitButtonLabel</button>
 
     </form>
 

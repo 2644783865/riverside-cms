@@ -10,6 +10,7 @@ using Riverside.Cms.Services.Core.Client;
 using Riverside.Cms.Services.Element.Client;
 using Riverside.Cms.Services.Storage.Client;
 using Riverside.Cms.Services.Storage.Infrastructure;
+using Riverside.Cms.Utilities.Net.Mail;
 using Riverside.Cms.Utilities.Text.Csv;
 using Riverside.Cms.Utilities.Text.Formatting;
 using RiversideCms.Mvc.Services;
@@ -27,8 +28,8 @@ namespace RiversideCms.Mvc
 
         private void ConfigureDependencyInjectionSharedServices(IServiceCollection services)
         {
-            // Utilities
             services.AddTransient<ICsvService, CsvService>();
+            services.AddTransient<IEmailService, SmtpEmailService>();
             services.AddTransient<IStringUtilities, StringUtilities>();
         }
 
@@ -143,6 +144,7 @@ namespace RiversideCms.Mvc
             services.Configure<Riverside.Cms.Services.Element.Infrastructure.SqlOptions>(Configuration);
             services.Configure<Riverside.Cms.Services.Storage.Infrastructure.SqlOptions>(Configuration);
             services.Configure<AzureBlobOptions>(Configuration);
+            services.Configure<EmailOptions>(Configuration);
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.

@@ -34,5 +34,22 @@ namespace Riverside.Cms.Services.Core.Client
                 throw new CoreClientException("Core API failed", ex);
             }
         }
+
+        public async Task<WebDomain> ReadDomainByRedirectUrlAsync(long tenantId, string redirectUrl)
+        {
+            try
+            {
+                string uri = $"{_options.Value.CoreApiBaseUrl}tenants/{tenantId}/domains?redirecturl={WebUtility.UrlEncode(redirectUrl)}";
+                using (HttpClient httpClient = new HttpClient())
+                {
+                    string json = await httpClient.GetStringAsync(uri);
+                    return JsonConvert.DeserializeObject<WebDomain>(json);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new CoreClientException("Core API failed", ex);
+            }
+        }
     }
 }

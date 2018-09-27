@@ -14,6 +14,7 @@ using Riverside.Cms.Services.Element.Domain;
 using Riverside.Cms.Services.Element.Infrastructure;
 using Riverside.Cms.Services.Storage.Domain;
 using Riverside.Cms.Services.Storage.Infrastructure;
+using Riverside.Cms.Utilities.Net.Mail;
 using Riverside.Cms.Utilities.Text.Csv;
 using Riverside.Cms.Utilities.Text.Formatting;
 using Swashbuckle.AspNetCore.Swagger;
@@ -60,11 +61,15 @@ namespace Element.Api
             services.AddTransient<IUserRepository, SqlUserRepository>();
         }
 
-        private void ConfigureDependencyInjectionServices(IServiceCollection services)
+        private void ConfigureDependencyInjectionSharedServices(IServiceCollection services)
         {
             services.AddTransient<ICsvService, CsvService>();
+            services.AddTransient<IEmailService, SmtpEmailService>();
             services.AddTransient<IStringUtilities, StringUtilities>();
+        }
 
+        private void ConfigureDependencyInjectionServices(IServiceCollection services)
+        {
             services.AddTransient<IForumService, ForumService>();
             services.AddTransient<IPageService, PageService>();
             services.AddTransient<ITagService, TagService>();
@@ -109,6 +114,7 @@ namespace Element.Api
             services.Configure<Riverside.Cms.Services.Element.Infrastructure.SqlOptions>(Configuration);
             services.Configure<Riverside.Cms.Services.Storage.Infrastructure.SqlOptions>(Configuration);
             services.Configure<AzureBlobOptions>(Configuration);
+            services.Configure<EmailOptions>(Configuration);
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -123,6 +129,7 @@ namespace Element.Api
 
             ConfigureDependencyInjectionStorageServices(services);
             ConfigureDependencyInjectionCoreServices(services);
+            ConfigureDependencyInjectionSharedServices(services);
             ConfigureDependencyInjectionServices(services);
             ConfigureOptionServices(services);
         }

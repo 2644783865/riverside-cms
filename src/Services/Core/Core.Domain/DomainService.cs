@@ -18,5 +18,10 @@ namespace Riverside.Cms.Services.Core.Domain
         {
             return _domainRepository.ReadDomainByUrlAsync(url);
         }
+
+        public Task<WebDomain> ReadDomainByRedirectUrlAsync(long tenantId, string redirectUrl)
+        {
+            return _domainRepository.ReadDomainByRedirectUrlAsync(tenantId, redirectUrl);
+        }
     }
 }

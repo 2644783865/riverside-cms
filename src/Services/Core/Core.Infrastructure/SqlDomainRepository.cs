@@ -40,5 +40,31 @@ namespace Riverside.Cms.Services.Core.Infrastructure
                 );
             }
         }
+
+        public async Task<WebDomain> ReadDomainByRedirectUrlAsync(long tenantId, string redirectUrl)
+        {
+            string redirectUrlClause = redirectUrl == null ? "RedirectUrl IS NULL" : "RedirectUrl = @RedirectUrl";
+            using (SqlConnection connection = new SqlConnection(_options.Value.SqlConnectionString))
+            {
+                connection.Open();
+                return await connection.QueryFirstOrDefaultAsync<WebDomain>($@"
+                    SELECT
+                        TenantId,
+                        DomainId,
+                        Url,
+                        RedirectUrl
+                    FROM
+                        cms.Domain
+                    WHERE
+                        TenantId = @TenantId AND
+                        {redirectUrlClause}",
+                    new
+                    {
+                        TenantId = tenantId,
+                        RedirectUrl = redirectUrl
+                    }
+                );
+            }
+        }
     }
 }

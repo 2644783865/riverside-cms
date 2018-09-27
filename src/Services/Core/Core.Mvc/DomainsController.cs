@@ -28,5 +28,17 @@ namespace Riverside.Cms.Services.Core.Mvc
                 return NotFound();
             return Ok(domain);
         }
+
+        [HttpGet]
+        [Route("api/v1/core/tenants/{tenantId:int}/domains")]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(WebDomain), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> ReadDomainByRedirectUrlAsync(long tenantId, [FromQuery]string redirectUrl)
+        {
+            WebDomain domain = await _domainService.ReadDomainByRedirectUrlAsync(tenantId, redirectUrl);
+            if (domain == null)
+                return NotFound();
+            return Ok(domain);
+        }
     }
 }
