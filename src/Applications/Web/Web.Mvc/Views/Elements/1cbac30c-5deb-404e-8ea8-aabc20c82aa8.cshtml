@@ -1,0 +1,60 @@
+﻿@using Riverside.Cms.Applications.Web.Mvc.Extensions
+@using Riverside.Cms.Services.Element.Client
+
+@model IElementView<PageHeaderElementSettings, PageHeaderElementContent>
+
+<div class="rcms-page-header">
+
+    @if (Model.Content.Name != null)
+    {
+        <h1>@Model.Content.Name</h1>
+    }
+
+    @if (Model.Content.Description != null)
+    {
+        @Html.MarkdownToHtml(Model.Content.Description)
+    }
+
+    @if (Model.Content.Image != null)
+    {
+        <div class="media-object">
+            <img 
+                 src="@Url.RouteUrl(RouteNames.PageImage, new { pageid = Model.Content.Image.PageId, pageImageType = "thumbnail", description = Url.UrlFriendly(Model.Content.Name), t = Model.Content.Image.BlobId})" alt="@Model.Content.Name"
+                 width="@Model.Content.Image.Width"
+                 height="@Model.Content.Image.Height"
+            />
+        </div>
+    }
+
+    @if (Model.Content.Created.HasValue || Model.Content.Updated.HasValue || Model.Content.Occurred.HasValue)
+    {
+        <dl>
+            @if (Model.Content.Created.HasValue)
+            {
+                <dt>Posted</dt>
+                <dd>@Html.Date(Model.Content.Created.Value)</dd>
+            }
+            @if (Model.Content.Updated.HasValue)
+            {
+                <dt>Updated</dt>
+                <dd>@Html.Date(Model.Content.Updated.Value)</dd>
+            }
+            @if (Model.Content.Occurred.HasValue)
+            {
+                <dt>@if (Model.Content.OccursInFuture) {<text>Occurs</text>} else {<text>Occurred</text>}</dt>
+                <dd>@Html.Date(Model.Content.Occurred.Value)</dd>
+            }
+        </dl>
+    }
+
+    @if (Model.Content.Breadcrumbs != null)
+    {
+        <ol class="breadcrumb">
+            @foreach (PageHeaderBreadcrumb breadcrumb in Model.Content.Breadcrumbs)
+            {
+                <li>@Html.PageLink(breadcrumb.Home ? "Home" : breadcrumb.Name, breadcrumb.PageId, breadcrumb.PageName, breadcrumb.Home, null, null)</li>
+            }
+        </ol>
+    }
+
+</div>

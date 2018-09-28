@@ -30,10 +30,10 @@ services:
       context: ./src/Services/Cms.Api
       dockerfile: Dockerfile
 
-  riversidecms.mvc:
-    image: riversidecms.mvc
+  web.mvc:
+    image: web.mvc
     build:
-      context: ./src/Applications/RiversideCms.Mvc
+      context: ./src/Applications/Web/Web.Mvc
       dockerfile: Dockerfile
     depends_on:
       - cms.api

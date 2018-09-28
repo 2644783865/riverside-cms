@@ -1,0 +1,54 @@
+﻿@using Riverside.Cms.Applications.Web.Mvc.Extensions
+@using Riverside.Cms.Services.Element.Client
+
+@model IElementView<FormElementSettings, object>
+
+<div class="rcms-form">
+
+    <form role="form" action="@Url.RouteUrl(RouteNames.ElementAction, new { elementId = Model.Settings.ElementId, elementTypeId = Model.Settings.ElementTypeId, pageid = 19 } )">
+
+        @foreach (FormField field in Model.Settings.Fields)
+        {
+            <div class="form-group @if (field.Required) {<text>has-error</text>}">
+                <label class="control-label" for="field_@field.FormFieldId">@field.Label</label>
+                @switch (field.FieldType)
+                {
+                    case FormFieldType.TextField:
+                        <input 
+                            data-required="@if (field.Required) {<text>1</text>} else {<text>0</text>}"
+                            type="text"
+                            id="field_@field.FormFieldId"
+                            name="field_@field.FormFieldId"
+                            autocomplete="off"
+                            autocorrect="off"
+                            autocapitalize="off"
+                            spellcheck="false"
+                            class="form-control" />
+                        break;
+
+                    case FormFieldType.MultiLineTextField:
+                        <textarea
+                             data-required="@if (field.Required) {<text>1</text>} else {<text>0</text>}"
+                             id="field_@field.FormFieldId"
+                             name="field_@field.FormFieldId"
+                             rows="5"
+                             autocomplete="off"
+                             autocorrect="off"
+                             autocapitalize="off"
+                             spellcheck="false"
+                             class="form-control"></textarea>
+                        break;
+                }
+            </div>
+        }
+
+        <button class="btn btn-primary" type="submit" disabled="disabled">@Model.Settings.SubmitButtonLabel</button>
+
+    </form>
+
+</div>
+
+@{
+    this.Context.Items["script_jquery"] = new ScriptInclude { Priority = 1, Name = "jquery.min.js" };
+    this.Context.Items["script_album"] = new ScriptInclude { Priority = 4, Name = "element-form.js" };
+}

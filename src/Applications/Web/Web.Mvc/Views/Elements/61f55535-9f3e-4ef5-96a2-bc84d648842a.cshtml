@@ -1,0 +1,123 @@
+﻿@using Riverside.Cms.Applications.Web.Mvc.Extensions
+@using Riverside.Cms.Services.Core.Client
+@using Riverside.Cms.Services.Element.Client
+
+@model IElementView<PageListElementSettings, PageListElementContent>
+
+<div class="rcms-page-list">
+
+    @if (Model.Content.DisplayName != null)
+    {
+        <h2>@Model.Content.DisplayName</h2>
+    }
+
+    @if (Model.Settings.Preamble != null)
+    {
+        <p class="rcms-preamble">@Html.FormatMultiline(Model.Settings.Preamble)</p>
+    }
+
+    @if (Model.Content.NoPagesMessage != null)
+    {
+        <div class="rcms-page-list-no-items">
+            <p>@Model.Content.NoPagesMessage</p>
+        </div>
+    }
+
+    @if (Model.Content.Pages.Any())
+    {
+        <div class="rcms-page-list-pages">
+            @foreach (PageListPage pageListPage in Model.Content.Pages)
+            {
+            <div class="rcms-page-list-item" @if (pageListPage.BackgroundImage != null ) {<text>style="background-image: url(@Url.RouteUrl(RouteNames.PageImage, new { pageid = pageListPage.BackgroundImage.PageId, pageImageType = "thumbnail", description = Url.UrlFriendly(pageListPage.Name), t = pageListPage.BackgroundImage.BlobId}));"</text>}>
+                @if (Model.Settings.ShowBackgroundImage)
+                {
+                    @Html.Raw("<div class=\"rcms-page-list-item-content\">")
+                }
+                <h3>@Html.PageLink(pageListPage.Name, pageListPage.PageId, pageListPage.Name, pageListPage.Home, null, null)</h3>
+                @if (pageListPage.Description != null)
+                {
+                    @Html.MarkdownToHtml(pageListPage.Description)
+                }
+                @if (pageListPage.Image != null)
+                {
+                    <a href="@Url.PageUrl(pageListPage.PageId, pageListPage.Name, pageListPage.Home, null, null)">
+                        <div class="media-object">
+                            <img 
+                                 src="@Url.RouteUrl(RouteNames.PageImage, new { pageid = pageListPage.Image.PageId, pageImageType = "thumbnail", description = Url.UrlFriendly(pageListPage.Name), t = pageListPage.Image.BlobId})" alt="@pageListPage.Name"
+                                 width="@pageListPage.Image.Width"
+                                 height="@pageListPage.Image.Height"
+                            />
+                        </div>
+                    </a>
+                }
+                @if (pageListPage.Created.HasValue || pageListPage.Updated.HasValue || pageListPage.Occurred.HasValue)
+                {
+                    <dl>
+                        @if (pageListPage.Created.HasValue)
+                        {
+                            <dt class="created">Posted</dt>
+                            <dd class="created">@Html.Date(pageListPage.Created.Value)</dd>
+                        }
+                        @if (pageListPage.Updated.HasValue)
+                        {
+                            <dt class="updated">Updated</dt>
+                            <dd class="updated">@Html.Date(pageListPage.Updated.Value)</dd>
+                        }
+                        @if (pageListPage.Occurred.HasValue)
+                        {
+                            <dt class="occurred">@if (pageListPage.OccursInFuture) {<text>Occurs</text>} else {<text>Occurred</text>}</dt>
+                            <dd class="occurred">@Html.Date(pageListPage.Occurred.Value)</dd>
+                        }
+                    </dl>
+                }
+                @if (pageListPage.Tags.Any())
+                {
+                    <ul class="tags">
+                        @foreach (Tag tag in pageListPage.Tags)
+                        {<li class="tag-available">@Html.PageLink(tag.Name, Model.Content.CurrentPage.PageId, Model.Content.CurrentPage.Name, Model.Content.CurrentPage.Home, new[] { tag.Name }, null)</li>}
+                    </ul>
+                }
+                @if (Model.Settings.ShowBackgroundImage)
+                {
+                    @Html.Raw("</div>")
+                }
+            </div>
+            }
+        </div>
+    }
+
+    @if (Model.Content.Pager != null)
+    {
+        int rollingButtonCount = 2;
+        int beginPageIndex = Math.Max(Model.Content.Pager.PageIndex - rollingButtonCount, 0);
+        int endPageIndex = Math.Min(Model.Content.Pager.PageIndex + rollingButtonCount, Model.Content.Pager.PageCount - 1);
+        IEnumerable<string> tagNames = Model.Content.Tags?.Select(t => t.Name);
+        <div class="rcms-page-list-pager">
+            <div class="row">
+                <div class="pager-text">
+                    <p>Page @(Model.Content.Pager.PageIndex + 1) of @Model.Content.Pager.PageCount</p>
+                </div>
+                <div class="pager-pagination">
+                    <ul class="pagination">
+                        <li @if (Model.Content.Pager.PageIndex == 0) {<text>class="disabled"</text>}><a href="@Url.PageUrl(Model.Content.CurrentPage.PageId, Model.Content.CurrentPage.Name, Model.Content.CurrentPage.Home, tagNames, null)"><i class="fa fa-fw fa-angle-double-left"></i> <span class="pager-button-label">First</span></a></li>
+                        <li @if (Model.Content.Pager.PageIndex == 0) {<text>class="disabled"</text>}><a href="@Url.PageUrl(Model.Content.CurrentPage.PageId, Model.Content.CurrentPage.Name, Model.Content.CurrentPage.Home, tagNames, Model.Content.Pager.PageIndex > 1 ? new { page = Model.Content.Pager.PageIndex } : null)"><i class="fa fa-fw fa-angle-left"></i> <span class="pager-button-label">Previous</span></a></li>
+                        @for (int pageIndex = beginPageIndex; pageIndex <= endPageIndex; pageIndex++)
+                        {
+                            <li @if (Model.Content.Pager.PageIndex == pageIndex) {<text>class="active"</text>}><a href="@Url.PageUrl(Model.Content.CurrentPage.PageId, Model.Content.CurrentPage.Name, Model.Content.CurrentPage.Home, tagNames, pageIndex != 0 ? new { page = pageIndex + 1 } : null)">@(pageIndex + 1)@if (Model.Content.Pager.PageIndex == pageIndex) {<text> <span class="sr-only">(current)</span></text>}</a></li>
+                        }
+                        <li @if (Model.Content.Pager.PageIndex == Model.Content.Pager.PageCount - 1) {<text>class="disabled"</text>}><a href="@Url.PageUrl(Model.Content.CurrentPage.PageId, Model.Content.CurrentPage.Name, Model.Content.CurrentPage.Home, tagNames, new { page = Math.Min(Model.Content.Pager.PageIndex + 2, Model.Content.Pager.PageCount) })"><i class="fa fa-fw fa-angle-right"></i> <span class="pager-button-label">Next</span></a></li>
+                        <li @if (Model.Content.Pager.PageIndex == Model.Content.Pager.PageCount - 1) {<text>class="disabled"</text>}><a href="@Url.PageUrl(Model.Content.CurrentPage.PageId, Model.Content.CurrentPage.Name, Model.Content.CurrentPage.Home, tagNames, new { page = Model.Content.Pager.PageCount })"><i class="fa fa-fw fa-angle-double-right"></i> <span class="pager-button-label">Last</span></a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (Model.Content.MoreMessage != null)
+    {
+        <div class="rcms-page-list-more">
+            <p>@Html.PageLink(Model.Content.MoreMessage, Model.Content.MorePage.PageId, Model.Content.MorePage.Name, Model.Content.MorePage.Home, null, null)</p>
+        </div>
+    }
+
+</div>

@@ -1,0 +1,50 @@
+﻿@using Riverside.Cms.Applications.Web.Mvc.Extensions
+@using Riverside.Cms.Services.Element.Client
+
+@model IElementView<LatestThreadsElementSettings, LatestThreadsElementContent>
+
+<div class="rcms-latest-threads">
+
+    @if (Model.Settings.DisplayName != null)
+    {
+        <h2>@Model.Settings.DisplayName</h2>
+    }
+
+    @if (Model.Settings.Preamble != null)
+    {
+        <p class="rcms-preamble">@Html.FormatMultiline(Model.Settings.Preamble)</p>
+    }
+
+    @if (!Model.Content.Threads.Any())
+    {
+        <p>@Model.Settings.NoThreadsMessage</p>
+    }
+    else
+    {
+        <ul class="comments">
+            @foreach (LatestThreadsThread thread in Model.Content.Threads)
+            {
+                <li>
+                    <a href="@Url.PageUrl(thread.PageId, thread.Subject, false, null, null)">
+                        <div class="media-object">
+                            @if (thread.LastPostByUser != null && thread.LastPostByUser.Image != null)
+                            {
+                                <img src="@Url.RouteUrl(RouteNames.UserImage, new { userid = thread.LastPostByUser.UserId, userimagetype = "thumbnail", description = Url.UrlFriendly(thread.LastPostByUser.Alias), t = thread.LastPostByUser.Image.BlobId})" alt="@thread.LastPostByUser.Alias"
+                                     width="@thread.LastPostByUser.Image.Width"
+                                     height="@thread.LastPostByUser.Image.Height" />
+                            }
+                            else if (thread.StartedByUser.Image != null)
+                            {
+                                <img src="@Url.RouteUrl(RouteNames.UserImage, new { userid = thread.StartedByUser.UserId, userimagetype = "thumbnail", description = Url.UrlFriendly(thread.StartedByUser.Alias), t = thread.StartedByUser.Image.BlobId})" alt="@thread.StartedByUser.Alias"
+                                     width="@thread.StartedByUser.Image.Width"
+                                     height="@thread.StartedByUser.Image.Height" />
+                            }
+                        </div>
+                        @thread.Subject <span class="badge">@(thread.Replies + 1)</span>
+                    </a>
+                </li>
+            }
+        </ul>
+    }
+
+</div>

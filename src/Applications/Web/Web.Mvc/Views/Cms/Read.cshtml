@@ -1,0 +1,56 @@
+﻿@using Riverside.Cms.Applications.Web.Mvc.Extensions
+@using Riverside.Cms.Services.Core.Client
+
+@model PageRender
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="keywords" content="@Model.View.Keywords" />
+    <meta name="description" content="@Model.View.Description" />
+    <title>@Model.View.Title</title>
+    <link href="@Url.Content("~/css/bootstrap.min.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/css/font-awesome.min.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content($"~/webs/{Model.View.TenantId}/assets/site.css")" rel="stylesheet" type="text/css" />
+</head>
+<body>
+    @Html.Raw(Model.View.BeginRender)
+    @foreach (PageViewZone pageViewZone in Model.View.PageViewZones)
+    {
+        @Html.FormatRaw(Model.View, pageViewZone.BeginRender)
+        @foreach (PageViewZoneElement pageViewZoneElement in pageViewZone.PageViewZoneElements)
+        {
+            @Html.FormatRaw(Model.View, pageViewZoneElement.BeginRender)
+            <div class="rcms-element" id="@(pageViewZoneElement.ElementTypeId + "_" + pageViewZoneElement.ElementId)">
+                @{ if (Model.Elements.ContainsKey(pageViewZoneElement.ElementId)) { @await Html.PartialAsync(Model.Elements[pageViewZoneElement.ElementId].PartialViewName, Model.Elements[pageViewZoneElement.ElementId].ElementView); } }
+            </div>
+            @Html.FormatRaw(Model.View, pageViewZoneElement.EndRender)
+        }
+        @Html.FormatRaw(Model.View, pageViewZone.EndRender)
+    }
+    @Html.FormatRaw(Model.View, Model.View.EndRender)
+
+    @{
+        IEnumerable<ScriptInclude> includes = this.Context.Items
+            .Where(kvp => kvp.Key.GetType() == typeof(string))
+            .Where(kvp => ((string)kvp.Key).StartsWith("script_"))
+            .Select(kvp => (ScriptInclude)kvp.Value)
+            .OrderBy(si => si.Priority);
+
+        @foreach (ScriptInclude include in includes)
+        {
+            string js = $"~/js/{include.Name}";
+            <script src="@Url.Content(js)"></script>
+        }
+    }
+</body>
+</html>
