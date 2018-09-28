@@ -1,32 +1,14 @@
 version: '3.4'
 
 services:
-  storage.api:
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-    ports:
-      - "5102:80"
-
-  core.api:
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-    ports:
-      - "5101:80"
-
   web.mvc:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     ports:
       - "5100:80"
 
-  element.api:
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-    ports:
-      - "5103:80"
-
   web.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     ports:
-      - "5104:80"
+      - "5101:80"

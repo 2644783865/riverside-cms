@@ -1,29 +1,6 @@
 version: '3.4'
 
 services:
-  storage.api:
-    image: storage.api
-    build:
-      context: ./src/Services/Storage/Storage.API
-      dockerfile: Dockerfile
-
-  core.api:
-    image: core.api
-    build:
-      context: ./src/Services/Core/Core.API
-      dockerfile: Dockerfile
-    depends_on:
-      - storage.api
-
-  element.api:
-    image: element.api
-    build:
-      context: ./src/Services/Element/Element.Api
-      dockerfile: Dockerfile
-    depends_on:
-      - core.api
-      - storage.api
-
   web.api:
     image: web.api
     build:
@@ -37,6 +14,3 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - web.api
-      - core.api
-      - element.api
-      - storage.api
