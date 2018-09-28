@@ -51,6 +51,7 @@ namespace Element.Api
             services.AddTransient<IPageViewService, PageViewService>();
             services.AddTransient<ITagService, TagService>();
             services.AddTransient<IUserService, UserService>();
+            services.AddTransient<IWebService, WebService>();
 
             // Core infrastructure services
             services.AddTransient<IDomainRepository, SqlDomainRepository>();
@@ -59,6 +60,7 @@ namespace Element.Api
             services.AddTransient<IPageRepository, SqlPageRepository>();
             services.AddTransient<ITagRepository, SqlTagRepository>();
             services.AddTransient<IUserRepository, SqlUserRepository>();
+            services.AddTransient<IWebRepository, SqlWebRepository>();
         }
 
         private void ConfigureDependencyInjectionSharedServices(IServiceCollection services)

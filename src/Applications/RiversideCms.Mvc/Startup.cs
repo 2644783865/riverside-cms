@@ -41,6 +41,7 @@ namespace RiversideCms.Mvc
             services.AddTransient<Riverside.Cms.Services.Core.Client.IPageViewService, Riverside.Cms.Services.Core.Client.PageViewService>();
             services.AddTransient<Riverside.Cms.Services.Core.Client.ITagService, Riverside.Cms.Services.Core.Client.TagService>();
             services.AddTransient<Riverside.Cms.Services.Core.Client.IUserService, Riverside.Cms.Services.Core.Client.UserService>();
+            services.AddTransient<Riverside.Cms.Services.Core.Client.IWebService, Riverside.Cms.Services.Core.Client.WebService>();
 
             // Element services
             services.AddTransient<Riverside.Cms.Services.Element.Client.IAlbumElementService, Riverside.Cms.Services.Element.Client.AlbumElementService>();
@@ -73,6 +74,7 @@ namespace RiversideCms.Mvc
             services.AddTransient<Riverside.Cms.Services.Core.Domain.IPageViewService, Riverside.Cms.Services.Core.Domain.PageViewService>();
             services.AddTransient<Riverside.Cms.Services.Core.Domain.ITagService, Riverside.Cms.Services.Core.Domain.TagService>();
             services.AddTransient<Riverside.Cms.Services.Core.Domain.IUserService, Riverside.Cms.Services.Core.Domain.UserService>();
+            services.AddTransient<Riverside.Cms.Services.Core.Domain.IWebService, Riverside.Cms.Services.Core.Domain.WebService>();
 
             // Core infrastructure services
             services.AddTransient<Riverside.Cms.Services.Core.Domain.IDomainRepository, Riverside.Cms.Services.Core.Infrastructure.SqlDomainRepository>();
@@ -81,6 +83,7 @@ namespace RiversideCms.Mvc
             services.AddTransient<Riverside.Cms.Services.Core.Domain.IPageRepository, Riverside.Cms.Services.Core.Infrastructure.SqlPageRepository>();
             services.AddTransient<Riverside.Cms.Services.Core.Domain.ITagRepository, Riverside.Cms.Services.Core.Infrastructure.SqlTagRepository>();
             services.AddTransient<Riverside.Cms.Services.Core.Domain.IUserRepository, Riverside.Cms.Services.Core.Infrastructure.SqlUserRepository>();
+            services.AddTransient<Riverside.Cms.Services.Core.Domain.IWebRepository, Riverside.Cms.Services.Core.Infrastructure.SqlWebRepository>();
         }
 
         private void ConfigureDependencyInjectionElementServices(IServiceCollection services)
