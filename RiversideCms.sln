@@ -73,7 +73,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Text.Csv", "src\Utilities\T
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Net", "Net", "{E6FBD48D-BB3B-41A7-9C6D-31EEFBC18E78}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Net.Mail", "src\Utilities\Net\Net.Mail\Net.Mail.csproj", "{9A92137F-9086-4DF5-869B-54DD6F81D72F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Net.Mail", "src\Utilities\Net\Net.Mail\Net.Mail.csproj", "{9A92137F-9086-4DF5-869B-54DD6F81D72F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application.Mvc", "src\Applications\Application.Mvc\Application.Mvc.csproj", "{415AD004-0FEA-4536-A25B-2F995B009050}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -191,6 +193,10 @@ Global
 		{9A92137F-9086-4DF5-869B-54DD6F81D72F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9A92137F-9086-4DF5-869B-54DD6F81D72F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9A92137F-9086-4DF5-869B-54DD6F81D72F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{415AD004-0FEA-4536-A25B-2F995B009050}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{415AD004-0FEA-4536-A25B-2F995B009050}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{415AD004-0FEA-4536-A25B-2F995B009050}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{415AD004-0FEA-4536-A25B-2F995B009050}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -224,6 +230,7 @@ Global
 		{7C64192D-0E57-44AE-B6F8-702E3B935308} = {69D4412B-C106-4F32-9F64-A8563CFC0B98}
 		{E6FBD48D-BB3B-41A7-9C6D-31EEFBC18E78} = {AFB77834-1A0D-4409-B5D2-E238A85B1FA3}
 		{9A92137F-9086-4DF5-869B-54DD6F81D72F} = {E6FBD48D-BB3B-41A7-9C6D-31EEFBC18E78}
+		{415AD004-0FEA-4536-A25B-2F995B009050} = {7473C34D-E8E8-465F-96D9-CAF19904780F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7A9D6838-ED01-4238-A5A9-22EFD2D48A70}
