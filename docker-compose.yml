@@ -24,10 +24,10 @@ services:
       - core.api
       - storage.api
 
-  cms.api:
-    image: cms.api
+  web.api:
+    image: web.api
     build:
-      context: ./src/Services/Cms.Api
+      context: ./src/Applications/Web/Web.Api
       dockerfile: Dockerfile
 
   web.mvc:
@@ -36,7 +36,7 @@ services:
       context: ./src/Applications/Web/Web.Mvc
       dockerfile: Dockerfile
     depends_on:
-      - cms.api
+      - web.api
       - core.api
       - element.api
       - storage.api

@@ -25,7 +25,7 @@ services:
     ports:
       - "5103:80"
 
-  cms.api:
+  web.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     ports:
