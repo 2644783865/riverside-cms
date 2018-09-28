@@ -66,9 +66,10 @@ function FormSubmitButtonClick() {
     FormDisableAll();
     _formElementSubmitted = $(this).parent().parent();
     $(_formElementSubmitted).prepend('<div class="spinner"></div>');
-    $(_formElementSubmitted).find('form').hide();
+    var form = $(_formElementSubmitted).find('form');
+    $(form).hide();
     var content = FormGetActionRequest(_formElementSubmitted);
-    var url = '/api/v1/element/tenants/6/elementtypes/eafbd5ab-8c98-4edc-b8e1-42f5e8bfe2dc/elements/187/action?pageid=19';
+    var url = $(form).attr('action');
     $.ajax({
         url: url,
         type: 'post',

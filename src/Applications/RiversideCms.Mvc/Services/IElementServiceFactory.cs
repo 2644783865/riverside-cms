@@ -10,5 +10,6 @@ namespace RiversideCms.Mvc.Services
     {
         Task<IElementView> GetElementViewAsync(long tenantId, Guid elementTypeId, long elementId, PageContext context);
         Task<BlobContent> GetElementBlobContentAsync(long tenantId, Guid elementTypeId, long elementId, long blobSetId, string blobLabel);
+        Task<object> PerformElementActionAsync(long tenantId, Guid elementTypeId, long elementId, string requestJson, PageContext context);
     }
 }

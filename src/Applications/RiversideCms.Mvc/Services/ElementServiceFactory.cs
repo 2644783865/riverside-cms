@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using Riverside.Cms.Services.Core.Client;
 using Riverside.Cms.Services.Element.Client;
 using Riverside.Cms.Services.Storage.Client;
@@ -109,6 +110,20 @@ namespace RiversideCms.Mvc.Services
 
                 case "c92ee4c4-b133-44cc-8322-640e99c334dc":
                     return await _htmlElementService.ReadBlobContentAsync(tenantId, elementId, blobSetId, blobLabel);
+
+                default:
+                    return null;
+            }
+        }
+
+        private TRequest DeserializeJson<TRequest>(string json) => JsonConvert.DeserializeObject<TRequest>(json);
+
+        public async Task<object> PerformElementActionAsync(long tenantId, Guid elementTypeId, long elementId, string requestJson, PageContext context)
+        {
+            switch (elementTypeId.ToString())
+            {
+                case "eafbd5ab-8c98-4edc-b8e1-42f5e8bfe2dc":
+                    return await _formElementService.PerformElementActionAsync(tenantId, elementId, DeserializeJson<FormElementActionRequest>(requestJson), context);
 
                 default:
                     return null;

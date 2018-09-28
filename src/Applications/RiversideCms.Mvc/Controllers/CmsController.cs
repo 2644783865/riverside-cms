@@ -163,5 +163,17 @@ namespace RiversideCms.Mvc.Controllers
 
             return File(blobContent.Stream, blobContent.Type, blobContent.Name);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> PerformElementActionAsync(Guid elementTypeId, long elementId, long pageId, [ModelBinder(BinderType = typeof(JsonModelBinder))]string json)
+        {
+            PageContext context = new PageContext
+            {
+                PageId = pageId
+            };
+            long tenantId = await GetTenantIdAsync();
+            object response = await _elementServiceFactory.PerformElementActionAsync(tenantId, elementTypeId, elementId, json, context);
+            return Json(response);
+        }
     }
 }
