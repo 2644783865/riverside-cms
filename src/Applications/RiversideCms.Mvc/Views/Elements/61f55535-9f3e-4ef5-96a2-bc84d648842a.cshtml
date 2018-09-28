@@ -28,7 +28,7 @@
         <div class="rcms-page-list-pages">
             @foreach (PageListPage pageListPage in Model.Content.Pages)
             {
-            <div class="rcms-page-list-item" @if (pageListPage.BackgroundImage != null ) {<text>style="background-image: url(@Url.RouteUrl("PageImage", new { pageid = pageListPage.BackgroundImage.PageId, pageImageType = "thumbnail", description = Url.UrlFriendly(pageListPage.Name), t = pageListPage.BackgroundImage.BlobId}));"</text>}>
+            <div class="rcms-page-list-item" @if (pageListPage.BackgroundImage != null ) {<text>style="background-image: url(@Url.RouteUrl(RouteNames.PageImage, new { pageid = pageListPage.BackgroundImage.PageId, pageImageType = "thumbnail", description = Url.UrlFriendly(pageListPage.Name), t = pageListPage.BackgroundImage.BlobId}));"</text>}>
                 @if (Model.Settings.ShowBackgroundImage)
                 {
                     @Html.Raw("<div class=\"rcms-page-list-item-content\">")
@@ -43,7 +43,7 @@
                     <a href="@Url.PageUrl(pageListPage.PageId, pageListPage.Name, pageListPage.Home, null, null)">
                         <div class="media-object">
                             <img 
-                                 src="@Url.RouteUrl("PageImage", new { pageid = pageListPage.Image.PageId, pageImageType = "thumbnail", description = Url.UrlFriendly(pageListPage.Name), t = pageListPage.Image.BlobId})" alt="@pageListPage.Name"
+                                 src="@Url.RouteUrl(RouteNames.PageImage, new { pageid = pageListPage.Image.PageId, pageImageType = "thumbnail", description = Url.UrlFriendly(pageListPage.Name), t = pageListPage.Image.BlobId})" alt="@pageListPage.Name"
                                  width="@pageListPage.Image.Width"
                                  height="@pageListPage.Image.Height"
                             />

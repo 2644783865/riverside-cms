@@ -24,7 +24,7 @@ namespace RiversideCms.Mvc.Extensions
 
             // Update HTML so page preview image is background of div with jumbotron outer class
             IUrlHelper urlHelper = new UrlHelper(htmlHelper.ViewContext);
-            string previewImageUrl = urlHelper.RouteUrl("PageImage", new { pageid = pageView.PageId, pageImageType = "preview", description = UrlUtils.UrlFriendly(pageView.Title), t = pageView.PreviewImageBlobId.Value });
+            string previewImageUrl = urlHelper.RouteUrl(RouteNames.PageImage, new { pageid = pageView.PageId, pageImageType = "preview", description = UrlUtils.UrlFriendly(pageView.Title), t = pageView.PreviewImageBlobId.Value });
             string replaceText = string.Format("class=\"jumbotron-outer\" style=\"background-image: url({0});\"", previewImageUrl);
             html = html.Replace("class=\"jumbotron-outer\"", replaceText);
             return new HtmlString(html);

@@ -9,5 +9,11 @@ namespace RiversideCms.Mvc
     {
         public const string ElementAction = "ElementAction";
         public const string ElementBlobContent = "ElementBlobContent";
+        public const string Home = "Home";
+        public const string HomeTagged = "HomeTagged";
+        public const string Page = "Page";
+        public const string PageImage = "PageImage";
+        public const string PageTagged = "PageTagged";
+        public const string UserImage = "UserImage";
     }
 }

@@ -30,10 +30,15 @@ namespace RiversideCms.Mvc.Extensions
 
         private static string GetRouteName(bool home, IEnumerable<string> tagNames)
         {
-            string routeName = home ? "Home" : "Page";
-            if (tagNames != null && tagNames.Any())
-                routeName += "Tagged";
-            return routeName;
+            bool tags = tagNames != null && tagNames.Any();
+            switch (home)
+            {
+                case true:
+                    return tags ? RouteNames.HomeTagged : RouteNames.Home;
+
+                default:
+                    return tags ? RouteNames.PageTagged : RouteNames.Page;
+            }
         }
 
         private static RouteValueDictionary GetRouteValueDictionary(long pageId, string pageName, bool home, IEnumerable<string> tagNames, object values)

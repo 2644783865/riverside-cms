@@ -29,13 +29,13 @@
                         <div class="media-object">
                             @if (thread.LastPostByUser != null && thread.LastPostByUser.Image != null)
                             {
-                                <img src="@Url.RouteUrl("UserImage", new { userid = thread.LastPostByUser.UserId, userimagetype = "thumbnail", description = Url.UrlFriendly(thread.LastPostByUser.Alias), t = thread.LastPostByUser.Image.BlobId})" alt="@thread.LastPostByUser.Alias"
+                                <img src="@Url.RouteUrl(RouteNames.UserImage, new { userid = thread.LastPostByUser.UserId, userimagetype = "thumbnail", description = Url.UrlFriendly(thread.LastPostByUser.Alias), t = thread.LastPostByUser.Image.BlobId})" alt="@thread.LastPostByUser.Alias"
                                      width="@thread.LastPostByUser.Image.Width"
                                      height="@thread.LastPostByUser.Image.Height" />
                             }
                             else if (thread.StartedByUser.Image != null)
                             {
-                                <img src="@Url.RouteUrl("UserImage", new { userid = thread.StartedByUser.UserId, userimagetype = "thumbnail", description = Url.UrlFriendly(thread.StartedByUser.Alias), t = thread.StartedByUser.Image.BlobId})" alt="@thread.StartedByUser.Alias"
+                                <img src="@Url.RouteUrl(RouteNames.UserImage, new { userid = thread.StartedByUser.UserId, userimagetype = "thumbnail", description = Url.UrlFriendly(thread.StartedByUser.Alias), t = thread.StartedByUser.Image.BlobId})" alt="@thread.StartedByUser.Alias"
                                      width="@thread.StartedByUser.Image.Width"
                                      height="@thread.StartedByUser.Image.Height" />
                             }

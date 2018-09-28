@@ -19,7 +19,7 @@
     {
         <div class="media-object">
             <img 
-                 src="@Url.RouteUrl("PageImage", new { pageid = Model.Content.Image.PageId, pageImageType = "thumbnail", description = Url.UrlFriendly(Model.Content.Name), t = Model.Content.Image.BlobId})" alt="@Model.Content.Name"
+                 src="@Url.RouteUrl(RouteNames.PageImage, new { pageid = Model.Content.Image.PageId, pageImageType = "thumbnail", description = Url.UrlFriendly(Model.Content.Name), t = Model.Content.Image.BlobId})" alt="@Model.Content.Name"
                  width="@Model.Content.Image.Width"
                  height="@Model.Content.Image.Height"
             />
