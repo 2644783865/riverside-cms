@@ -63,15 +63,15 @@ namespace Riverside.Cms.Services.Element.Domain
         private readonly IElementRepository<FormElementSettings> _elementRepository;
         private readonly IEmailService _emailService;
         private readonly IPageService _pageService;
-        private readonly IWebService _webService;
+        private readonly ITenantService _tenantService;
 
-        public FormElementService(IDomainService domainService, IElementRepository<FormElementSettings> elementRepository, IEmailService emailService, IPageService pageService, IWebService webService)
+        public FormElementService(IDomainService domainService, IElementRepository<FormElementSettings> elementRepository, IEmailService emailService, IPageService pageService, ITenantService tenantService)
         {
             _domainService = domainService;
             _elementRepository = elementRepository;
             _emailService = emailService;
             _pageService = pageService;
-            _webService = webService;
+            _tenantService = tenantService;
         }
 
         public Task<FormElementSettings> ReadElementSettingsAsync(long tenantId, long elementId)
@@ -115,7 +115,7 @@ namespace Riverside.Cms.Services.Element.Domain
             return url.Replace("http://", string.Empty).Replace("https://", string.Empty);
         }
 
-        private Email GetEmail(Web web, WebDomain domain, Page page, FormElementSettings settings, EmailContent content)
+        private Email GetEmail(Tenant tenant, WebDomain domain, Page page, FormElementSettings settings, EmailContent content)
         {
             // Get to recipients
             IEnumerable<EmailAddress> toAddresses = GetEmailAddresses(new string[] { "\r\n", "\n" }, settings.RecipientEmail);
@@ -128,7 +128,7 @@ namespace Riverside.Cms.Services.Element.Domain
             EmailAddress fromEmailAddress = new EmailAddress
             {
                 Email = $"donotreply@{host}",
-                DisplayName = web.Name
+                DisplayName = tenant.Name
             };
 
             // Return email to send
@@ -217,12 +217,12 @@ namespace Riverside.Cms.Services.Element.Domain
             FormElementSettings settings = await _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
             Page page = await _pageService.ReadPageAsync(tenantId, context.PageId);
             WebDomain domain = await _domainService.ReadDomainByRedirectUrlAsync(tenantId, null);
-            Web web = await _webService.ReadWebAsync(tenantId);
+            Tenant tenant = await _tenantService.ReadTenantAsync(tenantId);
 
             // Construct email
             IEnumerable<FormFieldLabelValue> labelValues = GetFormFieldLabelValues(settings, request);
             EmailContent content = GetEmailContent(page, labelValues);
-            Email email = GetEmail(web, domain, page, settings, content);
+            Email email = GetEmail(tenant, domain, page, settings, content);
 
             // Send finished email
             _emailService.Send(email);

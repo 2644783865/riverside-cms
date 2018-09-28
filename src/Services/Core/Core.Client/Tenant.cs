@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Riverside.Cms.Services.Core.Client
 {
-    public class Web
+    public class Tenant
     {
         public long TenantId { get; set; }
         public string Name { get; set; }

@@ -8,16 +8,16 @@ using Newtonsoft.Json;
 
 namespace Riverside.Cms.Services.Core.Client
 {
-    public class WebService : IWebService
+    public class TenantService : ITenantService
     {
         private readonly IOptions<CoreApiOptions> _options;
 
-        public WebService(IOptions<CoreApiOptions> options)
+        public TenantService(IOptions<CoreApiOptions> options)
         {
             _options = options;
         }
 
-        public async Task<Web> ReadWebAsync(long tenantId)
+        public async Task<Tenant> ReadTenantAsync(long tenantId)
         {
             try
             {
@@ -25,7 +25,7 @@ namespace Riverside.Cms.Services.Core.Client
                 using (HttpClient httpClient = new HttpClient())
                 {
                     string json = await httpClient.GetStringAsync(uri);
-                    return JsonConvert.DeserializeObject<Web>(json);
+                    return JsonConvert.DeserializeObject<Tenant>(json);
                 }
             }
             catch (Exception ex)

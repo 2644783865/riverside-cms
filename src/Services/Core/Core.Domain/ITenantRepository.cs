@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Riverside.Cms.Services.Core.Domain
 {
-    public class Web
+    public interface ITenantRepository
     {
-        public long TenantId { get; set; }
-        public string Name { get; set; }
+        Task<Tenant> ReadTenantAsync(long tenantId);
     }
 }

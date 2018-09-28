@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 
 namespace Riverside.Cms.Services.Core.Domain
 {
-    public interface IWebService
+    public interface ITenantService
     {
-        Task<Web> ReadWebAsync(long tenantId);
+        Task<Tenant> ReadTenantAsync(long tenantId);
     }
 }

@@ -43,8 +43,8 @@ namespace Cms.Api
             services.AddTransient<IPageService, PageService>();
             services.AddTransient<IPageViewService, PageViewService>();
             services.AddTransient<ITagService, TagService>();
+            services.AddTransient<ITenantService, TenantService>();
             services.AddTransient<IUserService, UserService>();
-            services.AddTransient<IWebService, WebService>();
 
             // Core infrastructure services
             services.AddTransient<IDomainRepository, SqlDomainRepository>();
@@ -52,8 +52,8 @@ namespace Cms.Api
             services.AddTransient<IMasterPageRepository, SqlMasterPageRepository>();
             services.AddTransient<IPageRepository, SqlPageRepository>();
             services.AddTransient<ITagRepository, SqlTagRepository>();
+            services.AddTransient<ITenantRepository, SqlTenantRepository>();
             services.AddTransient<IUserRepository, SqlUserRepository>();
-            services.AddTransient<IWebRepository, SqlWebRepository>();
         }
 
         private void ConfigureDependencyInjectionElementServices(IServiceCollection services)

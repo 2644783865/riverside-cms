@@ -9,21 +9,21 @@ using Riverside.Cms.Services.Core.Domain;
 
 namespace Riverside.Cms.Services.Core.Infrastructure
 {
-    public class SqlWebRepository : IWebRepository
+    public class SqlTenantRepository : ITenantRepository
     {
         private readonly IOptions<SqlOptions> _options;
 
-        public SqlWebRepository(IOptions<SqlOptions> options)
+        public SqlTenantRepository(IOptions<SqlOptions> options)
         {
             _options = options;
         }
 
-        public async Task<Web> ReadWebAsync(long tenantId)
+        public async Task<Tenant> ReadTenantAsync(long tenantId)
         {
             using (SqlConnection connection = new SqlConnection(_options.Value.SqlConnectionString))
             {
                 connection.Open();
-                return await connection.QueryFirstOrDefaultAsync<Web>(@"
+                return await connection.QueryFirstOrDefaultAsync<Tenant>(@"
                     SELECT
                         TenantId,
                         Name

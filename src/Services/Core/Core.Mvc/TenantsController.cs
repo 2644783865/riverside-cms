@@ -8,25 +8,25 @@ using Riverside.Cms.Services.Core.Domain;
 
 namespace Riverside.Cms.Services.Core.Mvc
 {
-    public class WebsController : Controller
+    public class TenantsController : Controller
     {
-        private readonly IWebService _webService;
+        private readonly ITenantService _tenantService;
 
-        public WebsController(IWebService webService)
+        public TenantsController(ITenantService tenantService)
         {
-            _webService = webService;
+            _tenantService = tenantService;
         }
 
         [HttpGet]
         [Route("api/v1/core/tenants/{tenantId:int}")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(Web), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(Tenant), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> ReadWebAsync(long tenantId)
         {
-            Web web = await _webService.ReadWebAsync(tenantId);
-            if (web == null)
+            Tenant tenant = await _tenantService.ReadTenantAsync(tenantId);
+            if (tenant == null)
                 return NotFound();
-            return Ok(web);
+            return Ok(tenant);
         }
     }
 }
