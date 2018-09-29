@@ -1,11 +1,11 @@
 ﻿@using Riverside.Cms.Applications.Web.Mvc.Extensions
 @using Riverside.Cms.Services.Element.Client
 
-@model IElementView<AlbumElementSettings, AlbumElementContent>
+@model IElementViewModel<AlbumElementSettings, AlbumElementContent>
 
 <div class="rcms-album">
 
-    @if (!Model.Content.Photos.Any())
+    @if (!Model.View.Content.Photos.Any())
     {
         <div class="rcms-album-photo-info">
             <h2>Album has no photos</h2>
@@ -17,11 +17,11 @@
         <div class="rcms-album-photos">
             @{
                 int index = -1;
-                foreach (AlbumPhoto photo in Model.Settings.Photos)
+                foreach (AlbumPhoto photo in Model.View.Settings.Photos)
                 {
                     index++;
-                    AlbumContentPhoto contentPhoto = Model.Content.Photos.ContainsKey(photo.BlobSetId) ? Model.Content.Photos[photo.BlobSetId] : null;
-                    string previewImageUrl = Url.RouteUrl(RouteNames.ElementBlobContent, new { elementtypeid = Model.Settings.ElementTypeId, elementid = Model.Settings.ElementId, blobsetid = photo.BlobSetId, bloblabel = "preview", t = photo.PreviewImageBlobId });
+                    AlbumContentPhoto contentPhoto = Model.View.Content.Photos.ContainsKey(photo.BlobSetId) ? Model.View.Content.Photos[photo.BlobSetId] : null;
+                    string previewImageUrl = Url.RouteUrl(RouteNames.ElementBlobContent, new { elementtypeid = Model.View.Settings.ElementTypeId, elementid = Model.View.Settings.ElementId, blobsetid = photo.BlobSetId, bloblabel = "preview", t = photo.PreviewImageBlobId });
                     <div class="rcms-album-photo">
                         <a
                            data-index="@index"
@@ -32,7 +32,7 @@
                             <img width="@contentPhoto.ThumbnailWidth"
                                  height="@contentPhoto.ThumbnailHeight"
                                  alt="@photo.Name"
-                                 src="@Url.RouteUrl(RouteNames.ElementBlobContent, new { elementtypeid = Model.Settings.ElementTypeId, elementid = Model.Settings.ElementId, blobsetid = photo.BlobSetId, bloblabel = "thumbnail", t = photo.ThumbnailImageBlobId })" />
+                                 src="@Url.RouteUrl(RouteNames.ElementBlobContent, new { elementtypeid = Model.View.Settings.ElementTypeId, elementid = Model.View.Settings.ElementId, blobsetid = photo.BlobSetId, bloblabel = "thumbnail", t = photo.ThumbnailImageBlobId })" />
                         </a>
                     </div>
                 }

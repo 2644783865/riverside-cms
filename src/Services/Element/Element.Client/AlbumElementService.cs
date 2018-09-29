@@ -70,7 +70,7 @@ namespace Riverside.Cms.Services.Element.Client
             }
         }
 
-        public async Task<IElementView<AlbumElementSettings, AlbumElementContent>> ReadElementViewAsync(long tenantId, long elementId, PageContext context)
+        public async Task<IElementView<AlbumElementSettings, AlbumElementContent>> ReadElementViewAsync(long tenantId, long elementId, IPageContext context)
         {
             try
             {

@@ -153,7 +153,7 @@ namespace Riverside.Cms.Services.Element.Domain
             };
         }
 
-        public async Task<IElementView<PageListElementSettings, PageListElementContent>> ReadElementViewAsync(long tenantId, long elementId, PageContext context)
+        public async Task<IElementView<PageListElementSettings, PageListElementContent>> ReadElementViewAsync(long tenantId, long elementId, IPageContext context)
         {
             PageListElementSettings settings = await _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
             if (settings == null)

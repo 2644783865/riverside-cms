@@ -8,6 +8,6 @@ namespace Riverside.Cms.Services.Element.Client
 {
     public interface IElementViewService<TSettings, TContent> where TSettings : IElementSettings
     {
-        Task<IElementView<TSettings, TContent>> ReadElementViewAsync(long tenantId, long elementId, PageContext context);
+        Task<IElementView<TSettings, TContent>> ReadElementViewAsync(long tenantId, long elementId, IPageContext context);
     }
 }

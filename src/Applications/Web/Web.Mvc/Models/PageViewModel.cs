@@ -6,9 +6,9 @@ using Riverside.Cms.Services.Core.Client;
 
 namespace Riverside.Cms.Applications.Web.Mvc.Models
 {
-    public class PageRender
+    public class PageViewModel
     {
         public PageView View { get; set; }
-        public Dictionary<long, ElementRender> Elements { get; set; }
+        public Dictionary<long, ElementPartialView> Elements { get; set; }
     }
 }

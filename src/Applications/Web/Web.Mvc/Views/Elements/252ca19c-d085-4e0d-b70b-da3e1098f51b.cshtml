@@ -1,36 +1,36 @@
 ﻿@using Riverside.Cms.Applications.Web.Mvc.Extensions
 @using Riverside.Cms.Services.Element.Client
 
-@model IElementView<TableElementSettings, TableElementContent>
+@model IElementViewModel<TableElementSettings, TableElementContent>
 
 <div class="rcms-table">
 
-    @if (Model.Settings.DisplayName != string.Empty)
+    @if (Model.View.Settings.DisplayName != string.Empty)
     {
-        <h2>@Model.Settings.DisplayName</h2>
+        <h2>@Model.View.Settings.DisplayName</h2>
     }
 
-    @if (Model.Settings.Preamble != string.Empty)
+    @if (Model.View.Settings.Preamble != string.Empty)
     {
-        <p class="rcms-preamble">@Html.FormatMultiline(Model.Settings.Preamble)</p>
+        <p class="rcms-preamble">@Html.FormatMultiline(Model.View.Settings.Preamble)</p>
     }
 
     <table class="table">
-        @if (Model.Content.Headers != null)
+        @if (Model.View.Content.Headers != null)
         {
             <thead>
                 <tr>
-                    @foreach (string header in Model.Content.Headers)
+                    @foreach (string header in Model.View.Content.Headers)
                     {
                         <th>@header</th>
                     }
                 </tr>
             </thead>
         }
-        @if (Model.Content.Rows.Any())
+        @if (Model.View.Content.Rows.Any())
         {
             <tbody>
-                @foreach (IEnumerable<string> row in Model.Content.Rows)
+                @foreach (IEnumerable<string> row in Model.View.Content.Rows)
                 {
                     <tr>
                         @foreach (string cell in row)

@@ -76,7 +76,7 @@ namespace Riverside.Cms.Services.Element.Client
             }
         }
 
-        public async Task<IElementView<FormElementSettings, object>> ReadElementViewAsync(long tenantId, long elementId, PageContext context)
+        public async Task<IElementView<FormElementSettings, object>> ReadElementViewAsync(long tenantId, long elementId, IPageContext context)
         {
             try
             {
@@ -93,7 +93,7 @@ namespace Riverside.Cms.Services.Element.Client
             }
         }
 
-        public async Task<FormElementActionResponse> PerformElementActionAsync(long tenantId, long elementId, FormElementActionRequest request, PageContext context)
+        public async Task<FormElementActionResponse> PerformElementActionAsync(long tenantId, long elementId, FormElementActionRequest request, IPageContext context)
         {
             try
             {

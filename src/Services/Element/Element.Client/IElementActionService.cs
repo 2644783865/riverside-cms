@@ -7,6 +7,6 @@ namespace Riverside.Cms.Services.Element.Client
 {
     public interface IElementActionService<TRequest, TResponse>
     {
-        Task<TResponse> PerformElementActionAsync(long tenantId, long elementId, TRequest request, PageContext context);
+        Task<TResponse> PerformElementActionAsync(long tenantId, long elementId, TRequest request, IPageContext context);
     }
 }

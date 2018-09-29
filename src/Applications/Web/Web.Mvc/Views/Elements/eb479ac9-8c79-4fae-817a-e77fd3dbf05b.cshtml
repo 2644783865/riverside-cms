@@ -1,22 +1,22 @@
 ﻿@using Riverside.Cms.Applications.Web.Mvc.Extensions
 @using Riverside.Cms.Services.Element.Client
 
-@model IElementView<TestimonialElementSettings, object>
+@model IElementViewModel<TestimonialElementSettings, object>
 
 <div class="rcms-testimonials">
 
-    @if (Model.Settings.DisplayName != string.Empty)
+    @if (Model.View.Settings.DisplayName != string.Empty)
     {
-        <h2>@Model.Settings.DisplayName</h2>
+        <h2>@Model.View.Settings.DisplayName</h2>
     }
 
-    @if (Model.Settings.Preamble != string.Empty)
+    @if (Model.View.Settings.Preamble != string.Empty)
     {
-        <p class="rcms-preamble">@Html.FormatMultiline(Model.Settings.Preamble)</p>
+        <p class="rcms-preamble">@Html.FormatMultiline(Model.View.Settings.Preamble)</p>
     }
 
     <ul>
-        @if (!Model.Settings.Testimonials.Any())
+        @if (!Model.View.Settings.Testimonials.Any())
         {
             <li>
                 <div class="rcms-testimonial">
@@ -26,7 +26,7 @@
                 </div>
             </li>
         }
-        @foreach (Testimonial testimonial in Model.Settings.Testimonials)
+        @foreach (Testimonial testimonial in Model.View.Settings.Testimonials)
         {
             <li>
                 <div class="rcms-testimonial">

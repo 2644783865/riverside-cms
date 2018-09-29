@@ -72,7 +72,7 @@ namespace Riverside.Cms.Services.Element.Domain
             return _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
         }
 
-        public async Task<IElementView<PageHeaderElementSettings, PageHeaderElementContent>> ReadElementViewAsync(long tenantId, long elementId, PageContext context)
+        public async Task<IElementView<PageHeaderElementSettings, PageHeaderElementContent>> ReadElementViewAsync(long tenantId, long elementId, IPageContext context)
         {
             PageHeaderElementSettings settings = await _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
             if (settings == null)

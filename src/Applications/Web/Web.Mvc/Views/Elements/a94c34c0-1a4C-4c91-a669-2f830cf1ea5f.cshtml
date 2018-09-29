@@ -2,14 +2,14 @@
 @using Riverside.Cms.Services.Core.Client
 @using Riverside.Cms.Services.Element.Client
 
-@model IElementView<NavigationBarElementSettings, NavigationBarElementContent>
+@model IElementViewModel<NavigationBarElementSettings, NavigationBarElementContent>
 
 @{
     bool userLoggedOn = User.Identity.IsAuthenticated;
-    bool showLoggedOffUserOptions = Model.Settings.ShowLoggedOffUserOptions && !userLoggedOn;
-    bool showLoggedOnUserOptions = Model.Settings.ShowLoggedOnUserOptions && userLoggedOn;
+    bool showLoggedOffUserOptions = Model.View.Settings.ShowLoggedOffUserOptions && !userLoggedOn;
+    bool showLoggedOnUserOptions = Model.View.Settings.ShowLoggedOnUserOptions && userLoggedOn;
     bool adminTabs = showLoggedOnUserOptions || showLoggedOffUserOptions;
-    bool pageTabs = Model.Content.Tabs.Any();
+    bool pageTabs = Model.View.Content.Tabs.Any();
 }
 
 <div class="rcms-nav-bar">
@@ -25,9 +25,9 @@
                         <span class="icon-bar"></span>
                     </button>
                 }
-                @if (Model.Settings.Brand != string.Empty)
+                @if (Model.View.Settings.Brand != string.Empty)
                 {
-                    <a class="navbar-brand" href="@Url.Content("~/")">@Model.Settings.Brand</a>
+                    <a class="navbar-brand" href="@Url.Content("~/")">@Model.View.Settings.Brand</a>
                 }
             </div>
             @if (pageTabs || adminTabs)
@@ -36,7 +36,7 @@
                     @if (pageTabs)
                     {
                         <ul class="nav navbar-nav">
-                            @foreach (NavigationBarContentTab tab in Model.Content.Tabs)
+                            @foreach (NavigationBarContentTab tab in Model.View.Content.Tabs)
                             {
                                 if (tab.Tabs.Any())
                                 {

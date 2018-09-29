@@ -1,28 +1,28 @@
 ﻿@using Riverside.Cms.Applications.Web.Mvc.Extensions
 @using Riverside.Cms.Services.Element.Client
 
-@model IElementView<LatestThreadsElementSettings, LatestThreadsElementContent>
+@model IElementViewModel<LatestThreadsElementSettings, LatestThreadsElementContent>
 
 <div class="rcms-latest-threads">
 
-    @if (Model.Settings.DisplayName != null)
+    @if (Model.View.Settings.DisplayName != null)
     {
-        <h2>@Model.Settings.DisplayName</h2>
+        <h2>@Model.View.Settings.DisplayName</h2>
     }
 
-    @if (Model.Settings.Preamble != null)
+    @if (Model.View.Settings.Preamble != null)
     {
-        <p class="rcms-preamble">@Html.FormatMultiline(Model.Settings.Preamble)</p>
+        <p class="rcms-preamble">@Html.FormatMultiline(Model.View.Settings.Preamble)</p>
     }
 
-    @if (!Model.Content.Threads.Any())
+    @if (!Model.View.Content.Threads.Any())
     {
-        <p>@Model.Settings.NoThreadsMessage</p>
+        <p>@Model.View.Settings.NoThreadsMessage</p>
     }
     else
     {
         <ul class="comments">
-            @foreach (LatestThreadsThread thread in Model.Content.Threads)
+            @foreach (LatestThreadsThread thread in Model.View.Content.Threads)
             {
                 <li>
                     <a href="@Url.PageUrl(thread.PageId, thread.Subject, false, null, null)">

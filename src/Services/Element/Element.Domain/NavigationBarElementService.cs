@@ -103,7 +103,7 @@ namespace Riverside.Cms.Services.Element.Domain
             return GetContentTabs(pagesById, currentPageHierarchy, settings.Tabs);
         }
 
-        public async Task<IElementView<NavigationBarElementSettings, NavigationBarElementContent>> ReadElementViewAsync(long tenantId, long elementId, PageContext context)
+        public async Task<IElementView<NavigationBarElementSettings, NavigationBarElementContent>> ReadElementViewAsync(long tenantId, long elementId, IPageContext context)
         {
             NavigationBarElementSettings settings = await _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
             if (settings == null)

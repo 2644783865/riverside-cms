@@ -1,12 +1,12 @@
 ﻿@using Riverside.Cms.Applications.Web.Mvc.Extensions
 @using Riverside.Cms.Services.Element.Client
 
-@model IElementView<CarouselElementSettings, CarouselElementContent>
+@model IElementViewModel<CarouselElementSettings, CarouselElementContent>
 
 <div class="rcms-carousel">
 
     <ul>
-        @if (!Model.Settings.Slides.Any())
+        @if (!Model.View.Settings.Slides.Any())
         {
             <li>
                 <div class="rcms-carousel-slide">
@@ -19,13 +19,13 @@
         }
         else
         {
-            foreach (CarouselSlide slide in Model.Settings.Slides)
+            foreach (CarouselSlide slide in Model.View.Settings.Slides)
             {
-                if (Model.Content.Slides.ContainsKey(slide.BlobSetId))
+                if (Model.View.Content.Slides.ContainsKey(slide.BlobSetId))
                 {
-                    CarouselContentSlide contentSlide = Model.Content.Slides[slide.BlobSetId];
+                    CarouselContentSlide contentSlide = Model.View.Content.Slides[slide.BlobSetId];
                     <li>
-                        <div class="rcms-carousel-slide" style="background-image: url(@Url.RouteUrl(RouteNames.ElementBlobContent, new { elementtypeid = Model.Settings.ElementTypeId, elementid = Model.Settings.ElementId, blobsetid = slide.BlobSetId, bloblabel = "preview", t = slide.PreviewImageBlobId }));">
+                        <div class="rcms-carousel-slide" style="background-image: url(@Url.RouteUrl(RouteNames.ElementBlobContent, new { elementtypeid = Model.View.Settings.ElementTypeId, elementid = Model.View.Settings.ElementId, blobsetid = slide.BlobSetId, bloblabel = "preview", t = slide.PreviewImageBlobId }));">
                             @if (slide.Name != null || slide.Description != null || contentSlide.Button != null)
                             {
                                 <div class="rcms-carousel-slide-info">

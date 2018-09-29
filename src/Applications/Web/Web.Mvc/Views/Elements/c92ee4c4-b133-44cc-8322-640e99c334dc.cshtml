@@ -1,8 +1,8 @@
 ﻿@using Riverside.Cms.Applications.Web.Mvc.Extensions
 @using Riverside.Cms.Services.Element.Client
 
-@model IElementView<HtmlElementSettings, HtmlElementContent>
+@model IElementViewModel<HtmlElementSettings, HtmlElementContent>
 
 <div class="rcms-html">
-    @Html.FormatHtmlElementHtml(Model)
+    @Html.FormatHtmlElementHtml(Model.View)
 </div>

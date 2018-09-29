@@ -104,7 +104,7 @@ namespace Riverside.Cms.Services.Element.Domain
             return tagCloudSizes.OrderBy(t => t.Name);
         }
 
-        public async Task<IElementView<TagCloudElementSettings, TagCloudElementContent>> ReadElementViewAsync(long tenantId, long elementId, PageContext context)
+        public async Task<IElementView<TagCloudElementSettings, TagCloudElementContent>> ReadElementViewAsync(long tenantId, long elementId, IPageContext context)
         {
             TagCloudElementSettings settings = await _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
 

@@ -1,7 +1,7 @@
 ﻿@using Riverside.Cms.Applications.Web.Mvc.Extensions
 @using Riverside.Cms.Services.Core.Client
 
-@model PageRender
+@model PageViewModel
 
 @{
     Layout = null;
@@ -31,7 +31,7 @@
         {
             @Html.FormatRaw(Model.View, pageViewZoneElement.BeginRender)
             <div class="rcms-element" id="@(pageViewZoneElement.ElementTypeId + "_" + pageViewZoneElement.ElementId)">
-                @{ if (Model.Elements.ContainsKey(pageViewZoneElement.ElementId)) { @await Html.PartialAsync(Model.Elements[pageViewZoneElement.ElementId].PartialViewName, Model.Elements[pageViewZoneElement.ElementId].ElementView); } }
+                @{ if (Model.Elements.ContainsKey(pageViewZoneElement.ElementId)) { @await Html.PartialAsync(Model.Elements[pageViewZoneElement.ElementId].Name, Model.Elements[pageViewZoneElement.ElementId].Model); } }
             </div>
             @Html.FormatRaw(Model.View, pageViewZoneElement.EndRender)
         }

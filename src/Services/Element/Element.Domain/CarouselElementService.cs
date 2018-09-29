@@ -73,7 +73,7 @@ namespace Riverside.Cms.Services.Element.Domain
             return _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
         }
 
-        public async Task<IElementView<CarouselElementSettings, CarouselElementContent>> ReadElementViewAsync(long tenantId, long elementId, PageContext context)
+        public async Task<IElementView<CarouselElementSettings, CarouselElementContent>> ReadElementViewAsync(long tenantId, long elementId, IPageContext context)
         {
             // Get element settings
             CarouselElementSettings settings = await _elementRepository.ReadElementSettingsAsync(tenantId, elementId);

@@ -62,7 +62,7 @@ namespace Riverside.Cms.Services.Element.Domain
             return _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
         }
 
-        public async Task<IElementView<AlbumElementSettings, AlbumElementContent>> ReadElementViewAsync(long tenantId, long elementId, PageContext context)
+        public async Task<IElementView<AlbumElementSettings, AlbumElementContent>> ReadElementViewAsync(long tenantId, long elementId, IPageContext context)
         {
             // Get element settings
             AlbumElementSettings settings = await _elementRepository.ReadElementSettingsAsync(tenantId, elementId);

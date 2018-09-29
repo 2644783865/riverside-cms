@@ -42,7 +42,7 @@ namespace Riverside.Cms.Services.Element.Domain
             return message.Replace("%YEAR%", DateTime.UtcNow.Year.ToString());
         }
 
-        public async Task<IElementView<FooterElementSettings, FooterElementContent>> ReadElementViewAsync(long tenantId, long elementId, PageContext context)
+        public async Task<IElementView<FooterElementSettings, FooterElementContent>> ReadElementViewAsync(long tenantId, long elementId, IPageContext context)
         {
             FooterElementSettings settings = await _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
             if (settings == null)

@@ -46,16 +46,16 @@ namespace Riverside.Cms.Applications.Web.Mvc.Controllers
             return domain.TenantId;
         }
 
-        private async Task<ElementRender> GetElementRenderAsync(long tenantId, Guid elementTypeId, long elementId, PageContext context)
+        private async Task<ElementPartialView> GetElementPartialViewAsync(long tenantId, Guid elementTypeId, long elementId, IPageContext context)
         {
-            IElementView elementView = await _elementServiceFactory.GetElementViewAsync(tenantId, elementTypeId, elementId, context);
-            if (elementView == null)
-                return new ElementRender { PartialViewName = "~/Views/Elements/NotFound.cshtml" };
+            IElementViewModel model = await _elementServiceFactory.GetElementViewModelAsync(tenantId, elementTypeId, elementId, context);
+            if (model == null)
+                return new ElementPartialView { Name = "~/Views/Elements/NotFound.cshtml" };
 
-            return new ElementRender
+            return new ElementPartialView
             {
-                PartialViewName = $"~/Views/Elements/{elementTypeId}.cshtml",
-                ElementView = elementView
+                Name = $"~/Views/Elements/{elementTypeId}.cshtml",
+                Model = model
             };
         }
 
@@ -68,7 +68,7 @@ namespace Riverside.Cms.Applications.Web.Mvc.Controllers
             return tags.Select(t => t.TagId);
         }
 
-        private async Task<PageContext> GetPageContextAsync(long tenantId, long pageId, string tags)
+        private async Task<IPageContext> GetPageContextAsync(long tenantId, long pageId, string tags)
         {
             return new PageContext
             {
@@ -80,30 +80,30 @@ namespace Riverside.Cms.Applications.Web.Mvc.Controllers
 
         private async Task<IActionResult> ReadPageTaggedAsync(long tenantId, long pageId, string tags)
         {
-            PageContext context = await GetPageContextAsync(tenantId, pageId, tags);
+            IPageContext context = await GetPageContextAsync(tenantId, pageId, tags);
 
             PageView pageView = await _pageViewService.ReadPageViewAsync(tenantId, pageId);
             pageView.PageViewZones = await _pageViewService.SearchPageViewZonesAsync(tenantId, pageId);
             foreach (PageViewZone pageViewZone in pageView.PageViewZones)
                 pageViewZone.PageViewZoneElements = await _pageViewService.SearchPageViewZoneElementsAsync(tenantId, pageId, pageViewZone.MasterPageZoneId);
 
-            Dictionary<long, ElementRender> elements = new Dictionary<long, ElementRender>();
+            Dictionary<long, ElementPartialView> elements = new Dictionary<long, ElementPartialView>();
             foreach (PageViewZone pageViewZone in pageView.PageViewZones)
             {
                 foreach (PageViewZoneElement pageViewZoneElement in pageViewZone.PageViewZoneElements)
                 {
                     if (!elements.ContainsKey(pageViewZoneElement.ElementId))
-                        elements.Add(pageViewZoneElement.ElementId, await GetElementRenderAsync(tenantId, pageViewZoneElement.ElementTypeId, pageViewZoneElement.ElementId, context));
+                        elements.Add(pageViewZoneElement.ElementId, await GetElementPartialViewAsync(tenantId, pageViewZoneElement.ElementTypeId, pageViewZoneElement.ElementId, context));
                 }
             }
 
-            PageRender pageRender = new PageRender
+            PageViewModel viewModel = new PageViewModel
             {
                 View = pageView,
                 Elements = elements
             };
 
-            return View("Read", pageRender);
+            return View("Read", viewModel);
         }
 
 

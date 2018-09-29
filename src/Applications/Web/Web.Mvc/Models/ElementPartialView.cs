@@ -6,9 +6,9 @@ using Riverside.Cms.Services.Element.Client;
 
 namespace Riverside.Cms.Applications.Web.Mvc.Models
 {
-    public class ElementRender
+    public class ElementPartialView
     {
-        public string PartialViewName { get; set; }
-        public IElementView ElementView { get; set; }
+        public string Name { get; set; }
+        public IElementViewModel Model { get; set; }
     }
 }

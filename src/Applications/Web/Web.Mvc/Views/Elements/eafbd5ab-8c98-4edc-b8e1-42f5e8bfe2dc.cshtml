@@ -1,13 +1,13 @@
 ﻿@using Riverside.Cms.Applications.Web.Mvc.Extensions
 @using Riverside.Cms.Services.Element.Client
 
-@model IElementView<FormElementSettings, object>
+@model IElementViewModel<FormElementSettings, object>
 
 <div class="rcms-form">
 
-    <form role="form" action="@Url.RouteUrl(RouteNames.ElementAction, new { elementId = Model.Settings.ElementId, elementTypeId = Model.Settings.ElementTypeId, pageid = 19 } )">
+    <form role="form" action="@Url.RouteUrl(RouteNames.ElementAction, new { elementId = Model.View.Settings.ElementId, elementTypeId = Model.View.Settings.ElementTypeId, pageid = Model.Context.PageId } )">
 
-        @foreach (FormField field in Model.Settings.Fields)
+        @foreach (FormField field in Model.View.Settings.Fields)
         {
             <div class="form-group @if (field.Required) {<text>has-error</text>}">
                 <label class="control-label" for="field_@field.FormFieldId">@field.Label</label>
@@ -42,7 +42,7 @@
             </div>
         }
 
-        <button class="btn btn-primary" type="submit" disabled="disabled">@Model.Settings.SubmitButtonLabel</button>
+        <button class="btn btn-primary" type="submit" disabled="disabled">@Model.View.Settings.SubmitButtonLabel</button>
 
     </form>
 

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Riverside.Cms.Services.Element.Client
 {
-    public class PageContext
+    public class PageContext : IPageContext
     {
         public long PageId { get; set; }
         public IEnumerable<long> TagIds { get; set; }

@@ -2,29 +2,29 @@
 @using Riverside.Cms.Services.Core.Client
 @using Riverside.Cms.Services.Element.Client
 
-@model IElementView<TagCloudElementSettings, TagCloudElementContent>
+@model IElementViewModel<TagCloudElementSettings, TagCloudElementContent>
 
 <div class="rcms-tag-cloud">
 
-    @if (Model.Settings.DisplayName != null)
+    @if (Model.View.Settings.DisplayName != null)
     {
-        <h2>@Model.Settings.DisplayName</h2>
+        <h2>@Model.View.Settings.DisplayName</h2>
     }
 
-    @if (Model.Content.AvailableTags.Any() || Model.Content.SelectedTags.Any() || Model.Content.RelatedTags.Any())
+    @if (Model.View.Content.AvailableTags.Any() || Model.View.Content.SelectedTags.Any() || Model.View.Content.RelatedTags.Any())
     {
         <ul class="tags">
-            @foreach (TagCloudSize tag in Model.Content.AvailableTags)
-            {<li class="tag-available"><a class="tag@(tag.Size)" href="@Url.PageUrl(Model.Content.Page.PageId, Model.Content.Page.Name, Model.Content.Page.Home, new[] { tag.Name }, null)">@tag.Name</a></li>}
-            @foreach (Tag tag in Model.Content.SelectedTags)
-            {<li class="tag-tagged"><a href="@Url.PageUrl(Model.Content.Page.PageId, Model.Content.Page.Name, Model.Content.Page.Home, Model.Content.SelectedTags.Select(t => t.Name).Where(t => t != tag.Name), null)">@tag.Name <i class="fa fa-times" aria-hidden="true"></i></a></li>}
-            @foreach (TagCloudSize tag in Model.Content.RelatedTags)
-            {<li class="tag-available"><a class="tag@(tag.Size)" href="@Url.PageUrl(Model.Content.Page.PageId, Model.Content.Page.Name, Model.Content.Page.Home, Model.Content.SelectedTags.Select(t => t.Name).Append(tag.Name), null)">@tag.Name</a></li>}
+            @foreach (TagCloudSize tag in Model.View.Content.AvailableTags)
+            {<li class="tag-available"><a class="tag@(tag.Size)" href="@Url.PageUrl(Model.View.Content.Page.PageId, Model.View.Content.Page.Name, Model.View.Content.Page.Home, new[] { tag.Name }, null)">@tag.Name</a></li>}
+            @foreach (Tag tag in Model.View.Content.SelectedTags)
+            {<li class="tag-tagged"><a href="@Url.PageUrl(Model.View.Content.Page.PageId, Model.View.Content.Page.Name, Model.View.Content.Page.Home, Model.View.Content.SelectedTags.Select(t => t.Name).Where(t => t != tag.Name), null)">@tag.Name <i class="fa fa-times" aria-hidden="true"></i></a></li>}
+            @foreach (TagCloudSize tag in Model.View.Content.RelatedTags)
+            {<li class="tag-available"><a class="tag@(tag.Size)" href="@Url.PageUrl(Model.View.Content.Page.PageId, Model.View.Content.Page.Name, Model.View.Content.Page.Home, Model.View.Content.SelectedTags.Select(t => t.Name).Append(tag.Name), null)">@tag.Name</a></li>}
         </ul>
     }
     else
     {
-        <p>@Model.Settings.NoTagsMessage</p>
+        <p>@Model.View.Settings.NoTagsMessage</p>
     }
 
 </div>

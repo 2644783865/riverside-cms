@@ -1,12 +1,12 @@
 ﻿@using Riverside.Cms.Applications.Web.Mvc.Extensions
 @using Riverside.Cms.Services.Element.Client
 
-@model IElementView<FooterElementSettings, FooterElementContent>
+@model IElementViewModel<FooterElementSettings, FooterElementContent>
 
 @{ 
     bool userLoggedOn = User.Identity.IsAuthenticated;
-    bool showLoggedOffUserOptions = Model.Settings.ShowLoggedOffUserOptions && !userLoggedOn;
-    bool showLoggedOnUserOptions = Model.Settings.ShowLoggedOnUserOptions && userLoggedOn;
+    bool showLoggedOffUserOptions = Model.View.Settings.ShowLoggedOffUserOptions && !userLoggedOn;
+    bool showLoggedOnUserOptions = Model.View.Settings.ShowLoggedOnUserOptions && userLoggedOn;
 
     string colClass = showLoggedOffUserOptions || showLoggedOnUserOptions ? "col-sm-6" : "col-sm-12";
 }
@@ -14,7 +14,7 @@
 <div class="rcms-footer">
     <div class="row">
         <div class="@colClass">
-            @Html.MarkdownToHtml(Model.Content.FormattedMessage)
+            @Html.MarkdownToHtml(Model.View.Content.FormattedMessage)
         </div>
         @if (showLoggedOffUserOptions)
         {
