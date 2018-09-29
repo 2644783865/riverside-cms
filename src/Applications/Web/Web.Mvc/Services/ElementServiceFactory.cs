@@ -45,72 +45,84 @@ namespace Riverside.Cms.Applications.Web.Mvc.Services
             _testimonialElementService = testimonialElementService;
         }
 
-        public async Task<IElementViewModel> GetElementViewModelAsync(long tenantId, Guid elementTypeId, long elementId, IPageContext context)
+        private async Task<IElementViewModel> GetElementViewModelAsync<TSettings, TContent>(long tenantId, long elementId, IPageContext context, Func<long, long, IPageContext, Task<IElementView<TSettings, TContent>>> func) where TSettings : IElementSettings
+        {
+            IElementView view = await func(tenantId, elementId, context);
+            if (view == null)
+                return null;
+            return new ElementViewModel<TSettings, TContent>
+            {
+                View = view,
+                Context = context
+            };
+        }
+
+        public Task<IElementViewModel> GetElementViewModelAsync(long tenantId, Guid elementTypeId, long elementId, IPageContext context)
         {
             switch (elementTypeId.ToString())
             {
                 case "b539d2a4-52ae-40d5-b366-e42447b93d15":
-                    return new ElementViewModel<AlbumElementSettings, AlbumElementContent> { View = await _albumElementService.ReadElementViewAsync(tenantId, elementId, context), Context = context };
+                    return GetElementViewModelAsync(tenantId, elementId, context, _albumElementService.ReadElementViewAsync);
 
                 case "aacb11a0-5532-47cb-aab9-939cee3d5175":
-                    return new ElementViewModel<CarouselElementSettings, CarouselElementContent> { View = await _carouselElementService.ReadElementViewAsync(tenantId, elementId, context), Context = context };
+                    return GetElementViewModelAsync(tenantId, elementId, context, _carouselElementService.ReadElementViewAsync);
 
                 case "5401977d-865f-4a7a-b416-0a26305615de":
-                    return new ElementViewModel<CodeSnippetElementSettings, object> { View = await _codeSnippetElementService.ReadElementViewAsync(tenantId, elementId, context), Context = context };
+                    return GetElementViewModelAsync(tenantId, elementId, context, _codeSnippetElementService.ReadElementViewAsync);
 
                 case "f1c2b384-4909-47c8-ada7-cd3cc7f32620":
-                    return new ElementViewModel<FooterElementSettings, FooterElementContent> { View = await _footerElementService.ReadElementViewAsync(tenantId, elementId, context), Context = context };
+                    return GetElementViewModelAsync(tenantId, elementId, context, _footerElementService.ReadElementViewAsync);
 
                 case "eafbd5ab-8c98-4edc-b8e1-42f5e8bfe2dc":
-                    return new ElementViewModel<FormElementSettings, object> { View = await _formElementService.ReadElementViewAsync(tenantId, elementId, context), Context = context };
+                    return GetElementViewModelAsync(tenantId, elementId, context, _formElementService.ReadElementViewAsync);
 
                 case "c92ee4c4-b133-44cc-8322-640e99c334dc":
-                    return new ElementViewModel<HtmlElementSettings, HtmlElementContent> { View = await _htmlElementService.ReadElementViewAsync(tenantId, elementId, context), Context = context };
+                    return GetElementViewModelAsync(tenantId, elementId, context, _htmlElementService.ReadElementViewAsync);
 
                 case "f9557287-ba01-48e3-9ab4-e2f4831933d0":
-                    return new ElementViewModel<LatestThreadsElementSettings, LatestThreadsElementContent> { View = await _latestThreadsElementService.ReadElementViewAsync(tenantId, elementId, context), Context = context };
+                    return GetElementViewModelAsync(tenantId, elementId, context, _latestThreadsElementService.ReadElementViewAsync);
 
                 case "a94c34c0-1a4c-4c91-a669-2f830cf1ea5f":
-                    return new ElementViewModel<NavigationBarElementSettings, NavigationBarElementContent> { View = await _navigationBarElementService.ReadElementViewAsync(tenantId, elementId, context), Context = context };
+                    return GetElementViewModelAsync(tenantId, elementId, context, _navigationBarElementService.ReadElementViewAsync);
 
                 case "1cbac30c-5deb-404e-8ea8-aabc20c82aa8":
-                    return new ElementViewModel<PageHeaderElementSettings, PageHeaderElementContent> { View = await _pageHeaderElementService.ReadElementViewAsync(tenantId, elementId, context), Context = context };
+                    return GetElementViewModelAsync(tenantId, elementId, context, _pageHeaderElementService.ReadElementViewAsync);
 
                 case "61f55535-9f3e-4ef5-96a2-bc84d648842a":
-                    return new ElementViewModel<PageListElementSettings, PageListElementContent> { View = await _pageListElementService.ReadElementViewAsync(tenantId, elementId, context), Context = context };
+                    return GetElementViewModelAsync(tenantId, elementId, context, _pageListElementService.ReadElementViewAsync);
 
                 case "cf0d7834-54fb-4a6e-86db-0f238f8b1ac1":
-                    return new ElementViewModel<ShareElementSettings, ShareElementContent> { View = await _shareElementService.ReadElementViewAsync(tenantId, elementId, context), Context = context };
+                    return GetElementViewModelAsync(tenantId, elementId, context, _shareElementService.ReadElementViewAsync);
 
                 case "4e6b936d-e8a1-4ff2-9576-9f9b78f82895":
-                    return new ElementViewModel<SocialBarElementSettings, SocialBarElementContent> { View = await _socialBarElementService.ReadElementViewAsync(tenantId, elementId, context), Context = context };
+                    return GetElementViewModelAsync(tenantId, elementId, context, _socialBarElementService.ReadElementViewAsync);
 
                 case "252ca19c-d085-4e0d-b70b-da3e1098f51b":
-                    return new ElementViewModel<TableElementSettings, TableElementContent> { View = await _tableElementService.ReadElementViewAsync(tenantId, elementId, context), Context = context };
+                    return GetElementViewModelAsync(tenantId, elementId, context, _tableElementService.ReadElementViewAsync);
 
                 case "b910c231-7dbd-4cad-92ef-775981e895b4":
-                    return new ElementViewModel<TagCloudElementSettings, TagCloudElementContent> { View = await _tagCloudElementService.ReadElementViewAsync(tenantId, elementId, context), Context = context };
+                    return GetElementViewModelAsync(tenantId, elementId, context, _tagCloudElementService.ReadElementViewAsync);
 
                 case "eb479ac9-8c79-4fae-817a-e77fd3dbf05b":
-                    return new ElementViewModel<TestimonialElementSettings, object> { View = await _testimonialElementService.ReadElementViewAsync(tenantId, elementId, context), Context = context };
+                    return GetElementViewModelAsync(tenantId, elementId, context, _testimonialElementService.ReadElementViewAsync);
 
                 default:
                     return null;
             }
         }
 
-        public async Task<BlobContent> GetElementBlobContentAsync(long tenantId, Guid elementTypeId, long elementId, long blobSetId, string blobLabel)
+        public Task<BlobContent> GetElementBlobContentAsync(long tenantId, Guid elementTypeId, long elementId, long blobSetId, string blobLabel)
         {
             switch (elementTypeId.ToString())
             {
                 case "b539d2a4-52ae-40d5-b366-e42447b93d15":
-                    return await _albumElementService.ReadBlobContentAsync(tenantId, elementId, blobSetId, blobLabel);
+                    return _albumElementService.ReadBlobContentAsync(tenantId, elementId, blobSetId, blobLabel);
 
                 case "aacb11a0-5532-47cb-aab9-939cee3d5175":
-                    return await _carouselElementService.ReadBlobContentAsync(tenantId, elementId, blobSetId, blobLabel);
+                    return _carouselElementService.ReadBlobContentAsync(tenantId, elementId, blobSetId, blobLabel);
 
                 case "c92ee4c4-b133-44cc-8322-640e99c334dc":
-                    return await _htmlElementService.ReadBlobContentAsync(tenantId, elementId, blobSetId, blobLabel);
+                    return _htmlElementService.ReadBlobContentAsync(tenantId, elementId, blobSetId, blobLabel);
 
                 default:
                     return null;
