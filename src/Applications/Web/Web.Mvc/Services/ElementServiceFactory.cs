@@ -107,7 +107,7 @@ namespace Riverside.Cms.Applications.Web.Mvc.Services
                     return GetElementViewModelAsync(tenantId, elementId, context, _testimonialElementService.ReadElementViewAsync);
 
                 default:
-                    return null;
+                    return Task.FromResult<IElementViewModel>(null);
             }
         }
 
@@ -125,7 +125,7 @@ namespace Riverside.Cms.Applications.Web.Mvc.Services
                     return _htmlElementService.ReadBlobContentAsync(tenantId, elementId, blobSetId, blobLabel);
 
                 default:
-                    return null;
+                    return Task.FromResult<BlobContent>(null);
             }
         }
 
