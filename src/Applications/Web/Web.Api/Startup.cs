@@ -67,6 +67,7 @@ namespace Riverside.Cms.Applications.Web.Api
             services.AddTransient<ICodeSnippetElementService, CodeSnippetElementService>();
             services.AddTransient<IFooterElementService, FooterElementService>();
             services.AddTransient<IFormElementService, FormElementService>();
+            services.AddTransient<IForumElementService, ForumElementService>();
             services.AddTransient<IHtmlElementService, HtmlElementService>();
             services.AddTransient<ILatestThreadsElementService, LatestThreadsElementService>();
             services.AddTransient<INavigationBarElementService, NavigationBarElementService>();
@@ -84,6 +85,7 @@ namespace Riverside.Cms.Applications.Web.Api
             services.AddTransient<IElementRepository<CodeSnippetElementSettings>, SqlCodeSnippetElementRepository>();
             services.AddTransient<IElementRepository<FooterElementSettings>, SqlFooterElementRepository>();
             services.AddTransient<IElementRepository<FormElementSettings>, SqlFormElementRepository>();
+            services.AddTransient<IElementRepository<ForumElementSettings>, SqlForumElementRepository>();
             services.AddTransient<IElementRepository<HtmlElementSettings>, SqlHtmlElementRepository>();
             services.AddTransient<IElementRepository<LatestThreadsElementSettings>, SqlLatestThreadsElementRepository>();
             services.AddTransient<IElementRepository<NavigationBarElementSettings>, SqlNavigationBarElementRepository>();

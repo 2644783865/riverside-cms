@@ -48,6 +48,7 @@ namespace Riverside.Cms.Applications.Web.Mvc
             services.AddTransient<Riverside.Cms.Services.Element.Client.ICodeSnippetElementService, Riverside.Cms.Services.Element.Client.CodeSnippetElementService>();
             services.AddTransient<Riverside.Cms.Services.Element.Client.IFooterElementService, Riverside.Cms.Services.Element.Client.FooterElementService>();
             services.AddTransient<Riverside.Cms.Services.Element.Client.IFormElementService, Riverside.Cms.Services.Element.Client.FormElementService>();
+            services.AddTransient<Riverside.Cms.Services.Element.Client.IForumElementService, Riverside.Cms.Services.Element.Client.ForumElementService>();
             services.AddTransient<Riverside.Cms.Services.Element.Client.IHtmlElementService, Riverside.Cms.Services.Element.Client.HtmlElementService>();
             services.AddTransient<Riverside.Cms.Services.Element.Client.ILatestThreadsElementService, Riverside.Cms.Services.Element.Client.LatestThreadsElementService>();
             services.AddTransient<Riverside.Cms.Services.Element.Client.INavigationBarElementService, Riverside.Cms.Services.Element.Client.NavigationBarElementService>();
@@ -94,6 +95,7 @@ namespace Riverside.Cms.Applications.Web.Mvc
             services.AddTransient<Riverside.Cms.Services.Element.Domain.ICodeSnippetElementService, Riverside.Cms.Services.Element.Domain.CodeSnippetElementService>();
             services.AddTransient<Riverside.Cms.Services.Element.Domain.IFooterElementService, Riverside.Cms.Services.Element.Domain.FooterElementService>();
             services.AddTransient<Riverside.Cms.Services.Element.Domain.IFormElementService, Riverside.Cms.Services.Element.Domain.FormElementService>();
+            services.AddTransient<Riverside.Cms.Services.Element.Domain.IForumElementService, Riverside.Cms.Services.Element.Domain.ForumElementService>();
             services.AddTransient<Riverside.Cms.Services.Element.Domain.IHtmlElementService, Riverside.Cms.Services.Element.Domain.HtmlElementService>();
             services.AddTransient<Riverside.Cms.Services.Element.Domain.ILatestThreadsElementService, Riverside.Cms.Services.Element.Domain.LatestThreadsElementService>();
             services.AddTransient<Riverside.Cms.Services.Element.Domain.INavigationBarElementService, Riverside.Cms.Services.Element.Domain.NavigationBarElementService>();
@@ -111,6 +113,7 @@ namespace Riverside.Cms.Applications.Web.Mvc
             services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Element.Domain.CodeSnippetElementSettings>, Riverside.Cms.Services.Element.Infrastructure.SqlCodeSnippetElementRepository>();
             services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Element.Domain.FooterElementSettings>, Riverside.Cms.Services.Element.Infrastructure.SqlFooterElementRepository>();
             services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Element.Domain.FormElementSettings>, Riverside.Cms.Services.Element.Infrastructure.SqlFormElementRepository>();
+            services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Element.Domain.ForumElementSettings>, Riverside.Cms.Services.Element.Infrastructure.SqlForumElementRepository>();
             services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Element.Domain.HtmlElementSettings>, Riverside.Cms.Services.Element.Infrastructure.SqlHtmlElementRepository>();
             services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Element.Domain.LatestThreadsElementSettings>, Riverside.Cms.Services.Element.Infrastructure.SqlLatestThreadsElementRepository>();
             services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Element.Domain.NavigationBarElementSettings>, Riverside.Cms.Services.Element.Infrastructure.SqlNavigationBarElementRepository>();

@@ -16,6 +16,7 @@ namespace Riverside.Cms.Services.Element.Mvc
         private readonly ICodeSnippetElementService _codeSnippetElementService;
         private readonly IFooterElementService _footerElementService;
         private readonly IFormElementService _formElementService;
+        private readonly IForumElementService _forumElementService;
         private readonly IHtmlElementService _htmlElementService;
         private readonly ILatestThreadsElementService _latestThreadsElementService;
         private readonly INavigationBarElementService _navigationBarElementService;
@@ -27,13 +28,14 @@ namespace Riverside.Cms.Services.Element.Mvc
         private readonly ITagCloudElementService _tagCloudElementService;
         private readonly ITestimonialElementService _testimonialElementService;
 
-        public ElementsController(IAlbumElementService albumElementService, ICarouselElementService carouselElementService, ICodeSnippetElementService codeSnippetElementService, IFooterElementService footerElementService, IFormElementService formElementService, IHtmlElementService htmlElementService, ILatestThreadsElementService latestThreadsElementService, INavigationBarElementService navigationBarElementService, IPageHeaderElementService pageHeaderElementService, IPageListElementService pageListElementService, IShareElementService shareElementService, ISocialBarElementService socialBarElementService, ITableElementService tableElementService, ITagCloudElementService tagCloudElementService, ITestimonialElementService testimonialElementService)
+        public ElementsController(IAlbumElementService albumElementService, ICarouselElementService carouselElementService, ICodeSnippetElementService codeSnippetElementService, IFooterElementService footerElementService, IFormElementService formElementService, IForumElementService forumElementService, IHtmlElementService htmlElementService, ILatestThreadsElementService latestThreadsElementService, INavigationBarElementService navigationBarElementService, IPageHeaderElementService pageHeaderElementService, IPageListElementService pageListElementService, IShareElementService shareElementService, ISocialBarElementService socialBarElementService, ITableElementService tableElementService, ITagCloudElementService tagCloudElementService, ITestimonialElementService testimonialElementService)
         {
             _albumElementService = albumElementService;
             _carouselElementService = carouselElementService;
             _codeSnippetElementService = codeSnippetElementService;
             _footerElementService = footerElementService;
             _formElementService = formElementService;
+            _forumElementService = forumElementService;
             _htmlElementService = htmlElementService;
             _latestThreadsElementService = latestThreadsElementService;
             _navigationBarElementService = navigationBarElementService;
@@ -210,6 +212,33 @@ namespace Riverside.Cms.Services.Element.Mvc
             PageContext context = new PageContext { PageId = pageId };
             FormElementActionResponse response = await _formElementService.PerformElementActionAsync(tenantId, elementId, request, context);
             return Ok(response);
+        }
+
+        // FORUM
+
+        [HttpGet]
+        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/484192d1-5a4f-496f-981b-7e0120453949/elements/{elementId:int}")]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(ForumElementSettings), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> ReadForumElementSettingsAsync(long tenantId, long elementId)
+        {
+            ForumElementSettings settings = await _forumElementService.ReadElementSettingsAsync(tenantId, elementId);
+            if (settings == null)
+                return NotFound();
+            return Ok(settings);
+        }
+
+        [HttpGet]
+        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/484192d1-5a4f-496f-981b-7e0120453949/elements/{elementId:int}/view")]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
+        [ProducesResponseType(typeof(IElementView<ForumElementSettings, ForumElementContent>), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> ReadForumElementViewAsync(long tenantId, long elementId, [FromQuery]long pageId)
+        {
+            PageContext context = new PageContext { PageId = pageId };
+            IElementView<ForumElementSettings, ForumElementContent> view = await _forumElementService.ReadElementViewAsync(tenantId, elementId, context);
+            if (view == null)
+                return NotFound();
+            return Ok(view);
         }
 
         // HTML

@@ -15,6 +15,7 @@ namespace Riverside.Cms.Applications.Web.Mvc.Services
         private readonly ICodeSnippetElementService _codeSnippetElementService;
         private readonly IFooterElementService _footerElementService;
         private readonly IFormElementService _formElementService;
+        private readonly IForumElementService _forumElementService;
         private readonly IHtmlElementService _htmlElementService;
         private readonly ILatestThreadsElementService _latestThreadsElementService;
         private readonly INavigationBarElementService _navigationBarElementService;
@@ -26,13 +27,14 @@ namespace Riverside.Cms.Applications.Web.Mvc.Services
         private readonly ITagCloudElementService _tagCloudElementService;
         private readonly ITestimonialElementService _testimonialElementService;
 
-        public ElementServiceFactory(IAlbumElementService albumElementService, ICarouselElementService carouselElementService, ICodeSnippetElementService codeSnippetElementService, IFooterElementService footerElementService, IFormElementService formElementService, IHtmlElementService htmlElementService, ILatestThreadsElementService latestThreadsElementService, INavigationBarElementService navigationBarElementService, IPageHeaderElementService pageHeaderElementService, IPageListElementService pageListElementService, IShareElementService shareElementService, ISocialBarElementService socialBarElementService, ITableElementService tableElementService, ITagCloudElementService tagCloudElementService, ITestimonialElementService testimonialElementService)
+        public ElementServiceFactory(IAlbumElementService albumElementService, ICarouselElementService carouselElementService, ICodeSnippetElementService codeSnippetElementService, IFooterElementService footerElementService, IFormElementService formElementService, IForumElementService forumElementService, IHtmlElementService htmlElementService, ILatestThreadsElementService latestThreadsElementService, INavigationBarElementService navigationBarElementService, IPageHeaderElementService pageHeaderElementService, IPageListElementService pageListElementService, IShareElementService shareElementService, ISocialBarElementService socialBarElementService, ITableElementService tableElementService, ITagCloudElementService tagCloudElementService, ITestimonialElementService testimonialElementService)
         {
             _albumElementService = albumElementService;
             _carouselElementService = carouselElementService;
             _codeSnippetElementService = codeSnippetElementService;
             _footerElementService = footerElementService;
             _formElementService = formElementService;
+            _forumElementService = forumElementService;
             _htmlElementService = htmlElementService;
             _latestThreadsElementService = latestThreadsElementService;
             _navigationBarElementService = navigationBarElementService;
@@ -75,6 +77,9 @@ namespace Riverside.Cms.Applications.Web.Mvc.Services
 
                 case "eafbd5ab-8c98-4edc-b8e1-42f5e8bfe2dc":
                     return GetElementViewModelAsync(tenantId, elementId, context, _formElementService.ReadElementViewAsync);
+
+                case "484192d1-5a4f-496f-981b-7e0120453949":
+                    return GetElementViewModelAsync(tenantId, elementId, context, _forumElementService.ReadElementViewAsync);
 
                 case "c92ee4c4-b133-44cc-8322-640e99c334dc":
                     return GetElementViewModelAsync(tenantId, elementId, context, _htmlElementService.ReadElementViewAsync);
