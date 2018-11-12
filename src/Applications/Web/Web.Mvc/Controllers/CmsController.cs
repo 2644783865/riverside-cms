@@ -140,9 +140,7 @@ namespace Riverside.Cms.Applications.Web.Mvc.Controllers
         public async Task<IActionResult> ReadPageImageAsync(long pageId, PageImageType pageImageType)
         {
             long tenantId = await GetTenantIdAsync();
-
             BlobContent blobContent = await _pageService.ReadPageImageAsync(tenantId, pageId, pageImageType);
-
             return File(blobContent.Stream, blobContent.Type, blobContent.Name);
         }
 
@@ -150,9 +148,7 @@ namespace Riverside.Cms.Applications.Web.Mvc.Controllers
         public async Task<IActionResult> ReadElementBlobAsync(Guid elementTypeId, long elementId, long blobSetId, string blobLabel)
         {
             long tenantId = await GetTenantIdAsync();
-
             BlobContent blobContent = await _elementServiceFactory.GetElementBlobContentAsync(tenantId, elementTypeId, elementId, blobSetId, blobLabel);
-
             return File(blobContent.Stream, blobContent.Type, blobContent.Name);
         }
 
@@ -160,9 +156,7 @@ namespace Riverside.Cms.Applications.Web.Mvc.Controllers
         public async Task<IActionResult> ReadUserBlobAsync(long userId, UserImageType userImageType)
         {
             long tenantId = await GetTenantIdAsync();
-
             BlobContent blobContent = await _userService.ReadUserImageAsync(tenantId, userId, userImageType);
-
             return File(blobContent.Stream, blobContent.Type, blobContent.Name);
         }
 
@@ -179,10 +173,20 @@ namespace Riverside.Cms.Applications.Web.Mvc.Controllers
         }
 
         [HttpGet]
-        public IActionResult Robots()
+        public async Task<IActionResult> RobotsAsync()
         {
-            string robots = _seoService.GetRobotsExclusionStandard();
+            string rootUrl = GetRootUrl();
+            string robots = await _seoService.GetRobotsExclusionStandardAsync(rootUrl);
             return Content(robots);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> SitemapAsync()
+        {
+            long tenantId = await GetTenantIdAsync();
+            string rootUrl = GetRootUrl();
+            string sitemap = await _seoService.GetSitemapAsync(tenantId, rootUrl);
+            return Content(sitemap, "application/xml", System.Text.Encoding.UTF8);
         }
     }
 }

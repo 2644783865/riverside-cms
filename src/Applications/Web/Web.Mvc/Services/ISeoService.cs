@@ -7,6 +7,7 @@ namespace Riverside.Cms.Applications.Web.Mvc.Services
 {
     public interface ISeoService
     {
-        string GetRobotsExclusionStandard();
+        Task<string> GetRobotsExclusionStandardAsync(string rootUrl);
+        Task<string> GetSitemapAsync(long tenantId, string rootUrl);
     }
 }

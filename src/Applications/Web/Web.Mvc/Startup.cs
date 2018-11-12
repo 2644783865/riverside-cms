@@ -204,7 +204,8 @@ namespace Riverside.Cms.Applications.Web.Mvc
                 routes.MapRoute(RouteNames.PageTagged, "pages/{pageId}/{description}/tagged/{*tags}", new { controller = "cms", action = "readpagetaggedasync" });
                 routes.MapRoute(RouteNames.Page, "pages/{pageId}/{*description}", new { controller = "cms", action = "readpageasync" });
                 routes.MapRoute(RouteNames.UserImage, "users/{userId}/images/{userImageType}/{*description}", new { controller = "cms", action = "readuserblobasync" });
-                routes.MapRoute(RouteNames.Robots, "robots.txt", new { controller = "cms", action = "robots" });
+                routes.MapRoute(RouteNames.Robots, "robots.txt", new { controller = "cms", action = "robotsasync" });
+                routes.MapRoute(RouteNames.Sitemap, "sitemap.xml", new { controller = "cms", action = "sitemapasync" });
                 routes.MapRoute("Login", "account/login", new { controller = "account", action = "login" });
                 routes.MapRoute("Logout", "account/logout", new { controller = "account", action = "logout" });
                 routes.MapRoute("Register", "account/register", new { controller = "account", action = "register" });

@@ -15,6 +15,7 @@ namespace Riverside.Cms.Applications.Web.Mvc
         public const string PageImage = "PageImage";
         public const string PageTagged = "PageTagged";
         public const string Robots = "Robots";
+        public const string Sitemap = "Sitemap";
         public const string UserImage = "UserImage";
     }
 }
