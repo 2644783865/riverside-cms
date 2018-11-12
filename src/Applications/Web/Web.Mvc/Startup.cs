@@ -58,10 +58,13 @@ namespace Riverside.Cms.Applications.Web.Mvc
             services.AddTransient<Riverside.Cms.Services.Element.Client.ISocialBarElementService, Riverside.Cms.Services.Element.Client.SocialBarElementService>();
             services.AddTransient<Riverside.Cms.Services.Element.Client.ITableElementService, Riverside.Cms.Services.Element.Client.TableElementService>();
             services.AddTransient<Riverside.Cms.Services.Element.Client.ITagCloudElementService, Riverside.Cms.Services.Element.Client.TagCloudElementService>();
-            services.AddTransient<Riverside.Cms.Services.Element.Client.ITestimonialElementService, Riverside.Cms.Services.Element.Client.TestimonialElementService>();
+            services.AddTransient<Riverside.Cms.Services.Element.Client.ITestimonialElementService, Riverside.Cms.Services.Element.Client.TestimonialElementService>();            
+        }
 
-            // Element service factory
+        private void ConfigureDependencyInjectionMvcServices(IServiceCollection services)
+        {
             services.AddTransient<IElementServiceFactory, ElementServiceFactory>();
+            services.AddTransient<ISeoService, SeoService>();
         }
 
         private void ConfigureDependencyInjectionCoreServices(IServiceCollection services)
@@ -168,6 +171,7 @@ namespace Riverside.Cms.Applications.Web.Mvc
 
             ConfigureDependencyInjectionSharedServices(services);
             ConfigureDependencyInjectionClientServices(services);
+            ConfigureDependencyInjectionMvcServices(services);
             ConfigureDependencyInjectionCoreServices(services);
             ConfigureDependencyInjectionElementServices(services);
             ConfigureDependencyInjectionStorageServices(services);
@@ -200,6 +204,7 @@ namespace Riverside.Cms.Applications.Web.Mvc
                 routes.MapRoute(RouteNames.PageTagged, "pages/{pageId}/{description}/tagged/{*tags}", new { controller = "cms", action = "readpagetaggedasync" });
                 routes.MapRoute(RouteNames.Page, "pages/{pageId}/{*description}", new { controller = "cms", action = "readpageasync" });
                 routes.MapRoute(RouteNames.UserImage, "users/{userId}/images/{userImageType}/{*description}", new { controller = "cms", action = "readuserblobasync" });
+                routes.MapRoute(RouteNames.Robots, "robots.txt", new { controller = "cms", action = "robots" });
                 routes.MapRoute("Login", "account/login", new { controller = "account", action = "login" });
                 routes.MapRoute("Logout", "account/logout", new { controller = "account", action = "logout" });
                 routes.MapRoute("Register", "account/register", new { controller = "account", action = "register" });

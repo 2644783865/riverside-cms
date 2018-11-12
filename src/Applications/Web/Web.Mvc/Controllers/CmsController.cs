@@ -17,15 +17,17 @@ namespace Riverside.Cms.Applications.Web.Mvc.Controllers
         private readonly IElementServiceFactory _elementServiceFactory;
         private readonly IPageService _pageService;
         private readonly IPageViewService _pageViewService;
+        private readonly ISeoService _seoService;
         private readonly ITagService _tagService;
         private readonly IUserService _userService;
 
-        public CmsController(IDomainService domainService, IElementServiceFactory elementServiceFactory, IPageService pageService, IPageViewService pageViewService, ITagService tagService, IUserService userService)
+        public CmsController(IDomainService domainService, IElementServiceFactory elementServiceFactory, IPageService pageService, IPageViewService pageViewService, ISeoService seoService, ITagService tagService, IUserService userService)
         {
             _domainService = domainService;
             _elementServiceFactory = elementServiceFactory;
             _pageService = pageService;
             _pageViewService = pageViewService;
+            _seoService = seoService;
             _tagService = tagService;
             _userService = userService;
         }
@@ -174,6 +176,13 @@ namespace Riverside.Cms.Applications.Web.Mvc.Controllers
             long tenantId = await GetTenantIdAsync();
             object response = await _elementServiceFactory.PerformElementActionAsync(tenantId, elementTypeId, elementId, json, context);
             return Json(response);
+        }
+
+        [HttpGet]
+        public IActionResult Robots()
+        {
+            string robots = _seoService.GetRobotsExclusionStandard();
+            return Content(robots);
         }
     }
 }
