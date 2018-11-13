@@ -1,0 +1,71 @@
+﻿@using Riverside.Cms.Applications.Web.Mvc.Extensions
+@using Riverside.Cms.Services.Mortgage.Client
+
+@model IElementViewModel<PayCalculatorElementSettings, object>
+
+<div class="rcms-mortgage-pay-calculator element-mortgagecalculator">
+
+    <p>Use this mortgage calculator to work out how much your monthly mortgage payment would be on an interest only and a repayment basis for different loan sizes, on different rates, over different terms. The figures are only a guide to what you might pay – the exact cost will depend on the particular mortgage you choose.</p>
+
+    <table>
+        <tr id="required-loan-amount-row">
+            <td>
+                <label for="required-loan-amount">Required Loan Amount:</label>
+            </td>
+            <td class="input">
+                <div class="input-group">
+                    <span class="input-group-addon">&pound;</span>
+                    <input class="form-control" type="text" id="required-loan-amount" value="" />
+                </div>
+            </td>
+        </tr>
+        <tr id="loan-duration-row">
+            <td>
+                <label for="loan-duration">Loan Duration:</label>
+            </td>
+            <td class="input">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="loan-duration" value="">
+                    <div class="input-group-btn">
+                        <button type="button" class="btn btn-default dropdown-toggle" id="selected-interval-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span id="selected-interval">Years</span> <span class="caret"></span></button>
+                        <ul class="dropdown-menu dropdown-menu-right">
+                            <li><a id="select-months" href="#">Months</a></li>
+                            <li><a id="select-years" href="#">Years</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr id="interest-rate-row">
+            <td>
+                <label for="interest-rate">Interest Rate:</label>
+            </td>
+            <td class="input">
+                <div class="input-group">
+                    <input class="form-control" type="text" id="interest-rate" value="" />
+                    <span class="input-group-addon">%</span>
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <ul id="error-message"><li></li></ul>
+
+    <a id="calculate-button" href="#">Calculate</a>
+
+    <div id="result">
+        <p>Your monthly payments would be:</p>
+        <p class="headline">Interest Only <strong>&pound;<span id="interest-only-amount"></span></strong>*</p>
+        <p class="headline">Repayment <strong>&pound;<span id="repayment-amount"></span></strong>*</p>
+        <p><a href="/pages/62/contact-us">Contact us to discuss further</a> or <a href="/pages/65/how-much-could-i-borrow">find out how much you could borrow</a>.</p>
+        <p><a href="#" id="reset-button">Click here to re-run the calculator</a>.</p>
+        <p class="disclaimer">* These calculations only provide an indication of what the monthly payments might be for a given rate, loan size and mortgage term.</p>
+        <p class="disclaimer">To discuss your personal situation in greater detail and get a personalised quotation for yourself please contact us on 020 3393 4333 or <a href="mailto:info@domusfinance.co.uk">info@domusfinance.co.uk</a>.</p>
+    </div>
+
+</div>
+
+@{
+    this.Context.Items["script_jquery"] = new ScriptInclude { Priority = 1, Name = "jquery.min.js" };
+    this.Context.Items["script_mortgage_pay_calculator"] = new ScriptInclude { Priority = 3, Name = "mortgage-pay-calculator.js" };
+}

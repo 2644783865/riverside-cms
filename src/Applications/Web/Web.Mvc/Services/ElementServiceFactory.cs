@@ -4,12 +4,14 @@ using Newtonsoft.Json;
 using Riverside.Cms.Applications.Web.Mvc.Models;
 using Riverside.Cms.Services.Core.Client;
 using Riverside.Cms.Services.Element.Client;
+using Riverside.Cms.Services.Mortgage.Client;
 using Riverside.Cms.Services.Storage.Client;
 
 namespace Riverside.Cms.Applications.Web.Mvc.Services
 {
     public class ElementServiceFactory : IElementServiceFactory
     {
+        // General elements
         private readonly IAlbumElementService _albumElementService;
         private readonly ICarouselElementService _carouselElementService;
         private readonly ICodeSnippetElementService _codeSnippetElementService;
@@ -27,8 +29,19 @@ namespace Riverside.Cms.Applications.Web.Mvc.Services
         private readonly ITagCloudElementService _tagCloudElementService;
         private readonly ITestimonialElementService _testimonialElementService;
 
-        public ElementServiceFactory(IAlbumElementService albumElementService, ICarouselElementService carouselElementService, ICodeSnippetElementService codeSnippetElementService, IFooterElementService footerElementService, IFormElementService formElementService, IForumElementService forumElementService, IHtmlElementService htmlElementService, ILatestThreadsElementService latestThreadsElementService, INavigationBarElementService navigationBarElementService, IPageHeaderElementService pageHeaderElementService, IPageListElementService pageListElementService, IShareElementService shareElementService, ISocialBarElementService socialBarElementService, ITableElementService tableElementService, ITagCloudElementService tagCloudElementService, ITestimonialElementService testimonialElementService)
+        // Mortgage elements
+        private readonly IAmortisationCalculatorElementService _amortisationCalculatorElementService;
+        private readonly IBorrowCalculatorElementService _borrowCalculatorElementService;
+        private readonly IPayCalculatorElementService _payCalculatorElementService;
+        private readonly IRentalCalculatorElementService _rentalCalculatorElementService;
+        private readonly IStampDutyCalculatorElementService _stampDutyCalculatorElementService;
+
+        public ElementServiceFactory(
+            IAlbumElementService albumElementService, ICarouselElementService carouselElementService, ICodeSnippetElementService codeSnippetElementService, IFooterElementService footerElementService, IFormElementService formElementService, IForumElementService forumElementService, IHtmlElementService htmlElementService, ILatestThreadsElementService latestThreadsElementService, INavigationBarElementService navigationBarElementService, IPageHeaderElementService pageHeaderElementService, IPageListElementService pageListElementService, IShareElementService shareElementService, ISocialBarElementService socialBarElementService, ITableElementService tableElementService, ITagCloudElementService tagCloudElementService, ITestimonialElementService testimonialElementService,
+            IAmortisationCalculatorElementService amortisationCalculatorElementService, IBorrowCalculatorElementService borrowCalculatorElementService, IPayCalculatorElementService payCalculatorElementService, IRentalCalculatorElementService rentalCalculatorElementService, IStampDutyCalculatorElementService stampDutyCalculatorElementService
+        )
         {
+            // General elements
             _albumElementService = albumElementService;
             _carouselElementService = carouselElementService;
             _codeSnippetElementService = codeSnippetElementService;
@@ -45,6 +58,13 @@ namespace Riverside.Cms.Applications.Web.Mvc.Services
             _tableElementService = tableElementService;
             _tagCloudElementService = tagCloudElementService;
             _testimonialElementService = testimonialElementService;
+
+            // Mortgage elements
+            _amortisationCalculatorElementService = amortisationCalculatorElementService;
+            _borrowCalculatorElementService = borrowCalculatorElementService;
+            _payCalculatorElementService = payCalculatorElementService;
+            _rentalCalculatorElementService = rentalCalculatorElementService;
+            _stampDutyCalculatorElementService = stampDutyCalculatorElementService;
         }
 
         private async Task<IElementViewModel> GetElementViewModelAsync<TSettings, TContent>(long tenantId, long elementId, IPageContext context, Func<long, long, IPageContext, Task<IElementView<TSettings, TContent>>> func) where TSettings : IElementSettings
@@ -63,6 +83,7 @@ namespace Riverside.Cms.Applications.Web.Mvc.Services
         {
             switch (elementTypeId.ToString())
             {
+                // General elements
                 case "b539d2a4-52ae-40d5-b366-e42447b93d15":
                     return GetElementViewModelAsync(tenantId, elementId, context, _albumElementService.ReadElementViewAsync);
 
@@ -110,6 +131,22 @@ namespace Riverside.Cms.Applications.Web.Mvc.Services
 
                 case "eb479ac9-8c79-4fae-817a-e77fd3dbf05b":
                     return GetElementViewModelAsync(tenantId, elementId, context, _testimonialElementService.ReadElementViewAsync);
+
+                // Mortgage elements
+                case "fb7e757d-905c-4ab1-828f-c39baabe55a6":
+                    return GetElementViewModelAsync(tenantId, elementId, context, _amortisationCalculatorElementService.ReadElementViewAsync);
+
+                case "8373bdac-6f80-4c5e-8e27-1b3a9c92cd7c":
+                    return GetElementViewModelAsync(tenantId, elementId, context, _borrowCalculatorElementService.ReadElementViewAsync);
+
+                case "f03aa333-4a52-4716-aa1b-1d0d6a31dc15":
+                    return GetElementViewModelAsync(tenantId, elementId, context, _payCalculatorElementService.ReadElementViewAsync);
+
+                case "eec21fac-d185-45ee-a8dd-6032679697b1":
+                    return GetElementViewModelAsync(tenantId, elementId, context, _rentalCalculatorElementService.ReadElementViewAsync);
+
+                case "9c167ed6-1caf-4b2c-8de1-2586d247e28e":
+                    return GetElementViewModelAsync(tenantId, elementId, context, _stampDutyCalculatorElementService.ReadElementViewAsync);
 
                 default:
                     return Task.FromResult<IElementViewModel>(null);

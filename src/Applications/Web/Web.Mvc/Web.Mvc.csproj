@@ -10,6 +10,7 @@
     <PackageReference Include="CommonMark.NET" Version="0.15.1" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.0.1985401" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -25,6 +26,10 @@
     <ProjectReference Include="..\..\..\Services\Element\Element.Domain\Element.Domain.csproj" />
     <ProjectReference Include="..\..\..\Services\Element\Element.Infrastructure\Element.Infrastructure.csproj" />
     <ProjectReference Include="..\..\..\Services\Element\Element.Mvc\Element.Mvc.csproj" />
+    <ProjectReference Include="..\..\..\Services\Mortgage\Mortgage.Client\Mortgage.Client.csproj" />
+    <ProjectReference Include="..\..\..\Services\Mortgage\Mortgage.Domain\Mortgage.Domain.csproj" />
+    <ProjectReference Include="..\..\..\Services\Mortgage\Mortgage.Infrastructure\Mortgage.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\Services\Mortgage\Mortgage.Mvc\Mortgage.Mvc.csproj" />
     <ProjectReference Include="..\..\..\Services\Storage\Storage.Client\Storage.Client.csproj" />
     <ProjectReference Include="..\..\..\Services\Storage\Storage.Domain\Storage.Domain.csproj" />
     <ProjectReference Include="..\..\..\Services\Storage\Storage.Infrastructure\Storage.Infrastructure.csproj" />

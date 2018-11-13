@@ -1,0 +1,93 @@
+﻿@using Riverside.Cms.Applications.Web.Mvc.Extensions
+@using Riverside.Cms.Services.Mortgage.Client
+
+@model IElementViewModel<AmortisationCalculatorElementSettings, object>
+
+<div class="rcms-mortgage-amortisation-calculator element-mortgagecalculator">
+
+    <div>
+
+        <div id="amortisation-fields">
+
+            <table>
+                <tr>
+                    <td id="principal-label"><label for="principal">Required Loan Amount:</label></td>
+                    <td id="principal-field">
+                        <div class="input-group">
+                            <span class="input-group-addon">&pound;</span>
+                            <input class="form-control" type="text" name="principal" id="principal" value="250000" />
+                        </div>
+                    </td>
+                    <td id="apr-label"><label for="apr">Interest Rate:</label></td>
+                    <td id="apr-field">
+                        <div class="input-group">
+                            <input class="form-control" type="text" name="apr" id="apr" value="5" />
+                            <span class="input-group-addon">%</span>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td id="years-label"><label for="loan-duration">Loan Duration:</label></td>
+                    <td id="years-field">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="loan-duration" name="loan-duration" value="25">
+                            <div class="input-group-btn">
+                                <button type="button" class="btn btn-default dropdown-toggle" id="selected-interval-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span id="selected-interval">Years</span> <span class="caret"></span></button>
+                                <ul class="dropdown-menu dropdown-menu-right">
+                                    <li><a id="select-months" href="#">Months</a></li>
+                                    <li><a id="select-years" href="#">Years</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </td>
+                    <td><label for="amortisation-month">Start date:</label></td>
+                    <td>
+                        <select name="amortisation-month" id="amortisation-month" class="form-control">
+                            <option value="0">Jan</option>
+                            <option value="1">Feb</option>
+                            <option value="2">Mar</option>
+                            <option value="3">Apr</option>
+                            <option value="4">May</option>
+                            <option value="5">Jun</option>
+                            <option value="6">Jul</option>
+                            <option value="7">Aug</option>
+                            <option value="8">Sep</option>
+                            <option value="9">Oct</option>
+                            <option value="10">Nov</option>
+                            <option value="11">Dec</option>
+                        </select><select name="amortisation-year" id="amortisation-year" class="form-control"></select>
+                    </td>
+                </tr>
+            </table>
+
+            <ul id="error-message"><li></li></ul>
+
+            <a id="calculate-button" href="#">Calculate</a>
+
+        </div>
+
+        <div id="amortisation-results">
+
+            <h1 id="amortisation-headline"></h1>
+
+            <div id="amortisation-chart"></div>
+
+            <div id="amortisation-table" class="table-responsive"></div>
+
+            <div id="amortisation-disclaimer">
+                <p><a href="#" id="reset-button">Click here to re-run the calculator</a>.</p>
+                <p class="disclaimer">* These calculations only provide an indication of what the monthly payments might be for a given rate, loan size and mortgage term.</p>
+                <p class="disclaimer">To discuss your personal situation in greater detail and get a personalised quotation for yourself please contact us on 020 3393 4333 or <a href="mailto:info@domusfinance.co.uk">info@domusfinance.co.uk</a>.</p>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@{
+    this.Context.Items["script_jquery"] = new ScriptInclude { Priority = 1, Name = "jquery.min.js" };
+    this.Context.Items["script_highcharts"] = new ScriptInclude { Priority = 3, Name = "highcharts.js" };
+    this.Context.Items["script_mortgage_amortisation_calculator"] = new ScriptInclude { Priority = 4, Name = "mortgage-amortisation-calculator.js" };
+}

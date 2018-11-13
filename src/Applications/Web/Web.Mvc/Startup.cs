@@ -58,7 +58,14 @@ namespace Riverside.Cms.Applications.Web.Mvc
             services.AddTransient<Riverside.Cms.Services.Element.Client.ISocialBarElementService, Riverside.Cms.Services.Element.Client.SocialBarElementService>();
             services.AddTransient<Riverside.Cms.Services.Element.Client.ITableElementService, Riverside.Cms.Services.Element.Client.TableElementService>();
             services.AddTransient<Riverside.Cms.Services.Element.Client.ITagCloudElementService, Riverside.Cms.Services.Element.Client.TagCloudElementService>();
-            services.AddTransient<Riverside.Cms.Services.Element.Client.ITestimonialElementService, Riverside.Cms.Services.Element.Client.TestimonialElementService>();            
+            services.AddTransient<Riverside.Cms.Services.Element.Client.ITestimonialElementService, Riverside.Cms.Services.Element.Client.TestimonialElementService>();
+
+            // Mortgage services
+            services.AddTransient<Riverside.Cms.Services.Mortgage.Client.IAmortisationCalculatorElementService, Riverside.Cms.Services.Mortgage.Client.AmortisationCalculatorElementService>();
+            services.AddTransient<Riverside.Cms.Services.Mortgage.Client.IBorrowCalculatorElementService, Riverside.Cms.Services.Mortgage.Client.BorrowCalculatorElementService>();
+            services.AddTransient<Riverside.Cms.Services.Mortgage.Client.IPayCalculatorElementService, Riverside.Cms.Services.Mortgage.Client.PayCalculatorElementService>();
+            services.AddTransient<Riverside.Cms.Services.Mortgage.Client.IRentalCalculatorElementService, Riverside.Cms.Services.Mortgage.Client.RentalCalculatorElementService>();
+            services.AddTransient<Riverside.Cms.Services.Mortgage.Client.IStampDutyCalculatorElementService, Riverside.Cms.Services.Mortgage.Client.StampDutyCalculatorElementService>();
         }
 
         private void ConfigureDependencyInjectionMvcServices(IServiceCollection services)
@@ -87,7 +94,6 @@ namespace Riverside.Cms.Applications.Web.Mvc
             services.AddTransient<Riverside.Cms.Services.Core.Domain.ITagRepository, Riverside.Cms.Services.Core.Infrastructure.SqlTagRepository>();
             services.AddTransient<Riverside.Cms.Services.Core.Domain.ITenantRepository, Riverside.Cms.Services.Core.Infrastructure.SqlTenantRepository>();
             services.AddTransient<Riverside.Cms.Services.Core.Domain.IUserRepository, Riverside.Cms.Services.Core.Infrastructure.SqlUserRepository>();
-
         }
 
         private void ConfigureDependencyInjectionElementServices(IServiceCollection services)
@@ -127,6 +133,20 @@ namespace Riverside.Cms.Applications.Web.Mvc
             services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Element.Domain.TableElementSettings>, Riverside.Cms.Services.Element.Infrastructure.SqlTableElementRepository>();
             services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Element.Domain.TagCloudElementSettings>, Riverside.Cms.Services.Element.Infrastructure.SqlTagCloudElementRepository>();
             services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Element.Domain.TestimonialElementSettings>, Riverside.Cms.Services.Element.Infrastructure.SqlTestimonialElementRepository>();
+
+            // Mortgage domain services
+            services.AddTransient<Riverside.Cms.Services.Mortgage.Domain.IAmortisationCalculatorElementService, Riverside.Cms.Services.Mortgage.Domain.AmortisationCalculatorElementService>();
+            services.AddTransient<Riverside.Cms.Services.Mortgage.Domain.IBorrowCalculatorElementService, Riverside.Cms.Services.Mortgage.Domain.BorrowCalculatorElementService>();
+            services.AddTransient<Riverside.Cms.Services.Mortgage.Domain.IPayCalculatorElementService, Riverside.Cms.Services.Mortgage.Domain.PayCalculatorElementService>();
+            services.AddTransient<Riverside.Cms.Services.Mortgage.Domain.IRentalCalculatorElementService, Riverside.Cms.Services.Mortgage.Domain.RentalCalculatorElementService>();
+            services.AddTransient<Riverside.Cms.Services.Mortgage.Domain.IStampDutyCalculatorElementService, Riverside.Cms.Services.Mortgage.Domain.StampDutyCalculatorElementService>();
+
+            // Mortgage infrastructure services
+            services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Mortgage.Domain.AmortisationCalculatorElementSettings>, Riverside.Cms.Services.Mortgage.Infrastructure.SqlAmortisationCalculatorElementRepository>();
+            services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Mortgage.Domain.BorrowCalculatorElementSettings>, Riverside.Cms.Services.Mortgage.Infrastructure.SqlBorrowCalculatorElementRepository>();
+            services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Mortgage.Domain.PayCalculatorElementSettings>, Riverside.Cms.Services.Mortgage.Infrastructure.SqlPayCalculatorElementRepository>();
+            services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Mortgage.Domain.RentalCalculatorElementSettings>, Riverside.Cms.Services.Mortgage.Infrastructure.SqlRentalCalculatorElementRepository>();
+            services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Mortgage.Domain.StampDutyCalculatorElementSettings>, Riverside.Cms.Services.Mortgage.Infrastructure.SqlStampDutyCalculatorElementRepository>();
         }
 
         private void ConfigureDependencyInjectionStorageServices(IServiceCollection services)
@@ -144,6 +164,7 @@ namespace Riverside.Cms.Applications.Web.Mvc
         {
             services.Configure<Riverside.Cms.Services.Core.Client.CoreApiOptions>(Configuration);
             services.Configure<Riverside.Cms.Services.Element.Client.ElementApiOptions>(Configuration);
+            services.Configure<Riverside.Cms.Services.Mortgage.Client.MortgageApiOptions>(Configuration);
             services.Configure<Riverside.Cms.Services.Storage.Client.StorageApiOptions>(Configuration);
         }
 
@@ -151,6 +172,7 @@ namespace Riverside.Cms.Applications.Web.Mvc
         {
             services.Configure<Riverside.Cms.Services.Core.Infrastructure.SqlOptions>(Configuration);
             services.Configure<Riverside.Cms.Services.Element.Infrastructure.SqlOptions>(Configuration);
+            services.Configure<Riverside.Cms.Services.Mortgage.Infrastructure.SqlOptions>(Configuration);
             services.Configure<Riverside.Cms.Services.Storage.Infrastructure.SqlOptions>(Configuration);
             services.Configure<AzureBlobOptions>(Configuration);
             services.Configure<EmailOptions>(Configuration);

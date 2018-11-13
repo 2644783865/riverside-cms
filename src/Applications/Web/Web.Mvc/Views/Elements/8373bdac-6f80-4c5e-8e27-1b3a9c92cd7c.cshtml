@@ -1,0 +1,79 @@
+﻿@using Riverside.Cms.Applications.Web.Mvc.Extensions
+@using Riverside.Cms.Services.Mortgage.Client
+
+@model IElementViewModel<BorrowCalculatorElementSettings, object>
+
+<div class="rcms-mortgage-borrow-calculator element-mortgagecalculator">
+
+    <p>Use this mortgage calculator to work out the maximum mortgage loan you could potentially borrow. Fill in the relevant boxes and then click calculate.</p>
+
+    <table>
+        <tr class="title">
+            <td colspan="2"><h2>Applicant 1</h2></td>
+        </tr>
+        <tr class="guaranteed" id="applicant-one-guaranteed-income-row">
+            <td><label for="applicant-one-guaranteed-income">Guaranteed Annual Income:</label></td>
+            <td class="input">
+                <div class="input-group">
+                    <span class="input-group-addon">&pound;</span>
+                    <input class="form-control" type="text" id="applicant-one-guaranteed-income" value="0" />
+                </div>
+            </td>
+        </tr>
+        <tr class="non-guaranteed" id="applicant-one-non-guaranteed-income-row">
+            <td><label for="applicant-one-non-guaranteed-income">Non-guaranteed Annual Income:<span class="example">e.g. Bonus / Commission</span></label></td>
+            <td class="input">
+                <div class="input-group">
+                    <span class="input-group-addon">&pound;</span>
+                    <input class="form-control" type="text" id="applicant-one-non-guaranteed-income" value="0" />
+                </div>
+            </td>
+        </tr>
+        <tr class="title">
+            <td colspan="2"><h2>Applicant 2</h2></td>
+        </tr>
+        <tr class="guaranteed" id="applicant-two-guaranteed-income-row">
+            <td><label for="applicant-two-guaranteed-income">Guaranteed Annual Income:</label></td>
+            <td class="input">
+                <div class="input-group">
+                    <span class="input-group-addon">&pound;</span>
+                    <input class="form-control" type="text" id="applicant-two-guaranteed-income" value="0" />
+                </div>
+            </td>
+        </tr>
+        <tr class="non-guaranteed" id="applicant-two-non-guaranteed-income-row">
+            <td><label for="applicant-two-non-guaranteed-income">Non-guaranteed Annual Income:<span class="example">e.g. Bonus / Commission</span></label></td>
+            <td class="input">
+                <div class="input-group">
+                    <span class="input-group-addon">&pound;</span>
+                    <input class="form-control" type="text" id="applicant-two-non-guaranteed-income" value="0" />
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <ul id="error-message"><li></li></ul>
+
+    <a id="calculate-button" href="#">Calculate</a>
+
+    <div id="result">
+        <p class="headline">You could borrow up to <strong>&pound;<span id="borrow-amount"></span></strong>*</p>
+        <p><a href="/pages/62/contact-us">Contact us to discuss further</a> or <a href="/pages/66/how-much-might-i-pay">find out what the monthly costs would be</a>.</p>
+        <p><a href="#" id="reset-button">Click here to re-run the calculator.</a></p>
+        <p class="disclaimer">
+            * This borrowing figure is an indication of the maximum you may be able to borrow.
+            The actual amount you could borrow will depend upon your personal circumstances as a whole
+            and your credit history and will vary from lender to lender.
+        </p>
+        <p class="disclaimer">
+            To get a more accurate indication of how much you could borrow based on your individual
+            circumstances please contact us.
+        </p>
+    </div>
+
+</div>
+
+@{
+    this.Context.Items["script_jquery"] = new ScriptInclude { Priority = 1, Name = "jquery.min.js" };
+    this.Context.Items["script_mortgage_borrow_calculator"] = new ScriptInclude { Priority = 3, Name = "mortgage-borrow-calculator.js" };
+}

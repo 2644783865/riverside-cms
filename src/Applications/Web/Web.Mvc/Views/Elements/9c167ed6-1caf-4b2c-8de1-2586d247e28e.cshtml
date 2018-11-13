@@ -1,0 +1,60 @@
+﻿@using Riverside.Cms.Applications.Web.Mvc.Extensions
+@using Riverside.Cms.Services.Mortgage.Client
+
+@model IElementViewModel<StampDutyCalculatorElementSettings, object>
+
+<div class="rcms-mortgage-stamp-duty-calculator element-mortgagecalculator">
+
+    <p>Use this mortgage calculator to work out how much stamp duty you will have to pay when buying a property. Fill out the form below and then click calculate.</p>
+
+    <table>
+        <tr id="property-price-row">
+            <td><label for="property-price">Property price:</label></td>
+            <td class="input">
+                <div class="input-group">
+                    <span class="input-group-addon">&pound;</span>
+                    <input class="form-control" type="text" id="property-price" value="" />
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <div class="checkbox">
+        <label style="padding-left: 20px;">
+            <input type="checkbox" id="second-home"> Property is buy to let or second home
+        </label>
+    </div>
+
+    <ul id="error-message"><li></li></ul>
+
+    <a id="calculate-button" href="#">Calculate</a>
+
+    <div id="result">
+        <p class="headline">Stamp duty to pay: <strong>&pound;<span id="stamp-duty"></span></strong></p>
+        <p class="headline">Effective rate: <strong><span id="effective-rate"></span>%</strong></p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Band</th>
+                    <th style="text-align: center;">%</th>
+                    <th style="text-align: right;">Taxable</th>
+                    <th style="text-align: right;">Tax</th>
+                </tr>
+            </thead>
+            <tbody id="results-body">
+            </tbody>
+        </table>
+        <p><a href="/pages/62/contact-us">Contact us to discuss further</a>.</p>
+        <p><a href="#" id="reset-button">Click here to re-run the calculator</a>.</p>
+        <p class="disclaimer">
+            To discuss your personal situation in greater detail and get a personalised quotation for
+            yourself please contact us on 020 3393 4333 or <a href="mailto:info@domusfinance.co.uk">info@domusfinance.co.uk</a>.
+        </p>
+    </div>
+
+</div>
+
+@{
+    this.Context.Items["script_jquery"] = new ScriptInclude { Priority = 1, Name = "jquery.min.js" };
+    this.Context.Items["script_mortgage_stamp_duty_calculator"] = new ScriptInclude { Priority = 3, Name = "mortgage-stamp-duty-calculator.js" };
+}

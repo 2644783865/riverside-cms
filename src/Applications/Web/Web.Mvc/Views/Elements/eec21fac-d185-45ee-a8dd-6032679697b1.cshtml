@@ -1,0 +1,66 @@
+﻿@using Riverside.Cms.Applications.Web.Mvc.Extensions
+@using Riverside.Cms.Services.Mortgage.Client
+
+@model IElementViewModel<RentalCalculatorElementSettings, object>
+
+<div class="rcms-mortgage-rental-calculator element-mortgagecalculator">
+
+    <p>Buy to Let mortgage lenders use rental calculations to work out how much they are comfortable lending. Use this mortgage calculator to work out the minimum rent required for different priced properties and your available deposit.</p>
+
+    <table>
+        <tr id="property-value-row">
+            <td><label for="property-value">Property Value:</label></td>
+            <td class="input">
+                <div class="input-group">
+                    <span class="input-group-addon">&pound;</span>
+                    <input class="form-control" type="text" id="property-value" value="" />
+                </div>
+            </td>
+        </tr>
+        <tr id="available-deposit-row">
+            <td><label for="available-deposit">Available Deposit:</label></td>
+            <td class="input">
+                <div class="input-group">
+                    <span class="input-group-addon">&pound;</span>
+                    <input class="form-control" type="text" id="available-deposit" value="" />
+                </div>
+            </td>
+        </tr>
+        <tr id="required-loan-row">
+            <td><label for="required-loan">Required Loan:</label></td>
+            <td class="input">
+                <div class="input-group">
+                    <span class="input-group-addon">&pound;</span>
+                    <input class="form-control" type="text" id="required-loan" value="" disabled="disabled" />
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <ul id="error-message"><li></li></ul>
+
+    <a id="calculate-button" href="#">Calculate</a>
+
+    <div id="result">
+        <p class="headline">The minimum monthly rent you would need to finance the above scenario would be: <strong>&pound;<span id="monthly-rent"></span></strong>*</p>
+        <p><a href="/pages/62/contact-us">Contact us to discuss further</a>.</p>
+        <p><a href="#" id="reset-button">Click here to re-run the calculator</a>.</p>
+        <p class="disclaimer">
+            * This calculation is a guideline for what the minimum required rent would need to be.
+            Every bank has its own rental calculation with many being less generous than the above calculation.
+            Where a lender uses the pay rate in its calculation there may also be a solution available at the time
+            of enquiry which is slightly more generous than this calculation based on the rates available at the time,
+            in addition there may be solutions available with a smaller percentage deposit.
+        </p>
+        <p class="disclaimer">
+            To discuss your personal situation in greater detail and get a personalised quotation for
+            yourself please contact us on 020 3393 4333 or <a href="mailto:info@domusfinance.co.uk">info@domusfinance.co.uk</a>.
+        </p>
+    </div>
+
+</div>
+
+@{
+    this.Context.Items["script_jquery"] = new ScriptInclude { Priority = 1, Name = "jquery.min.js" };
+    this.Context.Items["script_mortgage_rental_calculator"] = new ScriptInclude { Priority = 3, Name = "mortgage-rental-calculator.js" };
+}
