@@ -88,13 +88,15 @@ namespace Riverside.Cms.Services.Element.Domain
     public class PageListElementService : IPageListElementService
     {
         private readonly IElementRepository<PageListElementSettings> _elementRepository;
+        private readonly IMasterPageService _masterPageService;
         private readonly IPageService _pageService;
         private readonly IStorageService _storageService;
         private readonly ITagService _tagService;
 
-        public PageListElementService(IElementRepository<PageListElementSettings> elementRepository, IPageService pageService, IStorageService storageService, ITagService tagService)
+        public PageListElementService(IElementRepository<PageListElementSettings> elementRepository, IMasterPageService masterPageService, IPageService pageService, IStorageService storageService, ITagService tagService)
         {
             _elementRepository = elementRepository;
+            _masterPageService = masterPageService;
             _pageService = pageService;
             _storageService = storageService;
             _tagService = tagService;
@@ -153,6 +155,32 @@ namespace Riverside.Cms.Services.Element.Domain
             };
         }
 
+        /// <summary>
+        /// TODO: This method should be deprecated - it is only needed to support older websites where this page list functionality is required.
+        /// Older websites should be updated, so that this method can be removed. Once removed:
+        ///     long pageListPageId = await GetPageListPageId(settings, context);
+        /// Can be replaced with:
+        ///     long pageListPageId = settings.PageId ?? context.PageId;
+        /// </summary>
+        /// <param name="settings">Element settings.</param>
+        /// <param name="context">Page context.</param>
+        /// <returns>ID of page whose child pages are enumerated.</returns>
+        private async Task<long> GetPageListPageId(PageListElementSettings settings, IPageContext context)
+        {
+            // If page list page ID is not specified in settings (i.e. is determined by page context) and the page is a document, then return document's parent folder
+            if (settings.PageId == null)
+            {
+                Page pageListPage = await _pageService.ReadPageAsync(settings.TenantId, context.PageId);
+                MasterPage masterPage = await _masterPageService.ReadMasterPageAsync(settings.TenantId, pageListPage.MasterPageId);
+                if (masterPage.PageType == PageType.Document)
+                    return pageListPage.ParentPageId.Value;
+                return pageListPage.PageId;
+            }
+
+            // Otherwise, return specified page
+            return settings.PageId.Value;
+        }
+
         public async Task<IElementView<PageListElementSettings, PageListElementContent>> ReadElementViewAsync(long tenantId, long elementId, IPageContext context)
         {
             PageListElementSettings settings = await _elementRepository.ReadElementSettingsAsync(tenantId, elementId);
@@ -173,7 +201,7 @@ namespace Riverside.Cms.Services.Element.Domain
                 currentPageLink = await GetPageListPageLinkAsync(tenantId, context.PageId);
 
             PageListPageLink morePageLink = null;
-            long pageListPageId = settings.PageId ?? context.PageId;
+            long pageListPageId = await GetPageListPageId(settings, context);
             bool displayMorePageLink = settings.MoreMessage != null && context.PageId != pageListPageId;
             if (displayMorePageLink)
                 morePageLink = await GetPageListPageLinkAsync(tenantId, pageListPageId);
