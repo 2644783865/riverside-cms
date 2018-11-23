@@ -10,11 +10,31 @@ namespace Riverside.Cms.Services.Core.Domain
     {
         private readonly IMasterPageRepository _masterPageRepository;
         private readonly IPageRepository _pageRepository;
+        private readonly ITenantService _tenantService;
 
-        public PageViewService(IMasterPageRepository masterPageRepository, IPageRepository pageRepository)
+        public PageViewService(IMasterPageRepository masterPageRepository, IPageRepository pageRepository, ITenantService tenantService)
         {
             _masterPageRepository = masterPageRepository;
             _pageRepository = pageRepository;
+            _tenantService = tenantService;
+        }
+
+        private async Task<string> GetPageTitle(Page page)
+        {
+            // If a title is specified, then it must be used as the title
+            if (page.Title != null)
+                return page.Title;
+
+            // If page is home page, then use website name
+            if (page.ParentPageId == null)
+            {
+                Tenant tenant = await _tenantService.ReadTenantAsync(page.TenantId);
+                return tenant.Name;
+            }
+
+            // Otherwise, title is pipe separated list of page names from the current page's hierarchy (current page title first, home page title last) 
+            IEnumerable<Page> pages = await _pageRepository.ListPagesInHierarchyAsync(page.TenantId, page.PageId);
+            return string.Join(" | ", pages.Select(p => p.Name));
         }
 
         public async Task<PageView> ReadPageViewAsync(long tenantId, long pageId)
@@ -29,7 +49,7 @@ namespace Riverside.Cms.Services.Core.Domain
                 MasterPageId = masterPage.MasterPageId,
                 PreviewImageBlobId = page.PreviewImageBlobId,
                 PageId = pageId,
-                Title = page.Title ?? page.Name,
+                Title = await GetPageTitle(page),
                 Description = page.Description ?? string.Empty,
                 Keywords = string.Join(", ", page.Tags.Select(t => t.Name)),
                 BeginRender = masterPage.BeginRender,
