@@ -33,56 +33,5 @@ namespace Riverside.Cms.Services.Core.Client
                 throw new CoreClientException("Core API failed", ex);
             }
         }
-
-        public async Task<List<PageViewZone>> SearchPageViewZonesAsync(long tenantId, long pageId)
-        {
-            try
-            {
-                string uri = $"{_options.Value.CoreApiBaseUrl}tenants/{tenantId}/pageviews/{pageId}/zones";
-                using (HttpClient httpClient = new HttpClient())
-                {
-                    string json = await httpClient.GetStringAsync(uri);
-                    return JsonConvert.DeserializeObject<List<PageViewZone>>(json);
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new CoreClientException("Core API failed", ex);
-            }
-        }
-
-        public async Task<PageViewZone> ReadPageViewZoneAsync(long tenantId, long pageId, long masterPageZoneId)
-        {
-            try
-            {
-                string uri = $"{_options.Value.CoreApiBaseUrl}tenants/{tenantId}/pageviews/{pageId}/zones/{masterPageZoneId}";
-                using (HttpClient httpClient = new HttpClient())
-                {
-                    string json = await httpClient.GetStringAsync(uri);
-                    return JsonConvert.DeserializeObject<PageViewZone>(json);
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new CoreClientException("Core API failed", ex);
-            }
-        }
-
-        public async Task<List<PageViewZoneElement>> SearchPageViewZoneElementsAsync(long tenantId, long pageId, long masterPageZoneId)
-        {
-            try
-            {
-                string uri = $"{_options.Value.CoreApiBaseUrl}tenants/{tenantId}/pageviews/{pageId}/zones/{masterPageZoneId}/elements";
-                using (HttpClient httpClient = new HttpClient())
-                {
-                    string json = await httpClient.GetStringAsync(uri);
-                    return JsonConvert.DeserializeObject<List<PageViewZoneElement>>(json);
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new CoreClientException("Core API failed", ex);
-            }
-        }
     }
 }

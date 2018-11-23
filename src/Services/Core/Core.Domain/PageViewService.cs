@@ -37,70 +37,6 @@ namespace Riverside.Cms.Services.Core.Domain
             return string.Join(" | ", pages.Select(p => p.Name));
         }
 
-        public async Task<PageView> ReadPageViewAsync(long tenantId, long pageId)
-        {
-            Page page = await _pageRepository.ReadPageAsync(tenantId, pageId);
-            if (page == null)
-                return null;
-            MasterPage masterPage = await _masterPageRepository.ReadMasterPageAsync(tenantId, page.MasterPageId);
-            PageView pageView = new PageView
-            {
-                TenantId = tenantId,
-                MasterPageId = masterPage.MasterPageId,
-                PreviewImageBlobId = page.PreviewImageBlobId,
-                PageId = pageId,
-                Title = await GetPageTitle(page),
-                Description = page.Description ?? string.Empty,
-                Keywords = string.Join(", ", page.Tags.Select(t => t.Name)),
-                BeginRender = masterPage.BeginRender,
-                EndRender = masterPage.EndRender
-            };
-            return pageView;
-        }
-
-        private PageViewZone GetPageViewZoneFromMasterPageZone(long pageId, MasterPageZone masterPageZone)
-        {
-            PageViewZone pageViewZone = new PageViewZone
-            {
-                TenantId = masterPageZone.TenantId,
-                MasterPageId = masterPageZone.MasterPageId,
-                MasterPageZoneId = masterPageZone.MasterPageZoneId,
-                PageId = pageId,
-                BeginRender = masterPageZone.BeginRender,
-                EndRender = masterPageZone.EndRender
-            };
-            return pageViewZone;
-        }
-
-        private IEnumerable<PageViewZone> EnumeratePageViewZones(long pageId, IEnumerable<MasterPageZone> masterPageZones)
-        {
-            foreach (MasterPageZone masterPageZone in masterPageZones)
-            {
-                PageViewZone pageViewZone = GetPageViewZoneFromMasterPageZone(pageId, masterPageZone);
-                yield return pageViewZone;
-            }
-        }
-
-        public async Task<IEnumerable<PageViewZone>> SearchPageViewZonesAsync(long tenantId, long pageId)
-        {
-            Page page = await _pageRepository.ReadPageAsync(tenantId, pageId);
-            if (page == null)
-                return Enumerable.Empty<PageViewZone>();
-            IEnumerable<MasterPageZone> masterPageZones = await _masterPageRepository.SearchMasterPageZonesAsync(tenantId, page.MasterPageId);
-            return EnumeratePageViewZones(pageId, masterPageZones);
-        }
-
-        public async Task<PageViewZone> ReadPageViewZoneAsync(long tenantId, long pageId, long masterPageZoneId)
-        {
-            Page page = await _pageRepository.ReadPageAsync(tenantId, pageId);
-            if (page == null)
-                return null;
-            MasterPageZone masterPageZone = await _masterPageRepository.ReadMasterPageZoneAsync(tenantId, page.MasterPageId, masterPageZoneId);
-            if (masterPageZone == null)
-                return null;
-            return GetPageViewZoneFromMasterPageZone(pageId, masterPageZone);
-        }
-
         private IEnumerable<PageViewZoneElement> EnumeratePageViewZoneElements(IEnumerable<MasterPageZoneElement> masterPageZoneElements)
         {
             foreach (MasterPageZoneElement masterPageZoneElement in masterPageZoneElements)
@@ -156,35 +92,80 @@ namespace Riverside.Cms.Services.Core.Domain
             return pageZone.PageZoneId;
         }
 
-        public async Task<IEnumerable<PageViewZoneElement>> SearchPageViewZoneElementsAsync(long tenantId, long pageId, long masterPageZoneId)
+        private async Task<IEnumerable<PageViewZoneElement>> SearchPageViewZoneElementsAsync(Page page, MasterPageZone masterPageZone)
         {
-            Page page = await _pageRepository.ReadPageAsync(tenantId, pageId);
-            if (page == null)
-                return Enumerable.Empty<PageViewZoneElement>();
-            MasterPageZone masterPageZone = await _masterPageRepository.ReadMasterPageZoneAsync(tenantId, page.MasterPageId, masterPageZoneId);
-            if (masterPageZone == null)
-                return Enumerable.Empty<PageViewZoneElement>();
             switch (masterPageZone.AdminType)
             {
                 case AdminType.Editable:
-                    long? editablePageZoneId = await GetPageZoneId(tenantId, pageId, masterPageZoneId);
+                    long? editablePageZoneId = await GetPageZoneId(page.TenantId, page.PageId, masterPageZone.MasterPageZoneId);
                     if (editablePageZoneId == null)
                         return Enumerable.Empty<PageViewZoneElement>();
-                    IEnumerable<PageZoneElement> editablePageZoneElements = await _pageRepository.SearchPageZoneElementsAsync(tenantId, pageId, editablePageZoneId.Value);
-                    IEnumerable<MasterPageZoneElement> editableMasterPageZoneElements = await _masterPageRepository.SearchMasterPageZoneElementsAsync(tenantId, page.MasterPageId, masterPageZoneId);
+                    IEnumerable<PageZoneElement> editablePageZoneElements = await _pageRepository.SearchPageZoneElementsAsync(page.TenantId, page.PageId, editablePageZoneId.Value);
+                    IEnumerable<MasterPageZoneElement> editableMasterPageZoneElements = await _masterPageRepository.SearchMasterPageZoneElementsAsync(page.TenantId, page.MasterPageId, masterPageZone.MasterPageZoneId);
                     return EnumeratePageViewZoneElements(editablePageZoneElements, editableMasterPageZoneElements);
 
                 case AdminType.Configurable:
-                    long? pageZoneId = await GetPageZoneId(tenantId, pageId, masterPageZoneId);
+                    long? pageZoneId = await GetPageZoneId(page.TenantId, page.PageId, masterPageZone.MasterPageZoneId);
                     if (pageZoneId == null)
                         return Enumerable.Empty<PageViewZoneElement>();
-                    IEnumerable<PageZoneElement> pageZoneElements = await _pageRepository.SearchPageZoneElementsAsync(tenantId, pageId, pageZoneId.Value);
+                    IEnumerable<PageZoneElement> pageZoneElements = await _pageRepository.SearchPageZoneElementsAsync(page.TenantId, page.PageId, pageZoneId.Value);
                     return EnumeratePageViewZoneElements(pageZoneElements);
 
                 default: // AdminType.Static
-                    IEnumerable<MasterPageZoneElement> masterPageZoneElements = await _masterPageRepository.SearchMasterPageZoneElementsAsync(tenantId, page.MasterPageId, masterPageZoneId);
+                    IEnumerable<MasterPageZoneElement> masterPageZoneElements = await _masterPageRepository.SearchMasterPageZoneElementsAsync(page.TenantId, page.MasterPageId, masterPageZone.MasterPageZoneId);
                     return EnumeratePageViewZoneElements(masterPageZoneElements);
             }
+        }
+
+        private async Task<PageViewZone> GetPageViewZoneFromMasterPageZoneAsync(Page page, MasterPageZone masterPageZone)
+        {
+            PageViewZone pageViewZone = new PageViewZone
+            {
+                TenantId = masterPageZone.TenantId,
+                MasterPageId = masterPageZone.MasterPageId,
+                MasterPageZoneId = masterPageZone.MasterPageZoneId,
+                PageId = page.PageId,
+                BeginRender = masterPageZone.BeginRender,
+                EndRender = masterPageZone.EndRender,
+                PageViewZoneElements = await SearchPageViewZoneElementsAsync(page, masterPageZone)
+            };
+            return pageViewZone;
+        }
+
+        private IEnumerable<PageViewZone> EnumeratePageViewZones(Page page, IEnumerable<MasterPageZone> masterPageZones)
+        {
+            foreach (MasterPageZone masterPageZone in masterPageZones)
+            {
+                yield return GetPageViewZoneFromMasterPageZoneAsync(page, masterPageZone).Result;
+            }
+        }
+
+        private async Task<IEnumerable<PageViewZone>> SearchPageViewZonesAsync(MasterPage masterPage, Page page)
+        {
+            IEnumerable<MasterPageZone> masterPageZones = await _masterPageRepository.SearchMasterPageZonesAsync(masterPage.TenantId, masterPage.MasterPageId);
+            return EnumeratePageViewZones(page, masterPageZones);
+        }
+
+        public async Task<PageView> ReadPageViewAsync(long tenantId, long pageId)
+        {
+            Page page = await _pageRepository.ReadPageAsync(tenantId, pageId);
+            if (page == null)
+                return null;
+            MasterPage masterPage = await _masterPageRepository.ReadMasterPageAsync(tenantId, page.MasterPageId);
+            PageView pageView = new PageView
+            {
+                TenantId = tenantId,
+                MasterPageId = masterPage.MasterPageId,
+                PreviewImageBlobId = page.PreviewImageBlobId,
+                PageId = pageId,
+                Title = await GetPageTitle(page),
+                Description = page.Description ?? string.Empty,
+                Keywords = string.Join(", ", page.Tags.Select(t => t.Name)),
+                BeginRender = masterPage.BeginRender,
+                EndRender = masterPage.EndRender,
+                PageViewZones = await SearchPageViewZonesAsync(masterPage, page)
+            };
+            return pageView;
         }
     }
 }

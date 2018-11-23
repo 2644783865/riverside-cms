@@ -28,35 +28,5 @@ namespace Riverside.Cms.Services.Core.Mvc
                 return NotFound();
             return Ok(pageView);
         }
-
-        [HttpGet]
-        [Route("api/v1/core/tenants/{tenantId:int}/pageviews/{pageId:int}/zones")]
-        [ProducesResponseType(typeof(IEnumerable<PageViewZone>), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> SearchPageViewZonesAsync(long tenantId, long pageId)
-        {
-            IEnumerable<PageViewZone> pageViewZones = await _pageViewService.SearchPageViewZonesAsync(tenantId, pageId);
-            return Ok(pageViewZones);
-        }
-
-        [HttpGet]
-        [Route("api/v1/core/tenants/{tenantId:int}/pages/{pageId:int}/zones/{masterPageZoneId:int}")]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(PageZone), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ReadPageZoneAsync(long tenantId, long pageId, long masterPageZoneId)
-        {
-            PageViewZone pageViewZone = await _pageViewService.ReadPageViewZoneAsync(tenantId, pageId, masterPageZoneId);
-            if (pageViewZone == null)
-                return NotFound();
-            return Ok(pageViewZone);
-        }
-
-        [HttpGet]
-        [Route("api/v1/core/tenants/{tenantId:int}/pageviews/{pageId:int}/zones/{masterPageZoneId:int}/elements")]
-        [ProducesResponseType(typeof(IEnumerable<PageViewZoneElement>), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> SearchPageZoneElementsAsync(long tenantId, long pageId, long masterPageZoneId)
-        {
-            IEnumerable<PageViewZoneElement> pageViewZoneElements = await _pageViewService.SearchPageViewZoneElementsAsync(tenantId, pageId, masterPageZoneId);
-            return Ok(pageViewZoneElements);
-        }
     }
 }

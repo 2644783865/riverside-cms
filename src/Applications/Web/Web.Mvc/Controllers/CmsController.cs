@@ -85,9 +85,6 @@ namespace Riverside.Cms.Applications.Web.Mvc.Controllers
             IPageContext context = await GetPageContextAsync(tenantId, pageId, tags);
 
             PageView pageView = await _pageViewService.ReadPageViewAsync(tenantId, pageId);
-            pageView.PageViewZones = await _pageViewService.SearchPageViewZonesAsync(tenantId, pageId);
-            foreach (PageViewZone pageViewZone in pageView.PageViewZones)
-                pageViewZone.PageViewZoneElements = await _pageViewService.SearchPageViewZoneElementsAsync(tenantId, pageId, pageViewZone.MasterPageZoneId);
 
             Dictionary<long, ElementPartialView> elements = new Dictionary<long, ElementPartialView>();
             foreach (PageViewZone pageViewZone in pageView.PageViewZones)
