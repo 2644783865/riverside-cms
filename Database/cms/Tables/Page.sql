@@ -5,6 +5,7 @@
 	[MasterPageId] [bigint] NOT NULL,
 	[Name] [nvarchar](256) NOT NULL,
 	[Description] [nvarchar](max) NULL,
+    [Title] [nvarchar](256) NULL,
 	[Created] [datetime] NOT NULL,
 	[Updated] [datetime] NOT NULL,
 	[Occurred] [datetime] NULL,

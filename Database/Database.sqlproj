@@ -188,5 +188,6 @@
     <Build Include="cms\Tables\AssetElementType.sql" />
     <Build Include="cms\Tables\TenantPlace.sql" />
     <None Include="Scripts\Updates\update-00001.sql" />
+    <None Include="Scripts\Updates\update-00002.sql" />
   </ItemGroup>
 </Project>

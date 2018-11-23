@@ -264,3 +264,4 @@ paket-files/
 __pycache__/
 *.pyc
 /WebApplication/Properties/PublishProfiles
+/src/Applications/Web/Web.Mvc/Properties/PublishProfiles
