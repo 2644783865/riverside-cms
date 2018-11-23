@@ -188,8 +188,9 @@ namespace Riverside.Cms.Applications.Web.Mvc
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            services.AddHttpContextAccessor();
 
             ConfigureDependencyInjectionSharedServices(services);
             ConfigureDependencyInjectionClientServices(services);

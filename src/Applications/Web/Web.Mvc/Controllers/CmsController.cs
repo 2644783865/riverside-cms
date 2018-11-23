@@ -8,6 +8,7 @@ using Riverside.Cms.Services.Element.Client;
 using Riverside.Cms.Services.Storage.Client;
 using Riverside.Cms.Applications.Web.Mvc.Models;
 using Riverside.Cms.Applications.Web.Mvc.Services;
+using Microsoft.AspNetCore.Http;
 
 namespace Riverside.Cms.Applications.Web.Mvc.Controllers
 {
@@ -15,16 +16,18 @@ namespace Riverside.Cms.Applications.Web.Mvc.Controllers
     {
         private readonly IDomainService _domainService;
         private readonly IElementServiceFactory _elementServiceFactory;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IPageService _pageService;
         private readonly IPageViewService _pageViewService;
         private readonly ISeoService _seoService;
         private readonly ITagService _tagService;
         private readonly IUserService _userService;
 
-        public CmsController(IDomainService domainService, IElementServiceFactory elementServiceFactory, IPageService pageService, IPageViewService pageViewService, ISeoService seoService, ITagService tagService, IUserService userService)
+        public CmsController(IDomainService domainService, IElementServiceFactory elementServiceFactory, IHttpContextAccessor httpContextAccessor, IPageService pageService, IPageViewService pageViewService, ISeoService seoService, ITagService tagService, IUserService userService)
         {
             _domainService = domainService;
             _elementServiceFactory = elementServiceFactory;
+            _httpContextAccessor = httpContextAccessor;
             _pageService = pageService;
             _pageViewService = pageViewService;
             _seoService = seoService;
@@ -32,20 +35,26 @@ namespace Riverside.Cms.Applications.Web.Mvc.Controllers
             _userService = userService;
         }
 
-        /// <summary>
-        /// Returns root URL of current request. For example, the URI "http://localhost:7823/article/1" has root URI "http://localhost:7823".
-        /// </summary>
-        /// <returns>Root URL of current request.</returns>
-        public string GetRootUrl()
+        private async Task<WebDomain> GetDomainAsync()
         {
-            return string.Format("{0}://{1}", HttpContext.Request.Scheme, HttpContext.Request.Host);
-        }
+            // Return domain if we have it
+            WebDomain domain = (WebDomain)_httpContextAccessor.HttpContext.Items["riverside-cms-domain"];
+            if (domain != null)
+                return domain;
 
-        private async Task<long> GetTenantIdAsync()
-        {
-            string url = GetRootUrl();
-            WebDomain domain = await _domainService.ReadDomainByUrlAsync(url);
-            return domain.TenantId;
+            // Returns root URL of current request. For example, the URI "http://localhost:7823/article/1" has root URI "http://localhost:7823".
+            string rootUrl = string.Format("{0}://{1}", _httpContextAccessor.HttpContext.Request.Scheme, _httpContextAccessor.HttpContext.Request.Host);
+
+            // Get domain for root URL
+            domain = await _domainService.ReadDomainByUrlAsync(rootUrl);
+
+            // Redirect if necessary
+            if (domain.RedirectUrl != null)
+                Response.Redirect(domain.RedirectUrl);
+
+            // Otherwise set domain in context items and return result
+            _httpContextAccessor.HttpContext.Items["riverside-cms-domain"] = domain;
+            return domain;
         }
 
         private async Task<ElementPartialView> GetElementPartialViewAsync(long tenantId, Guid elementTypeId, long elementId, IPageContext context)
@@ -109,8 +118,8 @@ namespace Riverside.Cms.Applications.Web.Mvc.Controllers
         [HttpGet]
         public async Task<IActionResult> ReadPageTaggedAsync(long pageId, string tags)
         {
-            long tenantId = await GetTenantIdAsync();
-            return await ReadPageTaggedAsync(tenantId, pageId, tags);
+            WebDomain domain = await GetDomainAsync();
+            return await ReadPageTaggedAsync(domain.TenantId, pageId, tags);
         }
 
         [HttpGet]
@@ -122,9 +131,9 @@ namespace Riverside.Cms.Applications.Web.Mvc.Controllers
         [HttpGet]
         public async Task<IActionResult> ReadHomeTaggedAsync(string tags)
         {
-            long tenantId = await GetTenantIdAsync();
-            PageListResult result = await _pageService.ListPagesAsync(tenantId, null, false, PageType.Folder, null, SortBy.Created, true, 0, 1);
-            return await ReadPageTaggedAsync(tenantId, result.Pages.First().PageId, tags);
+            WebDomain domain = await GetDomainAsync();
+            PageListResult result = await _pageService.ListPagesAsync(domain.TenantId, null, false, PageType.Folder, null, SortBy.Created, true, 0, 1);
+            return await ReadPageTaggedAsync(domain.TenantId, result.Pages.First().PageId, tags);
         }
 
         [HttpGet]
@@ -136,24 +145,24 @@ namespace Riverside.Cms.Applications.Web.Mvc.Controllers
         [HttpGet]
         public async Task<IActionResult> ReadPageImageAsync(long pageId, PageImageType pageImageType)
         {
-            long tenantId = await GetTenantIdAsync();
-            BlobContent blobContent = await _pageService.ReadPageImageAsync(tenantId, pageId, pageImageType);
+            WebDomain domain = await GetDomainAsync();
+            BlobContent blobContent = await _pageService.ReadPageImageAsync(domain.TenantId, pageId, pageImageType);
             return File(blobContent.Stream, blobContent.Type, blobContent.Name);
         }
 
         [HttpGet]
         public async Task<IActionResult> ReadElementBlobAsync(Guid elementTypeId, long elementId, long blobSetId, string blobLabel)
         {
-            long tenantId = await GetTenantIdAsync();
-            BlobContent blobContent = await _elementServiceFactory.GetElementBlobContentAsync(tenantId, elementTypeId, elementId, blobSetId, blobLabel);
+            WebDomain domain = await GetDomainAsync();
+            BlobContent blobContent = await _elementServiceFactory.GetElementBlobContentAsync(domain.TenantId, elementTypeId, elementId, blobSetId, blobLabel);
             return File(blobContent.Stream, blobContent.Type, blobContent.Name);
         }
 
         [HttpGet]
         public async Task<IActionResult> ReadUserBlobAsync(long userId, UserImageType userImageType)
         {
-            long tenantId = await GetTenantIdAsync();
-            BlobContent blobContent = await _userService.ReadUserImageAsync(tenantId, userId, userImageType);
+            WebDomain domain = await GetDomainAsync();
+            BlobContent blobContent = await _userService.ReadUserImageAsync(domain.TenantId, userId, userImageType);
             return File(blobContent.Stream, blobContent.Type, blobContent.Name);
         }
 
@@ -164,25 +173,24 @@ namespace Riverside.Cms.Applications.Web.Mvc.Controllers
             {
                 PageId = pageId
             };
-            long tenantId = await GetTenantIdAsync();
-            object response = await _elementServiceFactory.PerformElementActionAsync(tenantId, elementTypeId, elementId, json, context);
+            WebDomain domain = await GetDomainAsync();
+            object response = await _elementServiceFactory.PerformElementActionAsync(domain.TenantId, elementTypeId, elementId, json, context);
             return Json(response);
         }
 
         [HttpGet]
         public async Task<IActionResult> RobotsAsync()
         {
-            string rootUrl = GetRootUrl();
-            string robots = await _seoService.GetRobotsExclusionStandardAsync(rootUrl);
+            WebDomain domain = await GetDomainAsync();
+            string robots = await _seoService.GetRobotsExclusionStandardAsync(domain.Url);
             return Content(robots);
         }
 
         [HttpGet]
         public async Task<IActionResult> SitemapAsync()
         {
-            long tenantId = await GetTenantIdAsync();
-            string rootUrl = GetRootUrl();
-            string sitemap = await _seoService.GetSitemapAsync(tenantId, rootUrl);
+            WebDomain domain = await GetDomainAsync();
+            string sitemap = await _seoService.GetSitemapAsync(domain.TenantId, domain.Url);
             return Content(sitemap, "application/xml", System.Text.Encoding.UTF8);
         }
     }
