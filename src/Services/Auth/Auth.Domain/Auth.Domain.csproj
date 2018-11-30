@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>Riverside.Cms.Services.Auth.Domain</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.ComponentModel.Annotations" Version="4.5.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Utilities\Security\Security.Encryption\Security.Encryption.csproj" />
+    <ProjectReference Include="..\..\..\Utilities\Validation\Validation.DataAnnotations\Validation.DataAnnotations.csproj" />
+    <ProjectReference Include="..\..\..\Utilities\Validation\Validation.Framework\Validation.Framework.csproj" />
+    <ProjectReference Include="..\..\Core\Core.Domain\Core.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="AuthenticationResource.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>AuthenticationResource.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="AuthenticationResource.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>AuthenticationResource.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+</Project>
