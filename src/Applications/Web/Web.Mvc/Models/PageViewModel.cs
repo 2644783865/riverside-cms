@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Riverside.Cms.Services.Core.Client;
+using Riverside.Cms.Services.Core.Domain;
 
 namespace Riverside.Cms.Applications.Web.Mvc.Models
 {

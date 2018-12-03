@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Newtonsoft.Json;
-using Riverside.Cms.Services.Element.Client;
+using Riverside.Cms.Services.Element.Domain;
 using Riverside.Cms.Utilities.Text.Formatting;
 
 namespace Riverside.Cms.Applications.Web.Mvc.Extensions

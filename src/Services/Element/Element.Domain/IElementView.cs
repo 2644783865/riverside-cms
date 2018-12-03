@@ -4,9 +4,15 @@ using System.Text;
 
 namespace Riverside.Cms.Services.Element.Domain
 {
-    public interface IElementView<TSettings, TContent> where TSettings : IElementSettings
+    public interface IElementView
     {
-        TSettings Settings { get; set; }
-        TContent Content { get; set; }
+        IElementSettings Settings { get; set; }
+        object Content { get; set; }
+    }
+
+    public interface IElementView<TSettings, TContent> : IElementView where TSettings : IElementSettings
+    {
+        new TSettings Settings { get; set; }
+        new TContent Content { get; set; }
     }
 }

@@ -3,18 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Riverside.Cms.Services.Core.Client;
-using Riverside.Cms.Services.Element.Client;
-using Riverside.Cms.Services.Storage.Client;
+using Riverside.Cms.Services.Core.Domain;
+using Riverside.Cms.Services.Element.Domain;
+using Riverside.Cms.Services.Storage.Domain;
 using Riverside.Cms.Applications.Web.Mvc.Models;
 using Riverside.Cms.Applications.Web.Mvc.Services;
 using Microsoft.AspNetCore.Http;
 
 namespace Riverside.Cms.Applications.Web.Mvc.Controllers
 {
+    [ValidateDomain()]
     public class CmsController : Controller
     {
-        private readonly IDomainService _domainService;
         private readonly IElementServiceFactory _elementServiceFactory;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IPageService _pageService;
@@ -23,9 +23,8 @@ namespace Riverside.Cms.Applications.Web.Mvc.Controllers
         private readonly ITagService _tagService;
         private readonly IUserService _userService;
 
-        public CmsController(IDomainService domainService, IElementServiceFactory elementServiceFactory, IHttpContextAccessor httpContextAccessor, IPageService pageService, IPageViewService pageViewService, ISeoService seoService, ITagService tagService, IUserService userService)
+        public CmsController(IElementServiceFactory elementServiceFactory, IHttpContextAccessor httpContextAccessor, IPageService pageService, IPageViewService pageViewService, ISeoService seoService, ITagService tagService, IUserService userService)
         {
-            _domainService = domainService;
             _elementServiceFactory = elementServiceFactory;
             _httpContextAccessor = httpContextAccessor;
             _pageService = pageService;
@@ -35,26 +34,9 @@ namespace Riverside.Cms.Applications.Web.Mvc.Controllers
             _userService = userService;
         }
 
-        private async Task<WebDomain> GetDomainAsync()
+        private WebDomain GetDomain()
         {
-            // Return domain if we have it
-            WebDomain domain = (WebDomain)_httpContextAccessor.HttpContext.Items["riverside-cms-domain"];
-            if (domain != null)
-                return domain;
-
-            // Returns root URL of current request. For example, the URI "http://localhost:7823/article/1" has root URI "http://localhost:7823".
-            string rootUrl = string.Format("{0}://{1}", _httpContextAccessor.HttpContext.Request.Scheme, _httpContextAccessor.HttpContext.Request.Host);
-
-            // Get domain for root URL
-            domain = await _domainService.ReadDomainByUrlAsync(rootUrl);
-
-            // Redirect if necessary
-            if (domain.RedirectUrl != null)
-                Response.Redirect(domain.RedirectUrl);
-
-            // Otherwise set domain in context items and return result
-            _httpContextAccessor.HttpContext.Items["riverside-cms-domain"] = domain;
-            return domain;
+            return (WebDomain)_httpContextAccessor.HttpContext.Items["riverside-cms-domain"];
         }
 
         private async Task<ElementPartialView> GetElementPartialViewAsync(long tenantId, Guid elementTypeId, long elementId, IPageContext context)
@@ -118,7 +100,7 @@ namespace Riverside.Cms.Applications.Web.Mvc.Controllers
         [HttpGet]
         public async Task<IActionResult> ReadPageTaggedAsync(long pageId, string tags)
         {
-            WebDomain domain = await GetDomainAsync();
+            WebDomain domain = GetDomain();
             return await ReadPageTaggedAsync(domain.TenantId, pageId, tags);
         }
 
@@ -131,7 +113,7 @@ namespace Riverside.Cms.Applications.Web.Mvc.Controllers
         [HttpGet]
         public async Task<IActionResult> ReadHomeTaggedAsync(string tags)
         {
-            WebDomain domain = await GetDomainAsync();
+            WebDomain domain = GetDomain();
             PageListResult result = await _pageService.ListPagesAsync(domain.TenantId, null, false, PageType.Folder, null, SortBy.Created, true, 0, 1);
             return await ReadPageTaggedAsync(domain.TenantId, result.Pages.First().PageId, tags);
         }
@@ -145,7 +127,7 @@ namespace Riverside.Cms.Applications.Web.Mvc.Controllers
         [HttpGet]
         public async Task<IActionResult> ReadPageImageAsync(long pageId, PageImageType pageImageType)
         {
-            WebDomain domain = await GetDomainAsync();
+            WebDomain domain = GetDomain();
             BlobContent blobContent = await _pageService.ReadPageImageAsync(domain.TenantId, pageId, pageImageType);
             return File(blobContent.Stream, blobContent.Type, blobContent.Name);
         }
@@ -153,7 +135,7 @@ namespace Riverside.Cms.Applications.Web.Mvc.Controllers
         [HttpGet]
         public async Task<IActionResult> ReadElementBlobAsync(Guid elementTypeId, long elementId, long blobSetId, string blobLabel)
         {
-            WebDomain domain = await GetDomainAsync();
+            WebDomain domain = GetDomain();
             BlobContent blobContent = await _elementServiceFactory.GetElementBlobContentAsync(domain.TenantId, elementTypeId, elementId, blobSetId, blobLabel);
             return File(blobContent.Stream, blobContent.Type, blobContent.Name);
         }
@@ -161,7 +143,7 @@ namespace Riverside.Cms.Applications.Web.Mvc.Controllers
         [HttpGet]
         public async Task<IActionResult> ReadUserBlobAsync(long userId, UserImageType userImageType)
         {
-            WebDomain domain = await GetDomainAsync();
+            WebDomain domain = GetDomain();
             BlobContent blobContent = await _userService.ReadUserImageAsync(domain.TenantId, userId, userImageType);
             return File(blobContent.Stream, blobContent.Type, blobContent.Name);
         }
@@ -173,7 +155,7 @@ namespace Riverside.Cms.Applications.Web.Mvc.Controllers
             {
                 PageId = pageId
             };
-            WebDomain domain = await GetDomainAsync();
+            WebDomain domain = GetDomain();
             object response = await _elementServiceFactory.PerformElementActionAsync(domain.TenantId, elementTypeId, elementId, json, context);
             return Json(response);
         }
@@ -181,7 +163,7 @@ namespace Riverside.Cms.Applications.Web.Mvc.Controllers
         [HttpGet]
         public async Task<IActionResult> RobotsAsync()
         {
-            WebDomain domain = await GetDomainAsync();
+            WebDomain domain = GetDomain();
             string robots = await _seoService.GetRobotsExclusionStandardAsync(domain.Url);
             return Content(robots);
         }
@@ -189,7 +171,7 @@ namespace Riverside.Cms.Applications.Web.Mvc.Controllers
         [HttpGet]
         public async Task<IActionResult> SitemapAsync()
         {
-            WebDomain domain = await GetDomainAsync();
+            WebDomain domain = GetDomain();
             string sitemap = await _seoService.GetSitemapAsync(domain.TenantId, domain.Url);
             return Content(sitemap, "application/xml", System.Text.Encoding.UTF8);
         }

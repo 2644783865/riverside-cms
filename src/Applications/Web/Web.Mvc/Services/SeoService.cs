@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Riverside.Cms.Applications.Web.Mvc.Extensions;
-using Riverside.Cms.Services.Core.Client;
+using Riverside.Cms.Services.Core.Domain;
 
 namespace Riverside.Cms.Applications.Web.Mvc.Services
 {

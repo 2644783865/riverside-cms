@@ -83,19 +83,21 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mortgage.Mvc", "src\Service
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Auth", "Auth", "{970A07C6-966E-42DC-A603-BFB010E87F3F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.Domain", "src\Services\Auth\Auth.Domain\Auth.Domain.csproj", "{01D57CB6-DD63-4B1A-B84A-3004C5D6A89B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Auth.Domain", "src\Services\Auth\Auth.Domain\Auth.Domain.csproj", "{01D57CB6-DD63-4B1A-B84A-3004C5D6A89B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Validation", "Validation", "{A317A55E-2612-45B3-B29A-35A09DA18F9C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Validation.Framework", "src\Utilities\Validation\Validation.Framework\Validation.Framework.csproj", "{1DDF3D90-3E2F-46FC-9425-C68B3F99A6E1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Validation.Framework", "src\Utilities\Validation\Validation.Framework\Validation.Framework.csproj", "{1DDF3D90-3E2F-46FC-9425-C68B3F99A6E1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Validation.DataAnnotations", "src\Utilities\Validation\Validation.DataAnnotations\Validation.DataAnnotations.csproj", "{294CAF93-62D5-49CB-BF0F-F967B65A5E0E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Validation.DataAnnotations", "src\Utilities\Validation\Validation.DataAnnotations\Validation.DataAnnotations.csproj", "{294CAF93-62D5-49CB-BF0F-F967B65A5E0E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.Infrastructure", "src\Services\Auth\Auth.Infrastructure\Auth.Infrastructure.csproj", "{C9A844C6-8EF4-46FC-A4BF-0A6FC8AD3537}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Auth.Infrastructure", "src\Services\Auth\Auth.Infrastructure\Auth.Infrastructure.csproj", "{C9A844C6-8EF4-46FC-A4BF-0A6FC8AD3537}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Security", "Security", "{1C9F23DE-D48A-424F-BFDB-5C4979377957}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Security.Encryption", "src\Utilities\Security\Security.Encryption\Security.Encryption.csproj", "{A8A956BB-F145-47AE-9CF7-CA862F0F8DD2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Security.Encryption", "src\Utilities\Security\Security.Encryption\Security.Encryption.csproj", "{A8A956BB-F145-47AE-9CF7-CA862F0F8DD2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Auth.Mvc", "src\Services\Auth\Auth.Mvc\Auth.Mvc.csproj", "{C0893E1D-1AD0-46F5-BD79-AC0BCF43C11A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -237,6 +239,10 @@ Global
 		{A8A956BB-F145-47AE-9CF7-CA862F0F8DD2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A8A956BB-F145-47AE-9CF7-CA862F0F8DD2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A8A956BB-F145-47AE-9CF7-CA862F0F8DD2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C0893E1D-1AD0-46F5-BD79-AC0BCF43C11A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C0893E1D-1AD0-46F5-BD79-AC0BCF43C11A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C0893E1D-1AD0-46F5-BD79-AC0BCF43C11A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C0893E1D-1AD0-46F5-BD79-AC0BCF43C11A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -281,6 +287,7 @@ Global
 		{C9A844C6-8EF4-46FC-A4BF-0A6FC8AD3537} = {970A07C6-966E-42DC-A603-BFB010E87F3F}
 		{1C9F23DE-D48A-424F-BFDB-5C4979377957} = {AFB77834-1A0D-4409-B5D2-E238A85B1FA3}
 		{A8A956BB-F145-47AE-9CF7-CA862F0F8DD2} = {1C9F23DE-D48A-424F-BFDB-5C4979377957}
+		{C0893E1D-1AD0-46F5-BD79-AC0BCF43C11A} = {970A07C6-966E-42DC-A603-BFB010E87F3F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7A9D6838-ED01-4238-A5A9-22EFD2D48A70}

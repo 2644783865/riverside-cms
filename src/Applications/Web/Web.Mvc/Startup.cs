@@ -9,6 +9,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Riverside.Cms.Applications.Web.Mvc.Services;
+using Riverside.Cms.Services.Core.Domain;
+using Riverside.Cms.Services.Core.Infrastructure;
+using Riverside.Cms.Services.Element.Domain;
+using Riverside.Cms.Services.Element.Infrastructure;
+using Riverside.Cms.Services.Mortgage.Domain;
+using Riverside.Cms.Services.Mortgage.Infrastructure;
+using Riverside.Cms.Services.Storage.Domain;
 using Riverside.Cms.Services.Storage.Infrastructure;
 using Riverside.Cms.Utilities.Net.Mail;
 using Riverside.Cms.Utilities.Text.Csv;
@@ -32,42 +39,6 @@ namespace Riverside.Cms.Applications.Web.Mvc
             services.AddTransient<IStringUtilities, StringUtilities>();
         }
 
-        private void ConfigureDependencyInjectionClientServices(IServiceCollection services)
-        {
-            // Core services
-            services.AddTransient<Riverside.Cms.Services.Core.Client.IDomainService, Riverside.Cms.Services.Core.Client.DomainService>();
-            services.AddTransient<Riverside.Cms.Services.Core.Client.IPageService, Riverside.Cms.Services.Core.Client.PageService>();
-            services.AddTransient<Riverside.Cms.Services.Core.Client.IPageViewService, Riverside.Cms.Services.Core.Client.PageViewService>();
-            services.AddTransient<Riverside.Cms.Services.Core.Client.ITagService, Riverside.Cms.Services.Core.Client.TagService>();
-            services.AddTransient<Riverside.Cms.Services.Core.Client.ITenantService, Riverside.Cms.Services.Core.Client.TenantService>();
-            services.AddTransient<Riverside.Cms.Services.Core.Client.IUserService, Riverside.Cms.Services.Core.Client.UserService>();
-
-            // Element services
-            services.AddTransient<Riverside.Cms.Services.Element.Client.IAlbumElementService, Riverside.Cms.Services.Element.Client.AlbumElementService>();
-            services.AddTransient<Riverside.Cms.Services.Element.Client.ICarouselElementService, Riverside.Cms.Services.Element.Client.CarouselElementService>();
-            services.AddTransient<Riverside.Cms.Services.Element.Client.ICodeSnippetElementService, Riverside.Cms.Services.Element.Client.CodeSnippetElementService>();
-            services.AddTransient<Riverside.Cms.Services.Element.Client.IFooterElementService, Riverside.Cms.Services.Element.Client.FooterElementService>();
-            services.AddTransient<Riverside.Cms.Services.Element.Client.IFormElementService, Riverside.Cms.Services.Element.Client.FormElementService>();
-            services.AddTransient<Riverside.Cms.Services.Element.Client.IForumElementService, Riverside.Cms.Services.Element.Client.ForumElementService>();
-            services.AddTransient<Riverside.Cms.Services.Element.Client.IHtmlElementService, Riverside.Cms.Services.Element.Client.HtmlElementService>();
-            services.AddTransient<Riverside.Cms.Services.Element.Client.ILatestThreadsElementService, Riverside.Cms.Services.Element.Client.LatestThreadsElementService>();
-            services.AddTransient<Riverside.Cms.Services.Element.Client.INavigationBarElementService, Riverside.Cms.Services.Element.Client.NavigationBarElementService>();
-            services.AddTransient<Riverside.Cms.Services.Element.Client.IPageHeaderElementService, Riverside.Cms.Services.Element.Client.PageHeaderElementService>();
-            services.AddTransient<Riverside.Cms.Services.Element.Client.IPageListElementService, Riverside.Cms.Services.Element.Client.PageListElementService>();
-            services.AddTransient<Riverside.Cms.Services.Element.Client.IShareElementService, Riverside.Cms.Services.Element.Client.ShareElementService>();
-            services.AddTransient<Riverside.Cms.Services.Element.Client.ISocialBarElementService, Riverside.Cms.Services.Element.Client.SocialBarElementService>();
-            services.AddTransient<Riverside.Cms.Services.Element.Client.ITableElementService, Riverside.Cms.Services.Element.Client.TableElementService>();
-            services.AddTransient<Riverside.Cms.Services.Element.Client.ITagCloudElementService, Riverside.Cms.Services.Element.Client.TagCloudElementService>();
-            services.AddTransient<Riverside.Cms.Services.Element.Client.ITestimonialElementService, Riverside.Cms.Services.Element.Client.TestimonialElementService>();
-
-            // Mortgage services
-            services.AddTransient<Riverside.Cms.Services.Mortgage.Client.IAmortisationCalculatorElementService, Riverside.Cms.Services.Mortgage.Client.AmortisationCalculatorElementService>();
-            services.AddTransient<Riverside.Cms.Services.Mortgage.Client.IBorrowCalculatorElementService, Riverside.Cms.Services.Mortgage.Client.BorrowCalculatorElementService>();
-            services.AddTransient<Riverside.Cms.Services.Mortgage.Client.IPayCalculatorElementService, Riverside.Cms.Services.Mortgage.Client.PayCalculatorElementService>();
-            services.AddTransient<Riverside.Cms.Services.Mortgage.Client.IRentalCalculatorElementService, Riverside.Cms.Services.Mortgage.Client.RentalCalculatorElementService>();
-            services.AddTransient<Riverside.Cms.Services.Mortgage.Client.IStampDutyCalculatorElementService, Riverside.Cms.Services.Mortgage.Client.StampDutyCalculatorElementService>();
-        }
-
         private void ConfigureDependencyInjectionMvcServices(IServiceCollection services)
         {
             services.AddTransient<IElementServiceFactory, ElementServiceFactory>();
@@ -77,103 +48,95 @@ namespace Riverside.Cms.Applications.Web.Mvc
         private void ConfigureDependencyInjectionCoreServices(IServiceCollection services)
         {
             // Core domain services
-            services.AddTransient<Riverside.Cms.Services.Core.Domain.IDomainService, Riverside.Cms.Services.Core.Domain.DomainService>();
-            services.AddTransient<Riverside.Cms.Services.Core.Domain.IForumService, Riverside.Cms.Services.Core.Domain.ForumService>();
-            services.AddTransient<Riverside.Cms.Services.Core.Domain.IMasterPageService, Riverside.Cms.Services.Core.Domain.MasterPageService>();
-            services.AddTransient<Riverside.Cms.Services.Core.Domain.IPageService, Riverside.Cms.Services.Core.Domain.PageService>();
-            services.AddTransient<Riverside.Cms.Services.Core.Domain.IPageViewService, Riverside.Cms.Services.Core.Domain.PageViewService>();
-            services.AddTransient<Riverside.Cms.Services.Core.Domain.ITagService, Riverside.Cms.Services.Core.Domain.TagService>();
-            services.AddTransient<Riverside.Cms.Services.Core.Domain.ITenantService, Riverside.Cms.Services.Core.Domain.TenantService>();
-            services.AddTransient<Riverside.Cms.Services.Core.Domain.IUserService, Riverside.Cms.Services.Core.Domain.UserService>();
+            services.AddTransient<IDomainService, DomainService>();
+            services.AddTransient<IForumService, ForumService>();
+            services.AddTransient<IMasterPageService, MasterPageService>();
+            services.AddTransient<IPageService, PageService>();
+            services.AddTransient<IPageViewService, PageViewService>();
+            services.AddTransient<ITagService, TagService>();
+            services.AddTransient<ITenantService, TenantService>();
+            services.AddTransient<IUserService, UserService>();
 
             // Core infrastructure services
-            services.AddTransient<Riverside.Cms.Services.Core.Domain.IDomainRepository, Riverside.Cms.Services.Core.Infrastructure.SqlDomainRepository>();
-            services.AddTransient<Riverside.Cms.Services.Core.Domain.IForumRepository, Riverside.Cms.Services.Core.Infrastructure.SqlForumRepository>();
-            services.AddTransient<Riverside.Cms.Services.Core.Domain.IMasterPageRepository, Riverside.Cms.Services.Core.Infrastructure.SqlMasterPageRepository>();
-            services.AddTransient<Riverside.Cms.Services.Core.Domain.IPageRepository, Riverside.Cms.Services.Core.Infrastructure.SqlPageRepository>();
-            services.AddTransient<Riverside.Cms.Services.Core.Domain.ITagRepository, Riverside.Cms.Services.Core.Infrastructure.SqlTagRepository>();
-            services.AddTransient<Riverside.Cms.Services.Core.Domain.ITenantRepository, Riverside.Cms.Services.Core.Infrastructure.SqlTenantRepository>();
-            services.AddTransient<Riverside.Cms.Services.Core.Domain.IUserRepository, Riverside.Cms.Services.Core.Infrastructure.SqlUserRepository>();
+            services.AddTransient<IDomainRepository, SqlDomainRepository>();
+            services.AddTransient<IForumRepository, SqlForumRepository>();
+            services.AddTransient<IMasterPageRepository, SqlMasterPageRepository>();
+            services.AddTransient<IPageRepository, SqlPageRepository>();
+            services.AddTransient<ITagRepository, SqlTagRepository>();
+            services.AddTransient<ITenantRepository, SqlTenantRepository>();
+            services.AddTransient<IUserRepository, SqlUserRepository>();
         }
 
         private void ConfigureDependencyInjectionElementServices(IServiceCollection services)
         {
             // Element domain services
-            services.AddTransient<Riverside.Cms.Services.Element.Domain.IAlbumElementService, Riverside.Cms.Services.Element.Domain.AlbumElementService>();
-            services.AddTransient<Riverside.Cms.Services.Element.Domain.ICarouselElementService, Riverside.Cms.Services.Element.Domain.CarouselElementService>();
-            services.AddTransient<Riverside.Cms.Services.Element.Domain.ICodeSnippetElementService, Riverside.Cms.Services.Element.Domain.CodeSnippetElementService>();
-            services.AddTransient<Riverside.Cms.Services.Element.Domain.IFooterElementService, Riverside.Cms.Services.Element.Domain.FooterElementService>();
-            services.AddTransient<Riverside.Cms.Services.Element.Domain.IFormElementService, Riverside.Cms.Services.Element.Domain.FormElementService>();
-            services.AddTransient<Riverside.Cms.Services.Element.Domain.IForumElementService, Riverside.Cms.Services.Element.Domain.ForumElementService>();
-            services.AddTransient<Riverside.Cms.Services.Element.Domain.IHtmlElementService, Riverside.Cms.Services.Element.Domain.HtmlElementService>();
-            services.AddTransient<Riverside.Cms.Services.Element.Domain.ILatestThreadsElementService, Riverside.Cms.Services.Element.Domain.LatestThreadsElementService>();
-            services.AddTransient<Riverside.Cms.Services.Element.Domain.INavigationBarElementService, Riverside.Cms.Services.Element.Domain.NavigationBarElementService>();
-            services.AddTransient<Riverside.Cms.Services.Element.Domain.IPageHeaderElementService, Riverside.Cms.Services.Element.Domain.PageHeaderElementService>();
-            services.AddTransient<Riverside.Cms.Services.Element.Domain.IPageListElementService, Riverside.Cms.Services.Element.Domain.PageListElementService>();
-            services.AddTransient<Riverside.Cms.Services.Element.Domain.IShareElementService, Riverside.Cms.Services.Element.Domain.ShareElementService>();
-            services.AddTransient<Riverside.Cms.Services.Element.Domain.ISocialBarElementService, Riverside.Cms.Services.Element.Domain.SocialBarElementService>();
-            services.AddTransient<Riverside.Cms.Services.Element.Domain.ITableElementService, Riverside.Cms.Services.Element.Domain.TableElementService>();
-            services.AddTransient<Riverside.Cms.Services.Element.Domain.ITagCloudElementService, Riverside.Cms.Services.Element.Domain.TagCloudElementService>();
-            services.AddTransient<Riverside.Cms.Services.Element.Domain.ITestimonialElementService, Riverside.Cms.Services.Element.Domain.TestimonialElementService>();
+            services.AddTransient<IAlbumElementService, AlbumElementService>();
+            services.AddTransient<ICarouselElementService, CarouselElementService>();
+            services.AddTransient<ICodeSnippetElementService, CodeSnippetElementService>();
+            services.AddTransient<IFooterElementService, FooterElementService>();
+            services.AddTransient<IFormElementService, FormElementService>();
+            services.AddTransient<IForumElementService, ForumElementService>();
+            services.AddTransient<IHtmlElementService, HtmlElementService>();
+            services.AddTransient<ILatestThreadsElementService, LatestThreadsElementService>();
+            services.AddTransient<INavigationBarElementService, NavigationBarElementService>();
+            services.AddTransient<IPageHeaderElementService, PageHeaderElementService>();
+            services.AddTransient<IPageListElementService, PageListElementService>();
+            services.AddTransient<IShareElementService, ShareElementService>();
+            services.AddTransient<ISocialBarElementService, SocialBarElementService>();
+            services.AddTransient<ITableElementService, TableElementService>();
+            services.AddTransient<ITagCloudElementService, TagCloudElementService>();
+            services.AddTransient<ITestimonialElementService, TestimonialElementService>();
 
             // Element infrastructure services
-            services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Element.Domain.AlbumElementSettings>, Riverside.Cms.Services.Element.Infrastructure.SqlAlbumElementRepository>();
-            services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Element.Domain.CarouselElementSettings>, Riverside.Cms.Services.Element.Infrastructure.SqlCarouselElementRepository>();
-            services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Element.Domain.CodeSnippetElementSettings>, Riverside.Cms.Services.Element.Infrastructure.SqlCodeSnippetElementRepository>();
-            services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Element.Domain.FooterElementSettings>, Riverside.Cms.Services.Element.Infrastructure.SqlFooterElementRepository>();
-            services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Element.Domain.FormElementSettings>, Riverside.Cms.Services.Element.Infrastructure.SqlFormElementRepository>();
-            services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Element.Domain.ForumElementSettings>, Riverside.Cms.Services.Element.Infrastructure.SqlForumElementRepository>();
-            services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Element.Domain.HtmlElementSettings>, Riverside.Cms.Services.Element.Infrastructure.SqlHtmlElementRepository>();
-            services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Element.Domain.LatestThreadsElementSettings>, Riverside.Cms.Services.Element.Infrastructure.SqlLatestThreadsElementRepository>();
-            services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Element.Domain.NavigationBarElementSettings>, Riverside.Cms.Services.Element.Infrastructure.SqlNavigationBarElementRepository>();
-            services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Element.Domain.PageHeaderElementSettings>, Riverside.Cms.Services.Element.Infrastructure.SqlPageHeaderElementRepository>();
-            services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Element.Domain.PageListElementSettings>, Riverside.Cms.Services.Element.Infrastructure.SqlPageListElementRepository>();
-            services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Element.Domain.ShareElementSettings>, Riverside.Cms.Services.Element.Infrastructure.SqlShareElementRepository>();
-            services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Element.Domain.SocialBarElementSettings>, Riverside.Cms.Services.Element.Infrastructure.SqlSocialBarElementRepository>();
-            services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Element.Domain.TableElementSettings>, Riverside.Cms.Services.Element.Infrastructure.SqlTableElementRepository>();
-            services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Element.Domain.TagCloudElementSettings>, Riverside.Cms.Services.Element.Infrastructure.SqlTagCloudElementRepository>();
-            services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Element.Domain.TestimonialElementSettings>, Riverside.Cms.Services.Element.Infrastructure.SqlTestimonialElementRepository>();
+            services.AddTransient<IElementRepository<AlbumElementSettings>, SqlAlbumElementRepository>();
+            services.AddTransient<IElementRepository<CarouselElementSettings>, SqlCarouselElementRepository>();
+            services.AddTransient<IElementRepository<CodeSnippetElementSettings>, SqlCodeSnippetElementRepository>();
+            services.AddTransient<IElementRepository<FooterElementSettings>, SqlFooterElementRepository>();
+            services.AddTransient<IElementRepository<FormElementSettings>, SqlFormElementRepository>();
+            services.AddTransient<IElementRepository<ForumElementSettings>, SqlForumElementRepository>();
+            services.AddTransient<IElementRepository<HtmlElementSettings>, SqlHtmlElementRepository>();
+            services.AddTransient<IElementRepository<LatestThreadsElementSettings>, SqlLatestThreadsElementRepository>();
+            services.AddTransient<IElementRepository<NavigationBarElementSettings>, SqlNavigationBarElementRepository>();
+            services.AddTransient<IElementRepository<PageHeaderElementSettings>, SqlPageHeaderElementRepository>();
+            services.AddTransient<IElementRepository<PageListElementSettings>, SqlPageListElementRepository>();
+            services.AddTransient<IElementRepository<ShareElementSettings>, SqlShareElementRepository>();
+            services.AddTransient<IElementRepository<SocialBarElementSettings>, SqlSocialBarElementRepository>();
+            services.AddTransient<IElementRepository<TableElementSettings>, SqlTableElementRepository>();
+            services.AddTransient<IElementRepository<TagCloudElementSettings>, SqlTagCloudElementRepository>();
+            services.AddTransient<IElementRepository<TestimonialElementSettings>, SqlTestimonialElementRepository>();
 
             // Mortgage domain services
-            services.AddTransient<Riverside.Cms.Services.Mortgage.Domain.IAmortisationCalculatorElementService, Riverside.Cms.Services.Mortgage.Domain.AmortisationCalculatorElementService>();
-            services.AddTransient<Riverside.Cms.Services.Mortgage.Domain.IBorrowCalculatorElementService, Riverside.Cms.Services.Mortgage.Domain.BorrowCalculatorElementService>();
-            services.AddTransient<Riverside.Cms.Services.Mortgage.Domain.IPayCalculatorElementService, Riverside.Cms.Services.Mortgage.Domain.PayCalculatorElementService>();
-            services.AddTransient<Riverside.Cms.Services.Mortgage.Domain.IRentalCalculatorElementService, Riverside.Cms.Services.Mortgage.Domain.RentalCalculatorElementService>();
-            services.AddTransient<Riverside.Cms.Services.Mortgage.Domain.IStampDutyCalculatorElementService, Riverside.Cms.Services.Mortgage.Domain.StampDutyCalculatorElementService>();
+            services.AddTransient<IAmortisationCalculatorElementService, AmortisationCalculatorElementService>();
+            services.AddTransient<IBorrowCalculatorElementService, BorrowCalculatorElementService>();
+            services.AddTransient<IPayCalculatorElementService, PayCalculatorElementService>();
+            services.AddTransient<IRentalCalculatorElementService, RentalCalculatorElementService>();
+            services.AddTransient<IStampDutyCalculatorElementService, StampDutyCalculatorElementService>();
 
             // Mortgage infrastructure services
-            services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Mortgage.Domain.AmortisationCalculatorElementSettings>, Riverside.Cms.Services.Mortgage.Infrastructure.SqlAmortisationCalculatorElementRepository>();
-            services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Mortgage.Domain.BorrowCalculatorElementSettings>, Riverside.Cms.Services.Mortgage.Infrastructure.SqlBorrowCalculatorElementRepository>();
-            services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Mortgage.Domain.PayCalculatorElementSettings>, Riverside.Cms.Services.Mortgage.Infrastructure.SqlPayCalculatorElementRepository>();
-            services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Mortgage.Domain.RentalCalculatorElementSettings>, Riverside.Cms.Services.Mortgage.Infrastructure.SqlRentalCalculatorElementRepository>();
-            services.AddTransient<Riverside.Cms.Services.Element.Domain.IElementRepository<Riverside.Cms.Services.Mortgage.Domain.StampDutyCalculatorElementSettings>, Riverside.Cms.Services.Mortgage.Infrastructure.SqlStampDutyCalculatorElementRepository>();
+            services.AddTransient<IElementRepository<AmortisationCalculatorElementSettings>, SqlAmortisationCalculatorElementRepository>();
+            services.AddTransient<IElementRepository<BorrowCalculatorElementSettings>, SqlBorrowCalculatorElementRepository>();
+            services.AddTransient<IElementRepository<PayCalculatorElementSettings>, SqlPayCalculatorElementRepository>();
+            services.AddTransient<IElementRepository<RentalCalculatorElementSettings>, SqlRentalCalculatorElementRepository>();
+            services.AddTransient<IElementRepository<StampDutyCalculatorElementSettings>, SqlStampDutyCalculatorElementRepository>();
         }
 
         private void ConfigureDependencyInjectionStorageServices(IServiceCollection services)
         {
             // Storage domain services
-            services.AddTransient<Riverside.Cms.Services.Storage.Domain.IStorageService, Riverside.Cms.Services.Storage.Domain.StorageService>();
+            services.AddTransient<IStorageService, StorageService>();
 
             // Storage infrastructure services
-            services.AddTransient<Riverside.Cms.Services.Storage.Domain.IBlobService, AzureBlobService>();
-            services.AddTransient<Riverside.Cms.Services.Storage.Domain.IImageService, ImageService>();
-            services.AddTransient<Riverside.Cms.Services.Storage.Domain.IStorageRepository, SqlStorageRepository>();
-        }
-
-        private void ConfigureOptionClientServices(IServiceCollection services)
-        {
-            services.Configure<Riverside.Cms.Services.Core.Client.CoreApiOptions>(Configuration);
-            services.Configure<Riverside.Cms.Services.Element.Client.ElementApiOptions>(Configuration);
-            services.Configure<Riverside.Cms.Services.Mortgage.Client.MortgageApiOptions>(Configuration);
-            services.Configure<Riverside.Cms.Services.Storage.Client.StorageApiOptions>(Configuration);
+            services.AddTransient<IBlobService, AzureBlobService>();
+            services.AddTransient<IImageService, ImageService>();
+            services.AddTransient<IStorageRepository, SqlStorageRepository>();
         }
 
         private void ConfigureOptionServices(IServiceCollection services)
         {
-            services.Configure<Riverside.Cms.Services.Core.Infrastructure.SqlOptions>(Configuration);
-            services.Configure<Riverside.Cms.Services.Element.Infrastructure.SqlOptions>(Configuration);
-            services.Configure<Riverside.Cms.Services.Mortgage.Infrastructure.SqlOptions>(Configuration);
-            services.Configure<Riverside.Cms.Services.Storage.Infrastructure.SqlOptions>(Configuration);
+            services.Configure<Cms.Services.Core.Infrastructure.SqlOptions>(Configuration);
+            services.Configure<Cms.Services.Element.Infrastructure.SqlOptions>(Configuration);
+            services.Configure<Cms.Services.Mortgage.Infrastructure.SqlOptions>(Configuration);
+            services.Configure<Cms.Services.Storage.Infrastructure.SqlOptions>(Configuration);
             services.Configure<AzureBlobOptions>(Configuration);
             services.Configure<EmailOptions>(Configuration);
         }
@@ -193,12 +156,10 @@ namespace Riverside.Cms.Applications.Web.Mvc
             services.AddHttpContextAccessor();
 
             ConfigureDependencyInjectionSharedServices(services);
-            ConfigureDependencyInjectionClientServices(services);
             ConfigureDependencyInjectionMvcServices(services);
             ConfigureDependencyInjectionCoreServices(services);
             ConfigureDependencyInjectionElementServices(services);
             ConfigureDependencyInjectionStorageServices(services);
-            ConfigureOptionClientServices(services);
             ConfigureOptionServices(services);
         }
 

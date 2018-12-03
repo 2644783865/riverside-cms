@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Riverside.Cms.Applications.Web.Mvc.Models;
-using Riverside.Cms.Services.Core.Client;
-using Riverside.Cms.Services.Element.Client;
-using Riverside.Cms.Services.Storage.Client;
+using Riverside.Cms.Services.Element.Domain;
+using Riverside.Cms.Services.Storage.Domain;
 
 namespace Riverside.Cms.Applications.Web.Mvc.Services
 {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Riverside.Cms.Services.Element.Client;
+using Riverside.Cms.Services.Element.Domain;
 
 namespace Riverside.Cms.Applications.Web.Mvc.Models
 {

@@ -18,19 +18,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Services\Core\Core.Client\Core.Client.csproj" />
     <ProjectReference Include="..\..\..\Services\Core\Core.Domain\Core.Domain.csproj" />
     <ProjectReference Include="..\..\..\Services\Core\Core.Infrastructure\Core.Infrastructure.csproj" />
     <ProjectReference Include="..\..\..\Services\Core\Core.Mvc\Core.Mvc.csproj" />
-    <ProjectReference Include="..\..\..\Services\Element\Element.Client\Element.Client.csproj" />
     <ProjectReference Include="..\..\..\Services\Element\Element.Domain\Element.Domain.csproj" />
     <ProjectReference Include="..\..\..\Services\Element\Element.Infrastructure\Element.Infrastructure.csproj" />
     <ProjectReference Include="..\..\..\Services\Element\Element.Mvc\Element.Mvc.csproj" />
-    <ProjectReference Include="..\..\..\Services\Mortgage\Mortgage.Client\Mortgage.Client.csproj" />
     <ProjectReference Include="..\..\..\Services\Mortgage\Mortgage.Domain\Mortgage.Domain.csproj" />
     <ProjectReference Include="..\..\..\Services\Mortgage\Mortgage.Infrastructure\Mortgage.Infrastructure.csproj" />
     <ProjectReference Include="..\..\..\Services\Mortgage\Mortgage.Mvc\Mortgage.Mvc.csproj" />
-    <ProjectReference Include="..\..\..\Services\Storage\Storage.Client\Storage.Client.csproj" />
     <ProjectReference Include="..\..\..\Services\Storage\Storage.Domain\Storage.Domain.csproj" />
     <ProjectReference Include="..\..\..\Services\Storage\Storage.Infrastructure\Storage.Infrastructure.csproj" />
     <ProjectReference Include="..\..\..\Services\Storage\Storage.Mvc\Storage.Mvc.csproj" />

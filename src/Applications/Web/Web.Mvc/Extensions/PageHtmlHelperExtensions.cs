@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.Routing;
-using Riverside.Cms.Services.Core.Client;
+using Riverside.Cms.Services.Core.Domain;
 
 namespace Riverside.Cms.Applications.Web.Mvc.Extensions
 {
