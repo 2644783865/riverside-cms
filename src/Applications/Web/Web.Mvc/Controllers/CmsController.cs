@@ -9,10 +9,11 @@ using Riverside.Cms.Services.Storage.Domain;
 using Riverside.Cms.Applications.Web.Mvc.Models;
 using Riverside.Cms.Applications.Web.Mvc.Services;
 using Microsoft.AspNetCore.Http;
+using Riverside.Cms.Services.Core.Common;
 
 namespace Riverside.Cms.Applications.Web.Mvc.Controllers
 {
-    [ValidateDomain()]
+    [MultiTenant(true)]
     public class CmsController : Controller
     {
         private readonly IElementServiceFactory _elementServiceFactory;
@@ -34,10 +35,8 @@ namespace Riverside.Cms.Applications.Web.Mvc.Controllers
             _userService = userService;
         }
 
-        private WebDomain GetDomain()
-        {
-            return (WebDomain)_httpContextAccessor.HttpContext.Items["riverside-cms-domain"];
-        }
+        private long TenantId => (long)RouteData.Values["tenantId"];
+        private string RootUrl => string.Format("{0}://{1}", _httpContextAccessor.HttpContext.Request.Scheme, _httpContextAccessor.HttpContext.Request.Host);
 
         private async Task<ElementPartialView> GetElementPartialViewAsync(long tenantId, Guid elementTypeId, long elementId, IPageContext context)
         {
@@ -100,8 +99,7 @@ namespace Riverside.Cms.Applications.Web.Mvc.Controllers
         [HttpGet]
         public async Task<IActionResult> ReadPageTaggedAsync(long pageId, string tags)
         {
-            WebDomain domain = GetDomain();
-            return await ReadPageTaggedAsync(domain.TenantId, pageId, tags);
+            return await ReadPageTaggedAsync(TenantId, pageId, tags);
         }
 
         [HttpGet]
@@ -113,9 +111,8 @@ namespace Riverside.Cms.Applications.Web.Mvc.Controllers
         [HttpGet]
         public async Task<IActionResult> ReadHomeTaggedAsync(string tags)
         {
-            WebDomain domain = GetDomain();
-            PageListResult result = await _pageService.ListPagesAsync(domain.TenantId, null, false, PageType.Folder, null, SortBy.Created, true, 0, 1);
-            return await ReadPageTaggedAsync(domain.TenantId, result.Pages.First().PageId, tags);
+            PageListResult result = await _pageService.ListPagesAsync(TenantId, null, false, PageType.Folder, null, SortBy.Created, true, 0, 1);
+            return await ReadPageTaggedAsync(TenantId, result.Pages.First().PageId, tags);
         }
 
         [HttpGet]
@@ -127,24 +124,21 @@ namespace Riverside.Cms.Applications.Web.Mvc.Controllers
         [HttpGet]
         public async Task<IActionResult> ReadPageImageAsync(long pageId, PageImageType pageImageType)
         {
-            WebDomain domain = GetDomain();
-            BlobContent blobContent = await _pageService.ReadPageImageAsync(domain.TenantId, pageId, pageImageType);
+            BlobContent blobContent = await _pageService.ReadPageImageAsync(TenantId, pageId, pageImageType);
             return File(blobContent.Stream, blobContent.Type, blobContent.Name);
         }
 
         [HttpGet]
         public async Task<IActionResult> ReadElementBlobAsync(Guid elementTypeId, long elementId, long blobSetId, string blobLabel)
         {
-            WebDomain domain = GetDomain();
-            BlobContent blobContent = await _elementServiceFactory.GetElementBlobContentAsync(domain.TenantId, elementTypeId, elementId, blobSetId, blobLabel);
+            BlobContent blobContent = await _elementServiceFactory.GetElementBlobContentAsync(TenantId, elementTypeId, elementId, blobSetId, blobLabel);
             return File(blobContent.Stream, blobContent.Type, blobContent.Name);
         }
 
         [HttpGet]
         public async Task<IActionResult> ReadUserBlobAsync(long userId, UserImageType userImageType)
         {
-            WebDomain domain = GetDomain();
-            BlobContent blobContent = await _userService.ReadUserImageAsync(domain.TenantId, userId, userImageType);
+            BlobContent blobContent = await _userService.ReadUserImageAsync(TenantId, userId, userImageType);
             return File(blobContent.Stream, blobContent.Type, blobContent.Name);
         }
 
@@ -155,24 +149,21 @@ namespace Riverside.Cms.Applications.Web.Mvc.Controllers
             {
                 PageId = pageId
             };
-            WebDomain domain = GetDomain();
-            object response = await _elementServiceFactory.PerformElementActionAsync(domain.TenantId, elementTypeId, elementId, json, context);
+            object response = await _elementServiceFactory.PerformElementActionAsync(TenantId, elementTypeId, elementId, json, context);
             return Json(response);
         }
 
         [HttpGet]
         public async Task<IActionResult> RobotsAsync()
         {
-            WebDomain domain = GetDomain();
-            string robots = await _seoService.GetRobotsExclusionStandardAsync(domain.Url);
+            string robots = await _seoService.GetRobotsExclusionStandardAsync(RootUrl);
             return Content(robots);
         }
 
         [HttpGet]
         public async Task<IActionResult> SitemapAsync()
         {
-            WebDomain domain = GetDomain();
-            string sitemap = await _seoService.GetSitemapAsync(domain.TenantId, domain.Url);
+            string sitemap = await _seoService.GetSitemapAsync(TenantId, RootUrl);
             return Content(sitemap, "application/xml", System.Text.Encoding.UTF8);
         }
     }

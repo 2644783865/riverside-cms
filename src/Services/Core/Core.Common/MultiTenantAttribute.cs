@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Riverside.Cms.Services.Core.Domain;
 
@@ -7,10 +8,17 @@ namespace Riverside.Cms.Services.Core.Common
 {
     public class MultiTenantAttribute : Attribute, IFilterFactory
     {
+        private readonly bool _redirect;
+
+        public MultiTenantAttribute(bool redirect = false)
+        {
+            _redirect = redirect;
+        }
+
         public IFilterMetadata CreateInstance(IServiceProvider serviceProvider)
         {
             IDomainService domainService = (IDomainService)serviceProvider.GetService(typeof(IDomainService));
-            return new MultiTenantInternalAttribute(domainService);
+            return new MultiTenantInternalAttribute(_redirect, domainService);
         }
 
         public bool IsReusable
@@ -23,11 +31,23 @@ namespace Riverside.Cms.Services.Core.Common
 
         public class MultiTenantInternalAttribute : IAsyncActionFilter
         {
+            private readonly bool _redirect;
+
             private readonly IDomainService _domainService;
 
-            public MultiTenantInternalAttribute(IDomainService domainService)
+            public MultiTenantInternalAttribute(bool redirect, IDomainService domainService)
             {
+                _redirect = redirect;
                 _domainService = domainService;
+            }
+
+            private void ProcessInvalidDomain(HttpContext context, string rootUrl, string redirectUrl)
+            {
+                string path = context.Request.Path.Value;
+                if (_redirect)
+                    context.Response.Redirect($"{redirectUrl}{path}", true);
+                else
+                    throw new MultiTenantDomainException("Request executed on invalid domain", $"{rootUrl}{path}", $"{redirectUrl}{path}");
             }
 
             public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
@@ -44,7 +64,7 @@ namespace Riverside.Cms.Services.Core.Common
 
                 // Throw error if request executed on wrong domain
                 if (domain.RedirectUrl != null)
-                    throw new MultiTenantDomainException("Request executed on invalid domain", $"{rootUrl}{context.HttpContext.Request.Path.Value}", $"{domain.RedirectUrl}{context.HttpContext.Request.Path.Value}");
+                    ProcessInvalidDomain(context.HttpContext, rootUrl, domain.RedirectUrl);
 
                 // Put domain into http context items, where it can be accessed later by controllers
                 context.RouteData.Values["tenantId"] = domain.TenantId;
