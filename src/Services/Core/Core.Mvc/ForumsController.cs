@@ -1,14 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
+﻿using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Riverside.Cms.Services.Core.Common;
 using Riverside.Cms.Services.Core.Domain;
 
 namespace Riverside.Cms.Services.Core.Mvc
 {
-    public class ForumsController : Controller
+    [MultiTenant()]
+    public class ForumsController : ControllerBase
     {
         private readonly IForumService _forumService;
 
@@ -19,13 +20,15 @@ namespace Riverside.Cms.Services.Core.Mvc
             _forumService = forumService;
         }
 
+        private long TenantId => (long)RouteData.Values["tenantId"];
+
         [HttpGet]
-        [Route("api/v1/core/tenants/{tenantId:int}/threads")]
+        [Route("api/v1/core/threads")]
         [ProducesResponseType(typeof(IEnumerable<ForumThread>), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ListForumThreadsAsync(long tenantId, [FromQuery]long? parentPageId, [FromQuery]bool? recursive, [FromQuery]string tagIds, [FromQuery]int? pageSize)
+        public async Task<IActionResult> ListForumThreadsAsync([FromQuery]long? parentPageId, [FromQuery]bool? recursive, [FromQuery]string tagIds, [FromQuery]int? pageSize)
         {
             IEnumerable<long> tagIdCollection = !string.IsNullOrWhiteSpace(tagIds) ? tagIds.Split(',').Select(long.Parse) : null;
-            IEnumerable<ForumThread> threads = await _forumService.ListLatestThreadsAsync(tenantId, parentPageId, recursive ?? false, tagIdCollection, pageSize ?? DefaultPageSize);
+            IEnumerable<ForumThread> threads = await _forumService.ListLatestThreadsAsync(TenantId, parentPageId, recursive ?? false, tagIdCollection, pageSize ?? DefaultPageSize);
             return Ok(threads);
         }
     }

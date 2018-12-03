@@ -1,15 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
+﻿using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Riverside.Cms.Services.Core.Common;
 using Riverside.Cms.Services.Element.Domain;
 using Riverside.Cms.Services.Storage.Domain;
 
 namespace Riverside.Cms.Services.Element.Mvc
 {
-    public class ElementsController : Controller
+    [MultiTenant()]
+    public class ElementsController : ControllerBase
     {
         private readonly IAlbumElementService _albumElementService;
         private readonly ICarouselElementService _carouselElementService;
@@ -48,39 +49,41 @@ namespace Riverside.Cms.Services.Element.Mvc
             _testimonialElementService = testimonialElementService;
         }
 
+        private long TenantId => (long)RouteData.Values["tenantId"];
+
         // ALBUM
 
         [HttpGet]
-        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/b539d2a4-52ae-40d5-b366-e42447b93d15/elements/{elementId:int}")]
+        [Route("api/v1/element/elementtypes/b539d2a4-52ae-40d5-b366-e42447b93d15/elements/{elementId:int}")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(AlbumElementSettings), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ReadAlbumElementSettingsAsync(long tenantId, long elementId, [FromQuery]long pageId)
+        public async Task<IActionResult> ReadAlbumElementSettingsAsync(long elementId, [FromQuery]long pageId)
         {
-            AlbumElementSettings settings = await _albumElementService.ReadElementSettingsAsync(tenantId, elementId);
+            AlbumElementSettings settings = await _albumElementService.ReadElementSettingsAsync(TenantId, elementId);
             if (settings == null)
                 return NotFound();
             return Ok(settings);
         }
 
         [HttpGet]
-        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/b539d2a4-52ae-40d5-b366-e42447b93d15/elements/{elementId:int}/blobsets/{blobSetId:int}/content")]
+        [Route("api/v1/element/elementtypes/b539d2a4-52ae-40d5-b366-e42447b93d15/elements/{elementId:int}/blobsets/{blobSetId:int}/content")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public async Task<IActionResult> ReadAlbumElementBlobContentAsync(long tenantId, long elementId, long blobSetId, [FromQuery]string blobLabel)
+        public async Task<IActionResult> ReadAlbumElementBlobContentAsync(long elementId, long blobSetId, [FromQuery]string blobLabel)
         {
-            BlobContent content = await _albumElementService.ReadBlobContentAsync(tenantId, elementId, blobSetId, blobLabel);
+            BlobContent content = await _albumElementService.ReadBlobContentAsync(TenantId, elementId, blobSetId, blobLabel);
             if (content == null)
                 return NotFound();
             return File(content.Stream, content.Type, content.Name);
         }
 
         [HttpGet]
-        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/b539d2a4-52ae-40d5-b366-e42447b93d15/elements/{elementId:int}/view")]
+        [Route("api/v1/element/elementtypes/b539d2a4-52ae-40d5-b366-e42447b93d15/elements/{elementId:int}/view")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(IElementView<AlbumElementSettings, AlbumElementContent>), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ReadAlbumElementViewAsync(long tenantId, long elementId, [FromQuery]long pageId)
+        public async Task<IActionResult> ReadAlbumElementViewAsync(long elementId, [FromQuery]long pageId)
         {
             PageContext context = new PageContext { PageId = pageId };
-            IElementView<AlbumElementSettings, AlbumElementContent> view = await _albumElementService.ReadElementViewAsync(tenantId, elementId, context);
+            IElementView<AlbumElementSettings, AlbumElementContent> view = await _albumElementService.ReadElementViewAsync(TenantId, elementId, context);
             if (view == null)
                 return NotFound();
             return Ok(view);
@@ -89,36 +92,36 @@ namespace Riverside.Cms.Services.Element.Mvc
         // CAROUSEL
 
         [HttpGet]
-        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/aacb11a0-5532-47cb-aab9-939cee3d5175/elements/{elementId:int}")]
+        [Route("api/v1/element/elementtypes/aacb11a0-5532-47cb-aab9-939cee3d5175/elements/{elementId:int}")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(CarouselElementSettings), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ReadCarouselElementSettingsAsync(long tenantId, long elementId, [FromQuery]long pageId)
+        public async Task<IActionResult> ReadCarouselElementSettingsAsync(long elementId, [FromQuery]long pageId)
         {
-            CarouselElementSettings settings = await _carouselElementService.ReadElementSettingsAsync(tenantId, elementId);
+            CarouselElementSettings settings = await _carouselElementService.ReadElementSettingsAsync(TenantId, elementId);
             if (settings == null)
                 return NotFound();
             return Ok(settings);
         }
 
         [HttpGet]
-        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/aacb11a0-5532-47cb-aab9-939cee3d5175/elements/{elementId:int}/blobsets/{blobSetId:int}/content")]
+        [Route("api/v1/element/elementtypes/aacb11a0-5532-47cb-aab9-939cee3d5175/elements/{elementId:int}/blobsets/{blobSetId:int}/content")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public async Task<IActionResult> ReadCarouselElementBlobContentAsync(long tenantId, long elementId, long blobSetId, [FromQuery]string blobLabel)
+        public async Task<IActionResult> ReadCarouselElementBlobContentAsync(long elementId, long blobSetId, [FromQuery]string blobLabel)
         {
-            BlobContent content = await _carouselElementService.ReadBlobContentAsync(tenantId, elementId, blobSetId, blobLabel);
+            BlobContent content = await _carouselElementService.ReadBlobContentAsync(TenantId, elementId, blobSetId, blobLabel);
             if (content == null)
                 return NotFound();
             return File(content.Stream, content.Type, content.Name);
         }
 
         [HttpGet]
-        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/aacb11a0-5532-47cb-aab9-939cee3d5175/elements/{elementId:int}/view")]
+        [Route("api/v1/element/elementtypes/aacb11a0-5532-47cb-aab9-939cee3d5175/elements/{elementId:int}/view")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(IElementView<CarouselElementSettings, CarouselElementContent>), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ReadCarouselElementViewAsync(long tenantId, long elementId, [FromQuery]long pageId)
+        public async Task<IActionResult> ReadCarouselElementViewAsync(long elementId, [FromQuery]long pageId)
         {
             PageContext context = new PageContext { PageId = pageId };
-            IElementView<CarouselElementSettings, CarouselElementContent> view = await _carouselElementService.ReadElementViewAsync(tenantId, elementId, context);
+            IElementView<CarouselElementSettings, CarouselElementContent> view = await _carouselElementService.ReadElementViewAsync(TenantId, elementId, context);
             if (view == null)
                 return NotFound();
             return Ok(view);
@@ -127,25 +130,25 @@ namespace Riverside.Cms.Services.Element.Mvc
         // CODE SNIPPET
 
         [HttpGet]
-        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/5401977d-865f-4a7a-b416-0a26305615de/elements/{elementId:int}")]
+        [Route("api/v1/element/elementtypes/5401977d-865f-4a7a-b416-0a26305615de/elements/{elementId:int}")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(CodeSnippetElementSettings), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ReadCodeSnippetElementSettingsAsync(long tenantId, long elementId)
+        public async Task<IActionResult> ReadCodeSnippetElementSettingsAsync(long elementId)
         {
-            CodeSnippetElementSettings settings = await _codeSnippetElementService.ReadElementSettingsAsync(tenantId, elementId);
+            CodeSnippetElementSettings settings = await _codeSnippetElementService.ReadElementSettingsAsync(TenantId, elementId);
             if (settings == null)
                 return NotFound();
             return Ok(settings);
         }
 
         [HttpGet]
-        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/5401977d-865f-4a7a-b416-0a26305615de/elements/{elementId:int}/view")]
+        [Route("api/v1/element/elementtypes/5401977d-865f-4a7a-b416-0a26305615de/elements/{elementId:int}/view")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(IElementView<CodeSnippetElementSettings, object>), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ReadCodeSnippetElementViewAsync(long tenantId, long elementId, [FromQuery]long pageId)
+        public async Task<IActionResult> ReadCodeSnippetElementViewAsync(long elementId, [FromQuery]long pageId)
         {
             PageContext context = new PageContext { PageId = pageId };
-            IElementView<CodeSnippetElementSettings, object> view = await _codeSnippetElementService.ReadElementViewAsync(tenantId, elementId, context);
+            IElementView<CodeSnippetElementSettings, object> view = await _codeSnippetElementService.ReadElementViewAsync(TenantId, elementId, context);
             if (view == null)
                 return NotFound();
             return Ok(view);
@@ -154,25 +157,25 @@ namespace Riverside.Cms.Services.Element.Mvc
         // FOOTER
 
         [HttpGet]
-        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/f1c2b384-4909-47c8-ada7-cd3cc7f32620/elements/{elementId:int}")]
+        [Route("api/v1/element/elementtypes/f1c2b384-4909-47c8-ada7-cd3cc7f32620/elements/{elementId:int}")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(FooterElementSettings), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ReadFooterElementSettingsAsync(long tenantId, long elementId)
+        public async Task<IActionResult> ReadFooterElementSettingsAsync(long elementId)
         {
-            FooterElementSettings settings = await _footerElementService.ReadElementSettingsAsync(tenantId, elementId);
+            FooterElementSettings settings = await _footerElementService.ReadElementSettingsAsync(TenantId, elementId);
             if (settings == null)
                 return NotFound();
             return Ok(settings);
         }
 
         [HttpGet]
-        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/f1c2b384-4909-47c8-ada7-cd3cc7f32620/elements/{elementId:int}/view")]
+        [Route("api/v1/element/elementtypes/f1c2b384-4909-47c8-ada7-cd3cc7f32620/elements/{elementId:int}/view")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(IElementView<FooterElementSettings, FooterElementContent>), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ReadFooterElementViewAsync(long tenantId, long elementId, [FromQuery]long pageId)
+        public async Task<IActionResult> ReadFooterElementViewAsync(long elementId, [FromQuery]long pageId)
         {
             PageContext context = new PageContext { PageId = pageId };
-            IElementView<FooterElementSettings, FooterElementContent> view = await _footerElementService.ReadElementViewAsync(tenantId, elementId, context);
+            IElementView<FooterElementSettings, FooterElementContent> view = await _footerElementService.ReadElementViewAsync(TenantId, elementId, context);
             if (view == null)
                 return NotFound();
             return Ok(view);
@@ -181,61 +184,61 @@ namespace Riverside.Cms.Services.Element.Mvc
         // FORM
 
         [HttpGet]
-        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/eafbd5ab-8c98-4edc-b8e1-42f5e8bfe2dc/elements/{elementId:int}")]
+        [Route("api/v1/element/elementtypes/eafbd5ab-8c98-4edc-b8e1-42f5e8bfe2dc/elements/{elementId:int}")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(FormElementSettings), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ReadFormElementSettingsAsync(long tenantId, long elementId)
+        public async Task<IActionResult> ReadFormElementSettingsAsync(long elementId)
         {
-            FormElementSettings settings = await _formElementService.ReadElementSettingsAsync(tenantId, elementId);
+            FormElementSettings settings = await _formElementService.ReadElementSettingsAsync(TenantId, elementId);
             if (settings == null)
                 return NotFound();
             return Ok(settings);
         }
 
         [HttpGet]
-        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/eafbd5ab-8c98-4edc-b8e1-42f5e8bfe2dc/elements/{elementId:int}/view")]
+        [Route("api/v1/element/elementtypes/eafbd5ab-8c98-4edc-b8e1-42f5e8bfe2dc/elements/{elementId:int}/view")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(IElementView<FormElementSettings, object>), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ReadFormElementViewAsync(long tenantId, long elementId, [FromQuery]long pageId)
+        public async Task<IActionResult> ReadFormElementViewAsync(long elementId, [FromQuery]long pageId)
         {
             PageContext context = new PageContext { PageId = pageId };
-            IElementView<FormElementSettings, object> view = await _formElementService.ReadElementViewAsync(tenantId, elementId, context);
+            IElementView<FormElementSettings, object> view = await _formElementService.ReadElementViewAsync(TenantId, elementId, context);
             if (view == null)
                 return NotFound();
             return Ok(view);
         }
 
         [HttpPost]
-        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/eafbd5ab-8c98-4edc-b8e1-42f5e8bfe2dc/elements/{elementId:int}/action")]
-        public async Task<IActionResult> PerformFormElementActionAsync(long tenantId, long elementId, [FromBody]FormElementActionRequest request, [FromQuery]long pageId)
+        [Route("api/v1/element/elementtypes/eafbd5ab-8c98-4edc-b8e1-42f5e8bfe2dc/elements/{elementId:int}/action")]
+        public async Task<IActionResult> PerformFormElementActionAsync(long elementId, [FromBody]FormElementActionRequest request, [FromQuery]long pageId)
         {
             PageContext context = new PageContext { PageId = pageId };
-            FormElementActionResponse response = await _formElementService.PerformElementActionAsync(tenantId, elementId, request, context);
+            FormElementActionResponse response = await _formElementService.PerformElementActionAsync(TenantId, elementId, request, context);
             return Ok(response);
         }
 
         // FORUM
 
         [HttpGet]
-        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/484192d1-5a4f-496f-981b-7e0120453949/elements/{elementId:int}")]
+        [Route("api/v1/element/elementtypes/484192d1-5a4f-496f-981b-7e0120453949/elements/{elementId:int}")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ForumElementSettings), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ReadForumElementSettingsAsync(long tenantId, long elementId)
+        public async Task<IActionResult> ReadForumElementSettingsAsync(long elementId)
         {
-            ForumElementSettings settings = await _forumElementService.ReadElementSettingsAsync(tenantId, elementId);
+            ForumElementSettings settings = await _forumElementService.ReadElementSettingsAsync(TenantId, elementId);
             if (settings == null)
                 return NotFound();
             return Ok(settings);
         }
 
         [HttpGet]
-        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/484192d1-5a4f-496f-981b-7e0120453949/elements/{elementId:int}/view")]
+        [Route("api/v1/element/elementtypes/484192d1-5a4f-496f-981b-7e0120453949/elements/{elementId:int}/view")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(IElementView<ForumElementSettings, ForumElementContent>), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ReadForumElementViewAsync(long tenantId, long elementId, [FromQuery]long pageId)
+        public async Task<IActionResult> ReadForumElementViewAsync(long elementId, [FromQuery]long pageId)
         {
             PageContext context = new PageContext { PageId = pageId };
-            IElementView<ForumElementSettings, ForumElementContent> view = await _forumElementService.ReadElementViewAsync(tenantId, elementId, context);
+            IElementView<ForumElementSettings, ForumElementContent> view = await _forumElementService.ReadElementViewAsync(TenantId, elementId, context);
             if (view == null)
                 return NotFound();
             return Ok(view);
@@ -244,36 +247,36 @@ namespace Riverside.Cms.Services.Element.Mvc
         // HTML
 
         [HttpGet]
-        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/c92ee4c4-b133-44cc-8322-640e99c334dc/elements/{elementId:int}")]
+        [Route("api/v1/element/elementtypes/c92ee4c4-b133-44cc-8322-640e99c334dc/elements/{elementId:int}")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(HtmlElementSettings), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ReadHtmlElementSettingsAsync(long tenantId, long elementId, [FromQuery]long pageId)
+        public async Task<IActionResult> ReadHtmlElementSettingsAsync(long elementId, [FromQuery]long pageId)
         {
-            HtmlElementSettings settings = await _htmlElementService.ReadElementSettingsAsync(tenantId, elementId);
+            HtmlElementSettings settings = await _htmlElementService.ReadElementSettingsAsync(TenantId, elementId);
             if (settings == null)
                 return NotFound();
             return Ok(settings);
         }
 
         [HttpGet]
-        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/c92ee4c4-b133-44cc-8322-640e99c334dc/elements/{elementId:int}/blobsets/{blobSetId:int}/content")]
+        [Route("api/v1/element/elementtypes/c92ee4c4-b133-44cc-8322-640e99c334dc/elements/{elementId:int}/blobsets/{blobSetId:int}/content")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public async Task<IActionResult> ReadHtmlElementBlobContentAsync(long tenantId, long elementId, long blobSetId, [FromQuery]string blobLabel)
+        public async Task<IActionResult> ReadHtmlElementBlobContentAsync(long elementId, long blobSetId, [FromQuery]string blobLabel)
         {
-            BlobContent content = await _htmlElementService.ReadBlobContentAsync(tenantId, elementId, blobSetId, blobLabel);
+            BlobContent content = await _htmlElementService.ReadBlobContentAsync(TenantId, elementId, blobSetId, blobLabel);
             if (content == null)
                 return NotFound();
             return File(content.Stream, content.Type, content.Name);
         }
 
         [HttpGet]
-        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/c92ee4c4-b133-44cc-8322-640e99c334dc/elements/{elementId:int}/view")]
+        [Route("api/v1/element/elementtypes/c92ee4c4-b133-44cc-8322-640e99c334dc/elements/{elementId:int}/view")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(IElementView<HtmlElementSettings, HtmlElementContent>), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ReadHtmlElementViewAsync(long tenantId, long elementId, [FromQuery]long pageId)
+        public async Task<IActionResult> ReadHtmlElementViewAsync(long elementId, [FromQuery]long pageId)
         {
             PageContext context = new PageContext { PageId = pageId };
-            IElementView<HtmlElementSettings, HtmlElementContent> view = await _htmlElementService.ReadElementViewAsync(tenantId, elementId, context);
+            IElementView<HtmlElementSettings, HtmlElementContent> view = await _htmlElementService.ReadElementViewAsync(TenantId, elementId, context);
             if (view == null)
                 return NotFound();
             return Ok(view);
@@ -282,25 +285,25 @@ namespace Riverside.Cms.Services.Element.Mvc
         // LATEST THREADS
 
         [HttpGet]
-        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/f9557287-ba01-48e3-9ab4-e2f4831933d0/elements/{elementId:int}")]
+        [Route("api/v1/element/elementtypes/f9557287-ba01-48e3-9ab4-e2f4831933d0/elements/{elementId:int}")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(LatestThreadsElementSettings), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ReadLatestThreadsElementSettingsAsync(long tenantId, long elementId, [FromQuery]long pageId)
+        public async Task<IActionResult> ReadLatestThreadsElementSettingsAsync(long elementId, [FromQuery]long pageId)
         {
-            LatestThreadsElementSettings settings = await _latestThreadsElementService.ReadElementSettingsAsync(tenantId, elementId);
+            LatestThreadsElementSettings settings = await _latestThreadsElementService.ReadElementSettingsAsync(TenantId, elementId);
             if (settings == null)
                 return NotFound();
             return Ok(settings);
         }
 
         [HttpGet]
-        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/f9557287-ba01-48e3-9ab4-e2f4831933d0/elements/{elementId:int}/view")]
+        [Route("api/v1/element/elementtypes/f9557287-ba01-48e3-9ab4-e2f4831933d0/elements/{elementId:int}/view")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(IElementView<LatestThreadsElementSettings, LatestThreadsElementContent>), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ReadLatestThreadsElementViewAsync(long tenantId, long elementId, [FromQuery]long pageId)
+        public async Task<IActionResult> ReadLatestThreadsElementViewAsync(long elementId, [FromQuery]long pageId)
         {
             PageContext context = new PageContext { PageId = pageId };
-            IElementView<LatestThreadsElementSettings, LatestThreadsElementContent> view = await _latestThreadsElementService.ReadElementViewAsync(tenantId, elementId, context);
+            IElementView<LatestThreadsElementSettings, LatestThreadsElementContent> view = await _latestThreadsElementService.ReadElementViewAsync(TenantId, elementId, context);
             if (view == null)
                 return NotFound();
             return Ok(view);
@@ -309,25 +312,25 @@ namespace Riverside.Cms.Services.Element.Mvc
         // NAVIGATION BAR
 
         [HttpGet]
-        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/a94c34c0-1a4c-4c91-a669-2f830cf1ea5f/elements/{elementId:int}")]
+        [Route("api/v1/element/elementtypes/a94c34c0-1a4c-4c91-a669-2f830cf1ea5f/elements/{elementId:int}")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(NavigationBarElementSettings), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ReadNavigationBarElementSettingsAsync(long tenantId, long elementId)
+        public async Task<IActionResult> ReadNavigationBarElementSettingsAsync(long elementId)
         {
-            NavigationBarElementSettings settings = await _navigationBarElementService.ReadElementSettingsAsync(tenantId, elementId);
+            NavigationBarElementSettings settings = await _navigationBarElementService.ReadElementSettingsAsync(TenantId, elementId);
             if (settings == null)
                 return NotFound();
             return Ok(settings);
         }
 
         [HttpGet]
-        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/a94c34c0-1a4c-4c91-a669-2f830cf1ea5f/elements/{elementId:int}/view")]
+        [Route("api/v1/element/elementtypes/a94c34c0-1a4c-4c91-a669-2f830cf1ea5f/elements/{elementId:int}/view")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(IElementView<NavigationBarElementSettings, NavigationBarElementContent>), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ReadNavigationBarElementViewAsync(long tenantId, long elementId, [FromQuery]long pageId)
+        public async Task<IActionResult> ReadNavigationBarElementViewAsync(long elementId, [FromQuery]long pageId)
         {
             PageContext context = new PageContext { PageId = pageId };
-            IElementView<NavigationBarElementSettings, NavigationBarElementContent> view = await _navigationBarElementService.ReadElementViewAsync(tenantId, elementId, context);
+            IElementView<NavigationBarElementSettings, NavigationBarElementContent> view = await _navigationBarElementService.ReadElementViewAsync(TenantId, elementId, context);
             if (view == null)
                 return NotFound();
             return Ok(view);
@@ -336,25 +339,25 @@ namespace Riverside.Cms.Services.Element.Mvc
         // PAGE HEADER
 
         [HttpGet]
-        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/1cbac30c-5deb-404e-8ea8-aabc20c82aa8/elements/{elementId:int}")]
+        [Route("api/v1/element/elementtypes/1cbac30c-5deb-404e-8ea8-aabc20c82aa8/elements/{elementId:int}")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(PageHeaderElementSettings), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ReadPageHeaderElementSettingsAsync(long tenantId, long elementId)
+        public async Task<IActionResult> ReadPageHeaderElementSettingsAsync(long elementId)
         {
-            PageHeaderElementSettings settings = await _pageHeaderElementService.ReadElementSettingsAsync(tenantId, elementId);
+            PageHeaderElementSettings settings = await _pageHeaderElementService.ReadElementSettingsAsync(TenantId, elementId);
             if (settings == null)
                 return NotFound();
             return Ok(settings);
         }
 
         [HttpGet]
-        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/1cbac30c-5deb-404e-8ea8-aabc20c82aa8/elements/{elementId:int}/view")]
+        [Route("api/v1/element/elementtypes/1cbac30c-5deb-404e-8ea8-aabc20c82aa8/elements/{elementId:int}/view")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(IElementView<PageHeaderElementSettings, PageHeaderElementContent>), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ReadPageHeaderElementViewAsync(long tenantId, long elementId, [FromQuery]long pageId)
+        public async Task<IActionResult> ReadPageHeaderElementViewAsync(long elementId, [FromQuery]long pageId)
         {
             PageContext context = new PageContext { PageId = pageId };
-            IElementView<PageHeaderElementSettings, PageHeaderElementContent> view = await _pageHeaderElementService.ReadElementViewAsync(tenantId, elementId, context);
+            IElementView<PageHeaderElementSettings, PageHeaderElementContent> view = await _pageHeaderElementService.ReadElementViewAsync(TenantId, elementId, context);
             if (view == null)
                 return NotFound();
             return Ok(view);
@@ -363,27 +366,27 @@ namespace Riverside.Cms.Services.Element.Mvc
         // PAGE LIST
 
         [HttpGet]
-        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/61f55535-9f3e-4ef5-96a2-bc84d648842a/elements/{elementId:int}")]
+        [Route("api/v1/element/elementtypes/61f55535-9f3e-4ef5-96a2-bc84d648842a/elements/{elementId:int}")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(PageListElementSettings), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ReadPageListElementSettingsAsync(long tenantId, long elementId)
+        public async Task<IActionResult> ReadPageListElementSettingsAsync(long elementId)
         {
-            PageListElementSettings settings = await _pageListElementService.ReadElementSettingsAsync(tenantId, elementId);
+            PageListElementSettings settings = await _pageListElementService.ReadElementSettingsAsync(TenantId, elementId);
             if (settings == null)
                 return NotFound();
             return Ok(settings);
         }
 
         [HttpGet]
-        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/61f55535-9f3e-4ef5-96a2-bc84d648842a/elements/{elementId:int}/view")]
+        [Route("api/v1/element/elementtypes/61f55535-9f3e-4ef5-96a2-bc84d648842a/elements/{elementId:int}/view")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(IElementView<PageListElementSettings, PageListElementContent>), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ReadPageListElementViewAsync(long tenantId, long elementId, [FromQuery]long pageId, [FromQuery]string tagIds, [FromQuery]string page)
+        public async Task<IActionResult> ReadPageListElementViewAsync(long elementId, [FromQuery]long pageId, [FromQuery]string tagIds, [FromQuery]string page)
         {
             IEnumerable<long> tagIdCollection = !string.IsNullOrWhiteSpace(tagIds) ? tagIds.Split(',').Select(long.Parse) : null;
             IDictionary<string, string> parameters = page != null ? new Dictionary<string, string> { { "page", page } } : null;
             PageContext context = new PageContext { PageId = pageId, Parameters = parameters, TagIds = tagIdCollection };
-            IElementView<PageListElementSettings, PageListElementContent> view = await _pageListElementService.ReadElementViewAsync(tenantId, elementId, context);
+            IElementView<PageListElementSettings, PageListElementContent> view = await _pageListElementService.ReadElementViewAsync(TenantId, elementId, context);
             if (view == null)
                 return NotFound();
             return Ok(view);
@@ -392,25 +395,25 @@ namespace Riverside.Cms.Services.Element.Mvc
         // SHARE
 
         [HttpGet]
-        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/cf0d7834-54fb-4a6e-86db-0f238f8b1ac1/elements/{elementId:int}")]
+        [Route("api/v1/element/elementtypes/cf0d7834-54fb-4a6e-86db-0f238f8b1ac1/elements/{elementId:int}")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(ShareElementSettings), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ReadShareElementSettingsAsync(long tenantId, long elementId)
+        public async Task<IActionResult> ReadShareElementSettingsAsync(long elementId)
         {
-            ShareElementSettings settings = await _shareElementService.ReadElementSettingsAsync(tenantId, elementId);
+            ShareElementSettings settings = await _shareElementService.ReadElementSettingsAsync(TenantId, elementId);
             if (settings == null)
                 return NotFound();
             return Ok(settings);
         }
 
         [HttpGet]
-        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/cf0d7834-54fb-4a6e-86db-0f238f8b1ac1/elements/{elementId:int}/view")]
+        [Route("api/v1/element/elementtypes/cf0d7834-54fb-4a6e-86db-0f238f8b1ac1/elements/{elementId:int}/view")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(IElementView<ShareElementSettings, ShareElementContent>), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ReadShareElementViewAsync(long tenantId, long elementId, [FromQuery]long pageId)
+        public async Task<IActionResult> ReadShareElementViewAsync(long elementId, [FromQuery]long pageId)
         {
             PageContext context = new PageContext { PageId = pageId };
-            IElementView<ShareElementSettings, ShareElementContent> view = await _shareElementService.ReadElementViewAsync(tenantId, elementId, context);
+            IElementView<ShareElementSettings, ShareElementContent> view = await _shareElementService.ReadElementViewAsync(TenantId, elementId, context);
             if (view == null)
                 return NotFound();
             return Ok(view);
@@ -419,25 +422,25 @@ namespace Riverside.Cms.Services.Element.Mvc
         // SOCIAL BAR
 
         [HttpGet]
-        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/4e6b936d-e8a1-4ff2-9576-9f9b78f82895/elements/{elementId:int}")]
+        [Route("api/v1/element/elementtypes/4e6b936d-e8a1-4ff2-9576-9f9b78f82895/elements/{elementId:int}")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(SocialBarElementSettings), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ReadSocialBarElementSettingsAsync(long tenantId, long elementId)
+        public async Task<IActionResult> ReadSocialBarElementSettingsAsync(long elementId)
         {
-            SocialBarElementSettings settings = await _socialBarElementService.ReadElementSettingsAsync(tenantId, elementId);
+            SocialBarElementSettings settings = await _socialBarElementService.ReadElementSettingsAsync(TenantId, elementId);
             if (settings == null)
                 return NotFound();
             return Ok(settings);
         }
 
         [HttpGet]
-        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/4e6b936d-e8a1-4ff2-9576-9f9b78f82895/elements/{elementId:int}/view")]
+        [Route("api/v1/element/elementtypes/4e6b936d-e8a1-4ff2-9576-9f9b78f82895/elements/{elementId:int}/view")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(IElementView<SocialBarElementSettings, SocialBarElementContent>), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ReadSocialBarElementViewAsync(long tenantId, long elementId, [FromQuery]long pageId)
+        public async Task<IActionResult> ReadSocialBarElementViewAsync(long elementId, [FromQuery]long pageId)
         {
             PageContext context = new PageContext { PageId = pageId };
-            IElementView<SocialBarElementSettings, SocialBarElementContent> view = await _socialBarElementService.ReadElementViewAsync(tenantId, elementId, context);
+            IElementView<SocialBarElementSettings, SocialBarElementContent> view = await _socialBarElementService.ReadElementViewAsync(TenantId, elementId, context);
             if (view == null)
                 return NotFound();
             return Ok(view);
@@ -446,25 +449,25 @@ namespace Riverside.Cms.Services.Element.Mvc
         // TABLE
 
         [HttpGet]
-        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/252ca19c-d085-4e0d-b70b-da3e1098f51b/elements/{elementId:int}")]
+        [Route("api/v1/element/elementtypes/252ca19c-d085-4e0d-b70b-da3e1098f51b/elements/{elementId:int}")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(TableElementSettings), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ReadTableElementSettingsAsync(long tenantId, long elementId)
+        public async Task<IActionResult> ReadTableElementSettingsAsync(long elementId)
         {
-            TableElementSettings settings = await _tableElementService.ReadElementSettingsAsync(tenantId, elementId);
+            TableElementSettings settings = await _tableElementService.ReadElementSettingsAsync(TenantId, elementId);
             if (settings == null)
                 return NotFound();
             return Ok(settings);
         }
 
         [HttpGet]
-        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/252ca19c-d085-4e0d-b70b-da3e1098f51b/elements/{elementId:int}/view")]
+        [Route("api/v1/element/elementtypes/252ca19c-d085-4e0d-b70b-da3e1098f51b/elements/{elementId:int}/view")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(IElementView<TableElementSettings, TableElementContent>), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ReadTableElementViewAsync(long tenantId, long elementId, [FromQuery]long pageId)
+        public async Task<IActionResult> ReadTableElementViewAsync(long elementId, [FromQuery]long pageId)
         {
             PageContext context = new PageContext { PageId = pageId };
-            IElementView<TableElementSettings, TableElementContent> view = await _tableElementService.ReadElementViewAsync(tenantId, elementId, context);
+            IElementView<TableElementSettings, TableElementContent> view = await _tableElementService.ReadElementViewAsync(TenantId, elementId, context);
             if (view == null)
                 return NotFound();
             return Ok(view);
@@ -473,26 +476,26 @@ namespace Riverside.Cms.Services.Element.Mvc
         // TAG CLOUD
 
         [HttpGet]
-        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/b910c231-7dbd-4cad-92ef-775981e895b4/elements/{elementId:int}")]
+        [Route("api/v1/element/elementtypes/b910c231-7dbd-4cad-92ef-775981e895b4/elements/{elementId:int}")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(TagCloudElementSettings), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ReadTagCloudElementSettingsAsync(long tenantId, long elementId)
+        public async Task<IActionResult> ReadTagCloudElementSettingsAsync(long elementId)
         {
-            TagCloudElementSettings settings = await _tagCloudElementService.ReadElementSettingsAsync(tenantId, elementId);
+            TagCloudElementSettings settings = await _tagCloudElementService.ReadElementSettingsAsync(TenantId, elementId);
             if (settings == null)
                 return NotFound();
             return Ok(settings);
         }
 
         [HttpGet]
-        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/b910c231-7dbd-4cad-92ef-775981e895b4/elements/{elementId:int}/view")]
+        [Route("api/v1/element/elementtypes/b910c231-7dbd-4cad-92ef-775981e895b4/elements/{elementId:int}/view")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(IElementView<TagCloudElementSettings, TagCloudElementContent>), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ReadTagCloudElementViewAsync(long tenantId, long elementId, [FromQuery]long pageId, [FromQuery]string tagIds)
+        public async Task<IActionResult> ReadTagCloudElementViewAsync(long elementId, [FromQuery]long pageId, [FromQuery]string tagIds)
         {
             IEnumerable<long> tagIdCollection = !string.IsNullOrWhiteSpace(tagIds) ? tagIds.Split(',').Select(long.Parse) : null;
             PageContext context = new PageContext { PageId = pageId, TagIds = tagIdCollection };
-            IElementView<TagCloudElementSettings, TagCloudElementContent> view = await _tagCloudElementService.ReadElementViewAsync(tenantId, elementId, context);
+            IElementView<TagCloudElementSettings, TagCloudElementContent> view = await _tagCloudElementService.ReadElementViewAsync(TenantId, elementId, context);
             if (view == null)
                 return NotFound();
             return Ok(view);
@@ -501,25 +504,25 @@ namespace Riverside.Cms.Services.Element.Mvc
         // TESTIMONIAL
 
         [HttpGet]
-        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/eb479ac9-8c79-4fae-817a-e77fd3dbf05b/elements/{elementId:int}")]
+        [Route("api/v1/element/elementtypes/eb479ac9-8c79-4fae-817a-e77fd3dbf05b/elements/{elementId:int}")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(TestimonialElementSettings), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ReadTestimonialElementSettingsAsync(long tenantId, long elementId)
+        public async Task<IActionResult> ReadTestimonialElementSettingsAsync(long elementId)
         {
-            TestimonialElementSettings settings = await _testimonialElementService.ReadElementSettingsAsync(tenantId, elementId);
+            TestimonialElementSettings settings = await _testimonialElementService.ReadElementSettingsAsync(TenantId, elementId);
             if (settings == null)
                 return NotFound();
             return Ok(settings);
         }
 
         [HttpGet]
-        [Route("api/v1/element/tenants/{tenantId:int}/elementtypes/eb479ac9-8c79-4fae-817a-e77fd3dbf05b/elements/{elementId:int}/view")]
+        [Route("api/v1/element/elementtypes/eb479ac9-8c79-4fae-817a-e77fd3dbf05b/elements/{elementId:int}/view")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(IElementView<TestimonialElementSettings, object>), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ReadTestimonialElementViewAsync(long tenantId, long elementId, [FromQuery]long pageId)
+        public async Task<IActionResult> ReadTestimonialElementViewAsync(long elementId, [FromQuery]long pageId)
         {
             PageContext context = new PageContext { PageId = pageId };
-            IElementView<TestimonialElementSettings, object> view = await _testimonialElementService.ReadElementViewAsync(tenantId, elementId, context);
+            IElementView<TestimonialElementSettings, object> view = await _testimonialElementService.ReadElementViewAsync(TenantId, elementId, context);
             if (view == null)
                 return NotFound();
             return Ok(view);

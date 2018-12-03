@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Riverside.Cms.Services.Core.Common;
 using Riverside.Cms.Services.Core.Domain;
 
 namespace Riverside.Cms.Services.Core.Mvc
 {
-    public class MasterPagesController : Controller
+    [MultiTenant()]
+    public class MasterPagesController : ControllerBase
     {
         private readonly IMasterPageService _masterPageService;
 
@@ -17,55 +17,57 @@ namespace Riverside.Cms.Services.Core.Mvc
             _masterPageService = masterPageService;
         }
 
+        private long TenantId => (long)RouteData.Values["tenantId"];
+
         [HttpGet]
-        [Route("api/v1/core/tenants/{tenantId:int}/masterpages/{masterPageId:int}")]
+        [Route("api/v1/core/masterpages/{masterPageId:int}")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(MasterPage), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ReadMasterPageAsync(long tenantId, long masterPageId)
+        public async Task<IActionResult> ReadMasterPageAsync(long masterPageId)
         {
-            MasterPage masterPage = await _masterPageService.ReadMasterPageAsync(tenantId, masterPageId);
+            MasterPage masterPage = await _masterPageService.ReadMasterPageAsync(TenantId, masterPageId);
             if (masterPage == null)
                 return NotFound();
             return Ok(masterPage);
         }
 
         [HttpGet]
-        [Route("api/v1/core/tenants/{tenantId:int}/masterpages/{masterPageId:int}/zones")]
+        [Route("api/v1/core/masterpages/{masterPageId:int}/zones")]
         [ProducesResponseType(typeof(IEnumerable<MasterPageZone>), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> SearchMasterPageZonesAsync(long tenantId, long masterPageId)
+        public async Task<IActionResult> SearchMasterPageZonesAsync(long masterPageId)
         {
-            IEnumerable<MasterPageZone> masterPageZones = await _masterPageService.SearchMasterPageZonesAsync(tenantId, masterPageId);
+            IEnumerable<MasterPageZone> masterPageZones = await _masterPageService.SearchMasterPageZonesAsync(TenantId, masterPageId);
             return Ok(masterPageZones);
         }
 
         [HttpGet]
-        [Route("api/v1/core/tenants/{tenantId:int}/masterpages/{masterPageId:int}/zones/{masterPageZoneId:int}")]
+        [Route("api/v1/core/masterpages/{masterPageId:int}/zones/{masterPageZoneId:int}")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(MasterPageZone), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ReadMasterPageZoneAsync(long tenantId, long masterPageId, long masterPageZoneId)
+        public async Task<IActionResult> ReadMasterPageZoneAsync(long masterPageId, long masterPageZoneId)
         {
-            MasterPageZone masterPageZone = await _masterPageService.ReadMasterPageZoneAsync(tenantId, masterPageId, masterPageZoneId);
+            MasterPageZone masterPageZone = await _masterPageService.ReadMasterPageZoneAsync(TenantId, masterPageId, masterPageZoneId);
             if (masterPageZone == null)
                 return NotFound();
             return Ok(masterPageZone);
         }
 
         [HttpGet]
-        [Route("api/v1/core/tenants/{tenantId:int}/masterpages/{masterPageId:int}/zones/{masterPageZoneId:int}/elements")]
+        [Route("api/v1/core/masterpages/{masterPageId:int}/zones/{masterPageZoneId:int}/elements")]
         [ProducesResponseType(typeof(IEnumerable<MasterPageZoneElement>), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> SearchMasterPageZoneElementsAsync(long tenantId, long masterPageId, long masterPageZoneId)
+        public async Task<IActionResult> SearchMasterPageZoneElementsAsync(long masterPageId, long masterPageZoneId)
         {
-            IEnumerable<MasterPageZoneElement> masterPageZoneElements = await _masterPageService.SearchMasterPageZoneElementsAsync(tenantId, masterPageId, masterPageZoneId);
+            IEnumerable<MasterPageZoneElement> masterPageZoneElements = await _masterPageService.SearchMasterPageZoneElementsAsync(TenantId, masterPageId, masterPageZoneId);
             return Ok(masterPageZoneElements);
         }
 
         [HttpGet]
-        [Route("api/v1/core/tenants/{tenantId:int}/masterpages/{masterPageId:int}/zones/{masterPageZoneId:int}/elements/{masterPageZoneElementId:int}")]
+        [Route("api/v1/core/masterpages/{masterPageId:int}/zones/{masterPageZoneId:int}/elements/{masterPageZoneElementId:int}")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(MasterPageZoneElement), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ReadMasterPageZoneElementAsync(long tenantId, long masterPageId, long masterPageZoneId, long masterPageZoneElementId)
+        public async Task<IActionResult> ReadMasterPageZoneElementAsync(long masterPageId, long masterPageZoneId, long masterPageZoneElementId)
         {
-            MasterPageZoneElement masterPageZoneElement = await _masterPageService.ReadMasterPageZoneElementAsync(tenantId, masterPageId, masterPageZoneId, masterPageZoneElementId);
+            MasterPageZoneElement masterPageZoneElement = await _masterPageService.ReadMasterPageZoneElementAsync(TenantId, masterPageId, masterPageZoneId, masterPageZoneElementId);
             if (masterPageZoneElement == null)
                 return NotFound();
             return Ok(masterPageZoneElement);

@@ -22,7 +22,7 @@ namespace Riverside.Cms.Services.Auth.Mvc
         [Route("api/v1/authentication/logon")]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.OK)]
-        public async Task<IActionResult> PostAsync([FromBody] LogonModel model)
+        public IActionResult PostAsync([FromBody] LogonModel model)
         {
             try
             {

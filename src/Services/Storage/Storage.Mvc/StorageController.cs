@@ -7,10 +7,12 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Riverside.Cms.Services.Storage.Domain;
+using Riverside.Cms.Services.Core.Common;
 
 namespace Riverside.Cms.Services.Storage.Mvc
 {
-    public class StorageController : Controller
+    [MultiTenant()]
+    public class StorageController : ControllerBase
     {
         private readonly IStorageService _storageService;
 
@@ -18,6 +20,8 @@ namespace Riverside.Cms.Services.Storage.Mvc
         {
             _storageService = storageService;
         }
+
+        private long TenantId => (long)RouteData.Values["tenantId"];
 
         private bool PostIsCreateAction(IFormFile file, long? sourceBlobId, ResizeMode? mode, int? width, int? height)
         {
@@ -40,7 +44,7 @@ namespace Riverside.Cms.Services.Storage.Mvc
             };
             Stream stream = file.OpenReadStream();
             long blobId = await _storageService.CreateBlobAsync(tenantId, blob, stream);
-            return CreatedAtAction(nameof(ReadBlobAsync), new { tenantId = tenantId, blobId = blobId }, null);
+            return CreatedAtAction(nameof(ReadBlobAsync), new { tenantId, blobId }, null);
         }
 
         private async Task<IActionResult> ResizeBlobAsync(long tenantId, string path, long sourceBlobId, ResizeMode mode, int width, int height)
@@ -52,55 +56,55 @@ namespace Riverside.Cms.Services.Storage.Mvc
                 Mode = mode
             };
             long destinationBlobId = await _storageService.ResizeBlobAsync(tenantId, sourceBlobId, path, options);
-            return CreatedAtAction(nameof(ReadBlobAsync), new { tenantId = tenantId, blobId = destinationBlobId }, null);
+            return CreatedAtAction(nameof(ReadBlobAsync), new { tenantId, blobId = destinationBlobId }, null);
         }
 
         [HttpGet]
-        [Route("api/v1/storage/tenants/{tenantId:int}/blobs")]
+        [Route("api/v1/storage/blobs")]
         [ProducesResponseType(typeof(IEnumerable<Blob>), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ListBlobsAsync(long tenantId, [FromQuery]string blobIds, [FromQuery]string path)
+        public async Task<IActionResult> ListBlobsAsync([FromQuery]string blobIds, [FromQuery]string path)
         {
             IEnumerable<Blob> blobs = null;
             if (blobIds != null)
             {
                 IEnumerable<long> blobIdCollection = !string.IsNullOrWhiteSpace(blobIds) ? blobIds.Split(',').Select(long.Parse) : null;
-                blobs = await _storageService.ListBlobsAsync(tenantId, blobIdCollection);
+                blobs = await _storageService.ListBlobsAsync(TenantId, blobIdCollection);
             }
             else
             {
-                blobs = await _storageService.SearchBlobsAsync(tenantId, path);
+                blobs = await _storageService.SearchBlobsAsync(TenantId, path);
             }
             return Ok(blobs);
         }
 
         [HttpGet]
-        [Route("api/v1/storage/tenants/{tenantId:int}/blobs/{blobId:int}")]
+        [Route("api/v1/storage/blobs/{blobId:int}")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(Blob), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ReadBlobAsync(long tenantId, long blobId)
+        public async Task<IActionResult> ReadBlobAsync(long blobId)
         {
-            Blob blob = await _storageService.ReadBlobAsync(tenantId, blobId);
+            Blob blob = await _storageService.ReadBlobAsync(TenantId, blobId);
             if (blob == null)
                 return NotFound();
             return Ok(blob);
         }
 
         [HttpGet]
-        [Route("api/v1/storage/tenants/{tenantId:int}/blobs/{blobId:int}/content")]
+        [Route("api/v1/storage/blobs/{blobId:int}/content")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public async Task<IActionResult> ReadBlobContentAsync(long tenantId, long blobId, [FromQuery(Name = "path")]string path)
+        public async Task<IActionResult> ReadBlobContentAsync(long blobId, [FromQuery(Name = "path")]string path)
         {
-            BlobContent blobContent = await _storageService.ReadBlobContentAsync(tenantId, blobId, path);
+            BlobContent blobContent = await _storageService.ReadBlobContentAsync(TenantId, blobId, path);
             if (blobContent == null)
                 return NotFound();
             return File(blobContent.Stream, blobContent.Type, blobContent.Name);
         }
 
         [HttpPost]
-        [Route("api/v1/storage/tenants/{tenantId:int}/blobs")]
+        [Route("api/v1/storage/blobs")]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Created)]
-        public async Task<IActionResult> CreateBlobAsync(long tenantId, string path, IFormFile file, [FromQuery(Name = "source")]long? sourceBlobId, [FromQuery(Name = "resize")]ResizeMode? mode, [FromQuery]int? width, [FromQuery]int? height)
+        public async Task<IActionResult> CreateBlobAsync(string path, IFormFile file, [FromQuery(Name = "source")]long? sourceBlobId, [FromQuery(Name = "resize")]ResizeMode? mode, [FromQuery]int? width, [FromQuery]int? height)
         {
             bool create = PostIsCreateAction(file, sourceBlobId, mode, width, height);
             bool resize = PostIsResizeAction(file, sourceBlobId, mode, width, height);
@@ -108,21 +112,21 @@ namespace Riverside.Cms.Services.Storage.Mvc
                 return BadRequest();
 
             if (create)
-                return await CreateBlobWorkAsync(tenantId, path, file);
+                return await CreateBlobWorkAsync(TenantId, path, file);
             else
-                return await ResizeBlobAsync(tenantId, path, sourceBlobId.Value, mode.Value, width.Value, height.Value);
+                return await ResizeBlobAsync(TenantId, path, sourceBlobId.Value, mode.Value, width.Value, height.Value);
         }
 
         [HttpDelete]
-        [Route("api/v1/storage/tenants/{tenantId:int}/blobs/{blobId:int}")]
+        [Route("api/v1/storage/blobs/{blobId:int}")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public async Task<IActionResult> DeleteBlobAsync(long tenantId, long blobId)
+        public async Task<IActionResult> DeleteBlobAsync(long blobId)
         {
-            Blob blob = await _storageService.ReadBlobAsync(tenantId, blobId);
+            Blob blob = await _storageService.ReadBlobAsync(TenantId, blobId);
             if (blob == null)
                 return NotFound();
-            await _storageService.DeleteBlobAsync(tenantId, blobId);
+            await _storageService.DeleteBlobAsync(TenantId, blobId);
             return NoContent();
         }
     }

@@ -99,6 +99,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Security.Encryption", "src\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Auth.Mvc", "src\Services\Auth\Auth.Mvc\Auth.Mvc.csproj", "{C0893E1D-1AD0-46F5-BD79-AC0BCF43C11A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Common", "src\Services\Core\Core.Common\Core.Common.csproj", "{8D70F138-BE6D-4583-A109-C59B646AEC33}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -243,6 +245,10 @@ Global
 		{C0893E1D-1AD0-46F5-BD79-AC0BCF43C11A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C0893E1D-1AD0-46F5-BD79-AC0BCF43C11A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C0893E1D-1AD0-46F5-BD79-AC0BCF43C11A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8D70F138-BE6D-4583-A109-C59B646AEC33}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D70F138-BE6D-4583-A109-C59B646AEC33}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D70F138-BE6D-4583-A109-C59B646AEC33}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D70F138-BE6D-4583-A109-C59B646AEC33}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -288,6 +294,7 @@ Global
 		{1C9F23DE-D48A-424F-BFDB-5C4979377957} = {AFB77834-1A0D-4409-B5D2-E238A85B1FA3}
 		{A8A956BB-F145-47AE-9CF7-CA862F0F8DD2} = {1C9F23DE-D48A-424F-BFDB-5C4979377957}
 		{C0893E1D-1AD0-46F5-BD79-AC0BCF43C11A} = {970A07C6-966E-42DC-A603-BFB010E87F3F}
+		{8D70F138-BE6D-4583-A109-C59B646AEC33} = {12968302-C293-42A6-8CE5-114CA39CDDBD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7A9D6838-ED01-4238-A5A9-22EFD2D48A70}
