@@ -19,8 +19,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{90988250-F53
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{0A016858-A0E1-4054-890A-8901079F8CC2}"
 EndProject
-Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{68440F57-BBC1-40A1-B5B6-AF72AE1B1177}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Storage", "Storage", "{E8D89EBC-FBFE-4191-8CC7-F489E729E4C9}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Storage.Domain", "src\Services\Storage\Storage.Domain\Storage.Domain.csproj", "{491F6FCC-9187-4FF2-A88C-81E68C8A55DE}"
@@ -103,7 +101,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core.Common", "src\Services
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UI", "UI", "{4388EDD4-E616-4D0B-B4F2-421283C0C835}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UI.Forms", "src\Utilities\UI\UI.Forms\UI.Forms.csproj", "{FB77A4E5-3E25-4244-884A-CA4BA8673A63}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UI.Forms", "src\Utilities\UI\UI.Forms\UI.Forms.csproj", "{FB77A4E5-3E25-4244-884A-CA4BA8673A63}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -137,10 +135,6 @@ Global
 		{403DC74A-A4D6-4BE6-99B5-2EA8A1D87019}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{403DC74A-A4D6-4BE6-99B5-2EA8A1D87019}.Release|Any CPU.Build.0 = Release|Any CPU
 		{403DC74A-A4D6-4BE6-99B5-2EA8A1D87019}.Release|Any CPU.Deploy.0 = Release|Any CPU
-		{68440F57-BBC1-40A1-B5B6-AF72AE1B1177}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{68440F57-BBC1-40A1-B5B6-AF72AE1B1177}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{68440F57-BBC1-40A1-B5B6-AF72AE1B1177}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{68440F57-BBC1-40A1-B5B6-AF72AE1B1177}.Release|Any CPU.Build.0 = Release|Any CPU
 		{491F6FCC-9187-4FF2-A88C-81E68C8A55DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{491F6FCC-9187-4FF2-A88C-81E68C8A55DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{491F6FCC-9187-4FF2-A88C-81E68C8A55DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
