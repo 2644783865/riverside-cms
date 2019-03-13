@@ -20,6 +20,7 @@ using Riverside.Cms.Services.Storage.Infrastructure;
 using Riverside.Cms.Utilities.Net.Mail;
 using Riverside.Cms.Utilities.Text.Csv;
 using Riverside.Cms.Utilities.Text.Formatting;
+using Riverside.Cms.Utilities.UI.Forms;
 
 namespace Riverside.Cms.Applications.Web.Mvc
 {
@@ -31,6 +32,11 @@ namespace Riverside.Cms.Applications.Web.Mvc
         }
 
         public IConfiguration Configuration { get; }
+
+        private void ConfigureDependencyInjectionUiServices(IServiceCollection services)
+        {
+            services.AddTransient<IFormService, FormService>();
+        }
 
         private void ConfigureDependencyInjectionSharedServices(IServiceCollection services)
         {
@@ -155,6 +161,7 @@ namespace Riverside.Cms.Applications.Web.Mvc
 
             services.AddHttpContextAccessor();
 
+            ConfigureDependencyInjectionUiServices(services);
             ConfigureDependencyInjectionSharedServices(services);
             ConfigureDependencyInjectionMvcServices(services);
             ConfigureDependencyInjectionCoreServices(services);

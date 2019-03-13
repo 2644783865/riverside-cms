@@ -77,12 +77,25 @@ namespace Riverside.Cms.Utilities.UI.Forms
             return null;
         }
 
+        private string GetHelpMessage(PropertyInfo property)
+        {
+            object[] customAttributes = property.GetCustomAttributes(typeof(DocumentedAttribute), true);
+            if (customAttributes != null && customAttributes.Length == 1)
+            {
+                DocumentedAttribute attribute = (DocumentedAttribute)customAttributes[0];
+                if (attribute.HelpMessageResourceName != null)
+                    return GetResourceText(attribute.ResourceType, attribute.HelpMessageResourceName);
+            }
+            return null;
+        }
+
         private IField GetTextField(PropertyInfo property, string id)
         {
             return new TextField
             {
                 Id = id,
                 Label = GetLabel(property),
+                HelpMessage = GetHelpMessage(property),
                 Pattern = GetPattern(property),
                 Required = GetRequired(property),
                 RequiredMessage = GetResourceMessage<RequiredAttribute>(property),

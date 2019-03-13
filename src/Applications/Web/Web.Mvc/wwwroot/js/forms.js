@@ -135,6 +135,7 @@ Vue.component('flib-text-field', {
                     v-model="selected"
                     @input="updateValue"
                 />
+                <small v-if="definition.helpMessage">{{definition.helpMessage}}</small>
                 <div role="alert" class="flib-messages" v-if="errorMessages.length > 0 && valueDateTime != null">
                     <ul>
                         <li v-for="message in errorMessages">{{message}}</li>

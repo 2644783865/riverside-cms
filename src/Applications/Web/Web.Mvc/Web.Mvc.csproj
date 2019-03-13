@@ -33,6 +33,7 @@
     <ProjectReference Include="..\..\..\Utilities\Net\Net.Mail\Net.Mail.csproj" />
     <ProjectReference Include="..\..\..\Utilities\Text\Text.Csv\Text.Csv.csproj" />
     <ProjectReference Include="..\..\..\Utilities\Text\Text.Formatting\Text.Formatting.csproj" />
+    <ProjectReference Include="..\..\..\Utilities\UI\UI.Forms\UI.Forms.csproj" />
   </ItemGroup>
 
 </Project>

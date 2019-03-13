@@ -200,6 +200,15 @@ ul:focus, .flib-input:focus {
     vertical-align: middle;
 }
 
+/*----- Help text -----*/
+
+.flib-field-control small {
+    display: block;
+    font-size: 12px;
+    color: #c2c2c2;
+    padding: 6px 13px;
+}
+
 /*----- Forms library buttons -----*/
 
 .flib-button {
