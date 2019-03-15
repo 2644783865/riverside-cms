@@ -30,11 +30,11 @@
                     submitClicked() {
                         axios
                             .post('/api/v1/authentication/authenticate', this.$data.model)
-                            .then((response) => { localStorage.setItem('token', response.data); })
+                            .then((response) => { localStorage.setItem('userSession', JSON.stringify(response.data)); })
                             .catch((error) => { this.processErrors(error); });
                     },
                     testClicked() {
-                        let token = localStorage.getItem('token');
+                        let token = JSON.parse(localStorage.getItem('userSession')).security.token;
                         const authHeader = token ? { 'Authorization': 'Bearer ' + token } : {};
                         let headers = {
                             ...authHeader,

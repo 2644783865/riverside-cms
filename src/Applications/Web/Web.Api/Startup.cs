@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -161,6 +160,21 @@ namespace Riverside.Cms.Applications.Web.Api
             });
         }
 
+        private void ConfigureAuthorisation(IServiceCollection services)
+        {
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("CreatePages", policy => { policy.RequireRole("Editor", "EditorInChief", "Administrator"); });
+                options.AddPolicy("UpdatePages", policy => { policy.RequireRole("Editor", "EditorInChief", "Administrator"); });
+                options.AddPolicy("DeletePages", policy => { policy.RequireRole("Editor", "EditorInChief", "Administrator"); });
+                options.AddPolicy("UpdatePageElements", policy => { policy.RequireRole("Editor", "EditorInChief", "Administrator"); });
+                options.AddPolicy("CreateMasterPages", policy => { policy.RequireRole("Administrator"); });
+                options.AddPolicy("UpdateMasterPages", policy => { policy.RequireRole("Administrator"); });
+                options.AddPolicy("DeleteMasterPages", policy => { policy.RequireRole("Administrator"); });
+                options.AddPolicy("UpdateMasterPageElements", policy => { policy.RequireRole("EditorInChief", "Administrator"); });
+            });
+        }
+
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
@@ -174,6 +188,7 @@ namespace Riverside.Cms.Applications.Web.Api
             ConfigureOptionServices(services);
 
             ConfigureAuthentication(services);
+            ConfigureAuthorisation(services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

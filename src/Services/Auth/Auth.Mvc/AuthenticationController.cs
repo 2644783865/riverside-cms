@@ -39,7 +39,7 @@ namespace Riverside.Cms.Services.Auth.Mvc
         }
 
         [HttpGet]
-        [Authorize(Roles = "Administrator")]
+        [Authorize(Policy = "UpdatePageElements")]
         [Route("api/v1/authentication/test")]
         public IActionResult Test()
         {
