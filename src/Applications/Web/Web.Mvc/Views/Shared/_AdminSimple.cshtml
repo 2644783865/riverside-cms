@@ -1,0 +1,21 @@
+﻿<!DOCTYPE html>
+<html class="rcms-admin-page-simple">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Admin</title>
+    <link href="@Url.Content("~/css/bootstrap.min.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/css/font-awesome.min.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/css/forms.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/css/cms.css")" rel="stylesheet" type="text/css" />
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600" rel="stylesheet">
+</head>
+<body>
+    @RenderBody()
+    <script src="~/js/vue.min.js"></script>
+    <script src="~/js/axios.min.js"></script>
+    <script src="~/js/forms.js"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

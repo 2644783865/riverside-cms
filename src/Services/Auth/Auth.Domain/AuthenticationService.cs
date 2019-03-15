@@ -8,43 +8,37 @@ namespace Riverside.Cms.Services.Auth.Domain
 {
     public class AuthenticationService : IAuthenticationService
     {
-        private readonly IAuthenticationProviderService _authenticationProviderService;
         private readonly IAuthenticationValidator _authenticationValidator;
+        private readonly ISecurityTokenService _securityTokenService;
         private readonly IUserRepository _userRepository;
 
-        public AuthenticationService(IAuthenticationProviderService authenticationProviderService, IAuthenticationValidator authenticationValidator, IUserRepository userRepository)
+        public AuthenticationService(IAuthenticationValidator authenticationValidator, ISecurityTokenService securityTokenService, IUserRepository userRepository)
         {
-            _authenticationProviderService = authenticationProviderService;
             _authenticationValidator = authenticationValidator;
+            _securityTokenService = securityTokenService;
             _userRepository = userRepository;
         }
 
-        public void Logoff()
-        {
-            _authenticationProviderService.Logoff();
-        }
-
-        public async Task LogonAsync(long tenantId, LogonModel model)
+        public async Task<IUserSession> AuthenticateAsync(long tenantId, LogonModel model)
         {
             try
             {
                 // Validate supplier logon user credentials
                 await _authenticationValidator.ValidateLogonAsync(tenantId, model);
 
-                // Get authenticated user details
-                UserIdentity identity = await _userRepository.ReadUserIdentityAsync(tenantId, model.Email.Trim().ToLower());
-
-                // Logon user using authentication provider
-                AuthenticationSession session = new AuthenticationSession
+                // Get user session, comprising identity and security token
+                IUserSession session = new UserSession();
+                session.Identity = await _userRepository.ReadUserIdentityAsync(tenantId, model.Email.Trim().ToLower());
+                session.Security = new UserSecurity
                 {
-                    Persist = model.RememberMe,
-                    Identity = identity
+                    Token = _securityTokenService.GenerateToken(session.Identity)
                 };
-                _authenticationProviderService.Logon(session);
+
+                // Return user session
+                return session;
             }
             catch (UserLockedOutException)
             {
-                Logoff();
                 throw;
             }
         }

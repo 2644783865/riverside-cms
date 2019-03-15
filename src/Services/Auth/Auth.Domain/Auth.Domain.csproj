@@ -26,7 +26,7 @@
 
   <ItemGroup>
     <EmbeddedResource Update="AuthenticationResource.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
+      <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>AuthenticationResource.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>

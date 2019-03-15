@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace Riverside.Cms.Services.Core.Domain
 {
-    public class UserIdentity
+    public class UserIdentity : IUserIdentity
     {
         public long TenantId { get; set; }
         public long UserId { get; set; }

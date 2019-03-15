@@ -22,7 +22,7 @@ namespace Riverside.Cms.Services.Auth.Domain {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class AuthenticationResource {
+    public class AuthenticationResource {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace Riverside.Cms.Services.Auth.Domain {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Riverside.Cms.Services.Auth.Domain.AuthenticationResource", typeof(AuthenticationResource).Assembly);
@@ -51,7 +51,7 @@ namespace Riverside.Cms.Services.Auth.Domain {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,7 +63,7 @@ namespace Riverside.Cms.Services.Auth.Domain {
         /// <summary>
         ///   Looks up a localized string similar to Email address is invalid.
         /// </summary>
-        internal static string LogonEmailInvalidMessage {
+        public static string LogonEmailInvalidMessage {
             get {
                 return ResourceManager.GetString("LogonEmailInvalidMessage", resourceCulture);
             }
@@ -72,7 +72,7 @@ namespace Riverside.Cms.Services.Auth.Domain {
         /// <summary>
         ///   Looks up a localized string similar to Email.
         /// </summary>
-        internal static string LogonEmailLabel {
+        public static string LogonEmailLabel {
             get {
                 return ResourceManager.GetString("LogonEmailLabel", resourceCulture);
             }
@@ -81,7 +81,7 @@ namespace Riverside.Cms.Services.Auth.Domain {
         /// <summary>
         ///   Looks up a localized string similar to Email address cannot be more than {1} characters in length.
         /// </summary>
-        internal static string LogonEmailMaxLengthMessage {
+        public static string LogonEmailMaxLengthMessage {
             get {
                 return ResourceManager.GetString("LogonEmailMaxLengthMessage", resourceCulture);
             }
@@ -90,7 +90,7 @@ namespace Riverside.Cms.Services.Auth.Domain {
         /// <summary>
         ///   Looks up a localized string similar to Email address is required.
         /// </summary>
-        internal static string LogonEmailRequiredMessage {
+        public static string LogonEmailRequiredMessage {
             get {
                 return ResourceManager.GetString("LogonEmailRequiredMessage", resourceCulture);
             }
@@ -99,7 +99,7 @@ namespace Riverside.Cms.Services.Auth.Domain {
         /// <summary>
         ///   Looks up a localized string similar to Password.
         /// </summary>
-        internal static string LogonPasswordLabel {
+        public static string LogonPasswordLabel {
             get {
                 return ResourceManager.GetString("LogonPasswordLabel", resourceCulture);
             }
@@ -108,7 +108,7 @@ namespace Riverside.Cms.Services.Auth.Domain {
         /// <summary>
         ///   Looks up a localized string similar to Password is required.
         /// </summary>
-        internal static string LogonPasswordRequiredMessage {
+        public static string LogonPasswordRequiredMessage {
             get {
                 return ResourceManager.GetString("LogonPasswordRequiredMessage", resourceCulture);
             }
@@ -117,7 +117,7 @@ namespace Riverside.Cms.Services.Auth.Domain {
         /// <summary>
         ///   Looks up a localized string similar to Remember me?.
         /// </summary>
-        internal static string LogonRememberMeLabel {
+        public static string LogonRememberMeLabel {
             get {
                 return ResourceManager.GetString("LogonRememberMeLabel", resourceCulture);
             }
@@ -126,7 +126,7 @@ namespace Riverside.Cms.Services.Auth.Domain {
         /// <summary>
         ///   Looks up a localized string similar to Email address or password is invalid.
         /// </summary>
-        internal static string LogonUserCredentialsInvalidMessage {
+        public static string LogonUserCredentialsInvalidMessage {
             get {
                 return ResourceManager.GetString("LogonUserCredentialsInvalidMessage", resourceCulture);
             }
@@ -135,7 +135,7 @@ namespace Riverside.Cms.Services.Auth.Domain {
         /// <summary>
         ///   Looks up a localized string similar to Email address or password is invalid.
         /// </summary>
-        internal static string LogonUserDisabledMessage {
+        public static string LogonUserDisabledMessage {
             get {
                 return ResourceManager.GetString("LogonUserDisabledMessage", resourceCulture);
             }
@@ -144,7 +144,7 @@ namespace Riverside.Cms.Services.Auth.Domain {
         /// <summary>
         ///   Looks up a localized string similar to Account locked out. Please try again later..
         /// </summary>
-        internal static string LogonUserLockedOutMessage {
+        public static string LogonUserLockedOutMessage {
             get {
                 return ResourceManager.GetString("LogonUserLockedOutMessage", resourceCulture);
             }
@@ -153,7 +153,7 @@ namespace Riverside.Cms.Services.Auth.Domain {
         /// <summary>
         ///   Looks up a localized string similar to Email address or password is invalid.
         /// </summary>
-        internal static string LogonUserUnconfirmedMessage {
+        public static string LogonUserUnconfirmedMessage {
             get {
                 return ResourceManager.GetString("LogonUserUnconfirmedMessage", resourceCulture);
             }

@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using Riverside.Cms.Services.Auth.Domain;
+using Riverside.Cms.Services.Auth.Infrastructure;
 using Riverside.Cms.Services.Core.Domain;
 using Riverside.Cms.Services.Core.Infrastructure;
 using Riverside.Cms.Services.Element.Domain;
@@ -16,8 +17,10 @@ using Riverside.Cms.Services.Element.Infrastructure;
 using Riverside.Cms.Services.Storage.Domain;
 using Riverside.Cms.Services.Storage.Infrastructure;
 using Riverside.Cms.Utilities.Net.Mail;
+using Riverside.Cms.Utilities.Security.Encryption;
 using Riverside.Cms.Utilities.Text.Csv;
 using Riverside.Cms.Utilities.Text.Formatting;
+using Riverside.Cms.Utilities.Validation.DataAnnotations;
 
 namespace Riverside.Cms.Applications.Web.Api
 {
@@ -34,7 +37,18 @@ namespace Riverside.Cms.Applications.Web.Api
         {
             services.AddTransient<ICsvService, CsvService>();
             services.AddTransient<IEmailService, SmtpEmailService>();
+            services.AddTransient<IModelValidator, ModelValidator>();
             services.AddTransient<IStringUtilities, StringUtilities>();
+        }
+
+        private void ConfigureDependencyInjectionAuthenticationServices(IServiceCollection services)
+        {
+            services.AddTransient<IAuthenticationService, AuthenticationService>();
+            services.AddTransient<IAuthenticationValidator, AuthenticationValidator>();
+            services.AddTransient<IAuthenticationConfigurationService, AuthenticationConfigurationService>();
+            services.AddTransient<IAuthenticationRepository, SqlAuthenticationRepository>();
+            services.AddTransient<IEncryptionService, EncryptionService>();
+            services.AddTransient<ISecurityTokenService, JwtSecurityTokenService>();
         }
 
         private void ConfigureDependencyInjectionCoreServices(IServiceCollection services)
@@ -111,11 +125,40 @@ namespace Riverside.Cms.Applications.Web.Api
 
         private void ConfigureOptionServices(IServiceCollection services)
         {
-            services.Configure<Riverside.Cms.Services.Core.Infrastructure.SqlOptions>(Configuration);
-            services.Configure<Riverside.Cms.Services.Element.Infrastructure.SqlOptions>(Configuration);
-            services.Configure<Riverside.Cms.Services.Storage.Infrastructure.SqlOptions>(Configuration);
+            services.Configure<Services.Auth.Infrastructure.SqlOptions>(Configuration);
+            services.Configure<Services.Core.Infrastructure.SqlOptions>(Configuration);
+            services.Configure<Services.Element.Infrastructure.SqlOptions>(Configuration);
+            services.Configure<Services.Storage.Infrastructure.SqlOptions>(Configuration);
             services.Configure<AzureBlobOptions>(Configuration);
             services.Configure<EmailOptions>(Configuration);
+            services.Configure<JwtOptions>(Configuration);
+        }
+
+        private void ConfigureAuthentication(IServiceCollection services)
+        {
+            services.AddAuthentication(x =>
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(x =>
+            {
+                x.RequireHttpsMetadata = false;
+                x.SaveToken = true;
+                x.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    IssuerSigningKeyResolver = (string token, SecurityToken securityToken, string kid, TokenValidationParameters validationParameters) =>
+                    {
+                        ISecurityTokenService tokenService = services.BuildServiceProvider().GetService<ISecurityTokenService>();
+                        long tenantId = Convert.ToInt64(kid);
+                        byte[] securityKey = tokenService.GetTenantSecurityKey(tenantId);
+                        return new List<SecurityKey> { new SymmetricSecurityKey(securityKey) };
+                    }
+                };
+            });
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -124,10 +167,13 @@ namespace Riverside.Cms.Applications.Web.Api
             services.AddMvc(options => { options.EnableEndpointRouting = false; }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             ConfigureDependencyInjectionSharedServices(services);
+            ConfigureDependencyInjectionAuthenticationServices(services);
             ConfigureDependencyInjectionCoreServices(services);
             ConfigureDependencyInjectionElementServices(services);
             ConfigureDependencyInjectionStorageServices(services);
             ConfigureOptionServices(services);
+
+            ConfigureAuthentication(services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -137,6 +183,8 @@ namespace Riverside.Cms.Applications.Web.Api
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseAuthentication();
 
             app.UseMvc();
         }

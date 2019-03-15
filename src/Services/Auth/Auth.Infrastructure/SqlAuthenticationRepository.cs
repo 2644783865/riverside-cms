@@ -24,21 +24,21 @@ namespace Riverside.Cms.Services.Auth.Infrastructure
             {
                 connection.Open();
                 return await connection.QueryFirstOrDefaultAsync<AuthenticationState>(@"
-                    SELECT
-                        cms.[User].TenantId,
-                        cms.[User].Email,
-                        cms.[User].Confirmed,
-                        cms.[User].Enabled,
-                        cms.[User].LockedOut,
-                        cms.[User].PasswordSaltedHash,
-                        cms.[User].PasswordSalt,
-                        cms.[User].LastPasswordFailure,
-                        cms.[User].PasswordFailures
-                    FROM
-                        cms.[User]
-                    WHERE
-                        TenantId = @TenantId AND
-                        Email = @Email",
+                SELECT
+                    cms.[User].TenantId,
+                    cms.[User].Email,
+                    cms.[User].Confirmed,
+                    cms.[User].Enabled,
+                    cms.[User].LockedOut,
+                    cms.[User].PasswordSaltedHash,
+                    cms.[User].PasswordSalt,
+                    cms.[User].LastPasswordFailure,
+                    cms.[User].PasswordFailures
+                FROM
+                    cms.[User]
+                WHERE
+                    TenantId = @TenantId AND
+                    Email = @Email",
                     new
                     {
                         TenantId = tenantId,

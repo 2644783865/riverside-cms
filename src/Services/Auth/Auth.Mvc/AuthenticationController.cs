@@ -1,15 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Text;
+﻿using System.Net;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Riverside.Cms.Services.Auth.Domain;
+using Riverside.Cms.Services.Core.Common;
 using Riverside.Cms.Utilities.Validation.Framework;
 
 namespace Riverside.Cms.Services.Auth.Mvc
 {
-    public class AuthenticationController : Controller
+    [Authorize]
+    [MultiTenant()]
+    public class AuthenticationController : ControllerBase
     {
         private readonly IAuthenticationService _authenticationService;
 
@@ -18,20 +19,31 @@ namespace Riverside.Cms.Services.Auth.Mvc
             _authenticationService = authenticationService;
         }
 
+        private long TenantId => (long)RouteData.Values["tenantId"];
+
         [HttpPost]
-        [Route("api/v1/authentication/logon")]
+        [AllowAnonymous]
+        [Route("api/v1/authentication/authenticate")]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.OK)]
-        public IActionResult PostAsync([FromBody] LogonModel model)
+        public async Task<IActionResult> AuthenticateAsync([FromBody]LogonModel model)
         {
             try
             {
-                return Ok();
+                return Ok(await _authenticationService.AuthenticateAsync(TenantId, model));
             }
             catch (ValidationErrorException ex)
             {
-                return BadRequest(ex.Errors);
+                return BadRequest(new { errors = ex.Errors });
             }
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Administrator")]
+        [Route("api/v1/authentication/test")]
+        public IActionResult Test()
+        {
+            return Ok("Test result returned");
         }
     }
 }

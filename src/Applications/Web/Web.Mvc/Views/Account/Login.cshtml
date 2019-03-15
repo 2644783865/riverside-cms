@@ -1,5 +1,27 @@
 ﻿@{
-    Layout = null;
+    Layout = "_AdminSimple";
 }
 
-<h1>Log in</h1>
+<div class="rcms-form-panel" id="rcms-form">
+    <div class="flib-form" v-cloak>
+        <h2>Login</h2>
+        <p>Enter your email address and password to login to Riverside CMS and administer your site. </p>
+        <flib-validation-summary :custom-error-messages="getCustomErrorMessages"></flib-validation-summary>
+        <div class="flib-field-group">
+            <flib-text-field :definition="{ id: 'email', label: 'Email', required: true, requiredMessage: 'Email address is required' }" v-model="model.email" @@validate="validateForm" :custom-error-messages="getCustomErrorMessages"></flib-text-field>
+            <flib-text-field :definition="{ id: 'password', label: 'Password', required: true, requiredMessage: 'Password is required' }" v-model="model.password" @@validate="validateForm" :custom-error-messages="getCustomErrorMessages"></flib-text-field>
+        </div>
+        <div class="flib-button-group">
+            <flib-button :definition="{ id: 'submitButton', label: 'Login' }" :state="{ disabled: false }" @@click="submitClicked" :enabled="form.valid"></flib-button>
+            <flib-button :definition="{ id: 'submitButton', label: 'Test' }" @@click="testClicked" :enabled="true"></flib-button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/admin-login.js"></script>
+    <script>
+        page.initialise();
+    </script>
+}
+
