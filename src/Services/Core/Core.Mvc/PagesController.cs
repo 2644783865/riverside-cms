@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Riverside.Cms.Services.Core.Common;
 using Riverside.Cms.Services.Core.Domain;
 using Riverside.Cms.Services.Storage.Domain;
+using Riverside.Cms.Utilities.Validation.Framework;
 
 namespace Riverside.Cms.Services.Core.Mvc
 {
@@ -45,6 +46,43 @@ namespace Riverside.Cms.Services.Core.Mvc
                 return NotFound();
             return File(blobContent.Stream, blobContent.Type, blobContent.Name);
         }
+
+#if false
+        [HttpPut]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [Route("api/v1/core/pages/{pageId:int}")]
+        public async Task<IActionResult> UpdatePageAsync(long pageId, [FromBody]Page page)
+        {
+            try
+            {
+                await _pageService.UpdatePageAsync(TenantId, pageId, page);
+                return Ok();
+            }
+            catch (ValidationErrorException ex)
+            {
+                return BadRequest(new { errors = ex.Errors });
+            }
+        }
+#endif
+        [HttpPut]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [Route("api/v1/core/pages/{pageId:int}")]
+        public IActionResult UpdatePage(long pageId, [FromBody]Page page)
+        {
+            try
+            {
+                int a = 3;
+                a++;
+                return Ok();
+            }
+            catch (ValidationErrorException ex)
+            {
+                return BadRequest(new { errors = ex.Errors });
+            }
+        }
+
 
         [HttpGet]
         [Route("api/v1/core/pages/{pageId:int}/hierarchy")]

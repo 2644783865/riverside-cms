@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace Riverside.Cms.Services.Core.Domain
@@ -10,9 +11,17 @@ namespace Riverside.Cms.Services.Core.Domain
 
         public long PageId { get; set; }
         public long? ParentPageId { get; set; }
+
+        [Required(ErrorMessageResourceType = typeof(PageResource), ErrorMessageResourceName = "NameRequiredMessage")]
+        [StringLength(256, MinimumLength = 1, ErrorMessageResourceType = typeof(PageResource), ErrorMessageResourceName = "NameLengthMessage")]
         public string Name { get; set; }
+
+        [StringLength(5000, MinimumLength = 1, ErrorMessageResourceType = typeof(PageResource), ErrorMessageResourceName = "DescriptionLengthMessage")]
         public string Description { get; set; }
+
+        [StringLength(256, MinimumLength = 1, ErrorMessageResourceType = typeof(PageResource), ErrorMessageResourceName = "TitleLengthMessage")]
         public string Title { get; set; }
+
         public DateTime Created { get; set; }
         public DateTime Updated { get; set; }
         public DateTime? Occurred { get; set; }

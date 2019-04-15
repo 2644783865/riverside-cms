@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
@@ -69,6 +68,48 @@ namespace Riverside.Cms.Services.Core.Infrastructure
                         page.Tags = await gr.ReadAsync<Tag>();
                     return page;
                 }
+            }
+        }
+
+        public async Task UpdatePageAsync(long tenantId, long pageId, Page page)
+        {
+            using (SqlConnection connection = new SqlConnection(_options.Value.SqlConnectionString))
+            {
+                connection.Open();
+                await connection.ExecuteAsync(@"
+                    UPDATE
+	                    cms.[Page]
+                    SET
+                        cms.[Page].ParentPageId = @ParentPageId,
+                        cms.[Page].MasterPageId = @MasterPageId,
+	                    cms.[Page].Name = @Name,
+	                    cms.[Page].[Description] = @Description,
+                        cms.[Page].Title = @Title,
+                        cms.[Page].Created = @Created,
+	                    cms.[Page].Updated = @Updated,
+	                    cms.[Page].Occurred = @Occurred,
+                        cms.[Page].ImageBlobId = @ImageBlobId,
+                        cms.[Page].PreviewImageBlobId = @PreviewImageBlobId,
+                        cms.[Page].ThumbnailImageBlobId = @ThumbnailImageBlobId
+                    WHERE
+	                    cms.[Page].TenantId = @TenantId AND
+	                    cms.[Page].PageId = @PageId",
+                    new
+                    {
+                        page.ParentPageId,
+                        page.MasterPageId,
+                        page.Name,
+                        page.Description,
+                        page.Title,
+                        page.Created,
+                        page.Updated,
+                        page.Occurred,
+                        page.ImageBlobId,
+                        page.PreviewImageBlobId,
+                        page.ThumbnailImageBlobId,
+                        TenantId = tenantId,
+                        PageId = pageId
+                    });
             }
         }
 

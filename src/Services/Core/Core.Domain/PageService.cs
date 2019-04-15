@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Riverside.Cms.Services.Storage.Domain;
 
@@ -9,13 +8,15 @@ namespace Riverside.Cms.Services.Core.Domain
     public class PageService : IPageService
     {
         private readonly IPageRepository _pageRepository;
+        private readonly IPageValidator _pageValidator;
         private readonly IStorageService _storageService;
 
         private const string PageImagePath = "pages/images";
 
-        public PageService(IPageRepository pageRepository, IStorageService storageService)
+        public PageService(IPageRepository pageRepository, IPageValidator pageValidator, IStorageService storageService)
         {
             _pageRepository = pageRepository;
+            _pageValidator = pageValidator;
             _storageService = storageService;
         }
 
@@ -66,6 +67,31 @@ namespace Riverside.Cms.Services.Core.Domain
             if (blobId == null)
                 return null;
             return await _storageService.ReadBlobContentAsync(tenantId, blobId.Value, PageImagePath);
+        }
+
+        public async Task UpdatePageAsync(long tenantId, long pageId, Page page)
+        {
+            // Override properties that are not allowed to be changed
+            Page currentPage = await _pageRepository.ReadPageAsync(tenantId, pageId);
+            page.ParentPageId = currentPage.ParentPageId;
+            page.MasterPageId = currentPage.MasterPageId;
+            page.Created = currentPage.Created;
+            page.Occurred = currentPage.Occurred;
+            page.ImageBlobId = currentPage.ImageBlobId;
+            page.PreviewImageBlobId = currentPage.PreviewImageBlobId;
+            page.ThumbnailImageBlobId = currentPage.ThumbnailImageBlobId;
+
+            // Ensure properties supplied, which can be changed, are in the correct format
+            page.Name = (page.Name ?? string.Empty).Trim();
+            page.Description = (page.Description ?? string.Empty).Trim();
+            page.Title = (page.Title ?? string.Empty).Trim();
+            page.Updated = DateTime.UtcNow;
+
+            // Perform validation (including checking that all or none of the image upload properties are specified)
+            _pageValidator.ValidateUpdatePage(tenantId, pageId, page);
+
+            // Do the update
+            await _pageRepository.UpdatePageAsync(tenantId, pageId, page);
         }
 
         public Task<IEnumerable<PageZone>> SearchPageZonesAsync(long tenantId, long pageId)

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Riverside.Cms.Services.Storage.Domain;
 
@@ -10,6 +8,7 @@ namespace Riverside.Cms.Services.Core.Domain
     {
         Task<Page> ReadPageAsync(long tenantId, long pageId);
         Task<BlobContent> ReadPageImageAsync(long tenantId, long pageId, PageImageType pageImageType);
+        Task UpdatePageAsync(long tenantId, long pageId, Page page);
 
         Task<IEnumerable<Page>> ListPagesInHierarchyAsync(long tenantId, long pageId);
         Task<IEnumerable<Page>> ListPagesAsync(long tenantId, IEnumerable<long> pageIds);

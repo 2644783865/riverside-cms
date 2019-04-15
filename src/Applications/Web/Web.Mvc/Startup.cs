@@ -73,6 +73,7 @@ namespace Riverside.Cms.Applications.Web.Mvc
             services.AddTransient<IForumService, ForumService>();
             services.AddTransient<IMasterPageService, MasterPageService>();
             services.AddTransient<IPageService, PageService>();
+            services.AddTransient<IPageValidator, PageValidator>();
             services.AddTransient<IPageViewService, PageViewService>();
             services.AddTransient<ITagService, TagService>();
             services.AddTransient<ITenantService, TenantService>();
@@ -252,6 +253,7 @@ namespace Riverside.Cms.Applications.Web.Mvc
 
             app.UseMvc(routes =>
             {
+                // General CMS
                 routes.MapRoute(RouteNames.Home, "", new { controller = "cms", action = "readhomeasync" });
                 routes.MapRoute(RouteNames.HomeTagged, "tagged/{*tags}", new { controller = "cms", action = "readhometaggedasync" });
                 routes.MapRoute(RouteNames.PageImage, "pages/{pageId}/images/{pageImageType}/{*description}", new { controller = "cms", action = "readpageimageasync" });
@@ -262,11 +264,19 @@ namespace Riverside.Cms.Applications.Web.Mvc
                 routes.MapRoute(RouteNames.UserImage, "users/{userId}/images/{userImageType}/{*description}", new { controller = "cms", action = "readuserblobasync" });
                 routes.MapRoute(RouteNames.Robots, "robots.txt", new { controller = "cms", action = "robotsasync" });
                 routes.MapRoute(RouteNames.Sitemap, "sitemap.xml", new { controller = "cms", action = "sitemapasync" });
+
+                // Account management
                 routes.MapRoute("Login", "account/login", new { controller = "account", action = "login" });
                 routes.MapRoute("Logout", "account/logout", new { controller = "account", action = "logout" });
                 routes.MapRoute("Register", "account/register", new { controller = "account", action = "register" });
                 routes.MapRoute("UpdateProfile", "account/updateprofile", new { controller = "account", action = "updateprofile" });
                 routes.MapRoute("ChangePassword", "account/changepassword", new { controller = "account", action = "changepassword" });
+
+                // Administration
+                routes.MapRoute("AdminPageRead", "admin/pages/{pageId}", new { controller = "admin", action = "readpage" });
+                routes.MapRoute("AdminPageUpdate", "admin/pages/{pageId}/update", new { controller = "admin", action = "updatepage" });
+
+                // Default
                 routes.MapRoute(
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");

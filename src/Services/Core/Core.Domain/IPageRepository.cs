@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Riverside.Cms.Services.Core.Domain
@@ -8,6 +6,7 @@ namespace Riverside.Cms.Services.Core.Domain
     public interface IPageRepository
     {
         Task<Page> ReadPageAsync(long tenantId, long pageId);
+        Task UpdatePageAsync(long tenantId, long pageId, Page page);
 
         Task<IEnumerable<Page>> ListPagesInHierarchyAsync(long tenantId, long pageId);
         Task<IEnumerable<Page>> ListPagesAsync(long tenantId, IEnumerable<long> pageIds);

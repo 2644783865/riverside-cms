@@ -3,12 +3,3 @@
     font-size: 14px;
     font-family: 'Open Sans', 'Arial', 'Helvetica Neue', 'Helvetica', 'sans-serif';
 }
-
-.rcms-admin-page-simple .rcms-form-panel {
-    max-width: 600px;
-    margin: 20px auto;
-    border: 1px solid #E4E8ED;
-}
-.rcms-admin-page-simple .flib-form {
-    background-color: #ffffff;
-}

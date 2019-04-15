@@ -2,7 +2,7 @@
     return {
         initialise: function () {
             new Vue({
-                el: '#rcms-form',
+                el: '#adminPage',
                 data: {
                     model: {
                         email: 'example@example.com',

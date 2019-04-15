@@ -1,0 +1,18 @@
+﻿@model string
+
+<div class="flib-form" v-cloak>
+    <h1>{{model.name}}</h1>
+    <flib-validation-summary :custom-error-messages="getCustomErrorMessages"></flib-validation-summary>
+    <h2>Details</h2>
+    <div class="flib-field-group">
+        <flib-text-field :definition="{ id: 'name', label: 'Name', required: true, requiredMessage: 'Name is required' }" :read-only="form.readOnly" v-model="model.name" @@validate="validateForm" :custom-error-messages="getCustomErrorMessages"></flib-text-field>
+        <flib-text-field :definition="{ id: 'description', label: 'Description', rows: 4 }" :read-only="form.readOnly" v-model="model.description" @@validate="validateForm" :custom-error-messages="getCustomErrorMessages"></flib-text-field>
+    </div>
+    <h2>Search engine optimisation</h2>
+    <div class="flib-field-group">
+        <flib-text-field :definition="{ id: 'title', label: 'Title', helpMessage: 'Use this field to override the default web page title' }" :read-only="form.readOnly" v-model="model.title" @@validate="validateForm" :custom-error-messages="getCustomErrorMessages"></flib-text-field>
+    </div>
+    <div class="flib-button-group" v-show="'@Model' !== ''">
+        <flib-button :definition="{ id: 'submitButton', label: '@Model' }" :state="{ disabled: false }" @@click="submitClicked" :enabled="form.valid"></flib-button>
+    </div>
+</div>

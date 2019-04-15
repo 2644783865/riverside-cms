@@ -1,20 +1,20 @@
-﻿@{
-    Layout = "_AdminSimple";
-}
+﻿<div class="flib-panel">
+    <ol class="flib-breadcrumb" v-cloak>
+        <li><a href="~/admin">Home</a></li>
+        <li><a href="~/admin/account/login">Login</a></li>
+    </ol>
+</div>
 
-<div class="rcms-form-panel" id="rcms-form">
-    <div class="flib-form" v-cloak>
-        <h2>Login</h2>
-        <p>Enter your email address and password to login to Riverside CMS and administer your site. </p>
-        <flib-validation-summary :custom-error-messages="getCustomErrorMessages"></flib-validation-summary>
-        <div class="flib-field-group">
-            <flib-text-field :definition="{ id: 'email', label: 'Email', required: true, requiredMessage: 'Email address is required' }" v-model="model.email" @@validate="validateForm" :custom-error-messages="getCustomErrorMessages"></flib-text-field>
-            <flib-text-field :definition="{ id: 'password', label: 'Password', required: true, requiredMessage: 'Password is required' }" v-model="model.password" @@validate="validateForm" :custom-error-messages="getCustomErrorMessages"></flib-text-field>
-        </div>
-        <div class="flib-button-group">
-            <flib-button :definition="{ id: 'submitButton', label: 'Login' }" :state="{ disabled: false }" @@click="submitClicked" :enabled="form.valid"></flib-button>
-            <flib-button :definition="{ id: 'submitButton', label: 'Test' }" @@click="testClicked" :enabled="true"></flib-button>
-        </div>
+<div class="flib-form" v-cloak>
+    <h2>Login</h2>
+    <flib-validation-summary :custom-error-messages="getCustomErrorMessages"></flib-validation-summary>
+    <div class="flib-field-group">
+        <flib-text-field :definition="{ id: 'email', label: 'Email', required: true, requiredMessage: 'Email address is required' }" v-model="model.email" @@validate="validateForm" :custom-error-messages="getCustomErrorMessages"></flib-text-field>
+        <flib-text-field :definition="{ id: 'password', label: 'Password', required: true, requiredMessage: 'Password is required' }" :password="true" v-model="model.password" @@validate="validateForm" :custom-error-messages="getCustomErrorMessages"></flib-text-field>
+    </div>
+    <div class="flib-button-group">
+        <flib-button :definition="{ id: 'submitButton', label: 'Login' }" :state="{ disabled: false }" @@click="submitClicked" :enabled="form.valid"></flib-button>
+        <flib-button :definition="{ id: 'submitButton', label: 'Test' }" @@click="testClicked" :enabled="true"></flib-button>
     </div>
 </div>
 

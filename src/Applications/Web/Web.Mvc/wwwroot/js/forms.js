@@ -73,6 +73,10 @@ Vue.component('flib-text-field', {
         customErrorMessages: {
             type: Function,
             default: _value => forms.createEmptyCustomErrorMessages()
+        },
+        password: {
+            type: Boolean,
+            default: false
         }
     },
     data: function () {
@@ -100,8 +104,7 @@ Vue.component('flib-text-field', {
                 messages.push(this.definition.lengthMessage);
             if (trimmedLength !== 0 && this.definition.maxLength > 0 && trimmedLength > this.definition.maxLength)
                 messages.push(this.definition.lengthMessage);
-            let id = this.definition.id + (this.index === null ? '' : this.index);
-            this.$emit('validate', { id: this.definition.id, errorMessages: messages });
+            this.$emit('validate', { id: this.id, errorMessages: messages });
             return messages;
         }
     },
@@ -110,7 +113,7 @@ Vue.component('flib-text-field', {
             <label :for="id">{{definition.label}}</label>
             <div class="flib-field-control">
                 <input v-if="!definition.rows"
-                    type="text"
+                    :type="password ? 'password' : 'text'"
                     :id="id"
                     :name="id"
                     :readonly="readOnly" 
@@ -135,7 +138,7 @@ Vue.component('flib-text-field', {
                     v-model="selected"
                     @input="updateValue"
                 />
-                <small v-if="definition.helpMessage">{{definition.helpMessage}}</small>
+                <small v-if="definition.helpMessage && !readOnly">{{definition.helpMessage}}</small>
                 <div role="alert" class="flib-messages" v-if="errorMessages.length > 0 && valueDateTime != null">
                     <ul>
                         <li v-for="message in errorMessages">{{message}}</li>

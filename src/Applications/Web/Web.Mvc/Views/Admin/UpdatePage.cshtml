@@ -1,0 +1,26 @@
+﻿@model long
+
+@{ 
+    long pageId = Model;
+}
+
+<div class="flib-panel">
+    <ol class="flib-breadcrumb" v-cloak>
+        <li><a href="~/admin">Home</a></li>
+        <li><a href="~/admin/pages">Pages</a></li>
+        <li><a href="~/admin/pages/@pageId">{{model.name}}</a></li>
+    </ol>
+    <ul class="flib-actions">
+        <li><a href="~/admin/pages/@pageId" title="Cancel action"><i class="fa fa-times"></i></a></li>
+    </ul>
+</div>
+
+@await Html.PartialAsync("PageForm.cshtml", "Update")
+
+@section Scripts
+{
+    <script src="~/js/admin-page.js" asp-append-version="true"></script>
+    <script>
+        page.initialise('update', @pageId);
+    </script>
+}

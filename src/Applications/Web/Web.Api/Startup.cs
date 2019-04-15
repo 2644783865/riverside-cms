@@ -57,6 +57,7 @@ namespace Riverside.Cms.Applications.Web.Api
             services.AddTransient<IForumService, ForumService>();
             services.AddTransient<IMasterPageService, MasterPageService>();
             services.AddTransient<IPageService, PageService>();
+            services.AddTransient<IPageValidator, PageValidator>();
             services.AddTransient<IPageViewService, PageViewService>();
             services.AddTransient<ITagService, TagService>();
             services.AddTransient<ITenantService, TenantService>();
