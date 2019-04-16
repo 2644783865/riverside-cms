@@ -8,6 +8,12 @@ body {
 a, a:hover {
     color: #0069c4;
 }
+ h1 {
+    font-size: 24px;
+    color: rgb(48, 48, 48);
+    font-weight: 600;
+    margin: 15px 0 15px 0;
+}
 
 /*----- VueJS -----*/
 
@@ -19,12 +25,6 @@ a, a:hover {
 
 /*----- Forms library style -----*/
 
-.flib-form h1 {
-    font-size: 24px;
-    color: rgb(48, 48, 48);
-    font-weight: 600;
-    margin: 15px 0 15px 0;
-}
 .flib-form h2 {
     font-size: 18px;
     color: rgb(48, 48, 48);
@@ -57,7 +57,6 @@ a, a:hover {
     color: #737373;
 }
 .flib-validation-summary .flib-messages {
-    padding: 0 13px;
     margin-bottom: 20px;
 }
 .flib-messages ul, .flib-messages ul li {

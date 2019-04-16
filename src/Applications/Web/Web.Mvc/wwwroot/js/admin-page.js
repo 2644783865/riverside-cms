@@ -27,8 +27,8 @@
                     },
                     update() {
                         axios
-                            .put(conf.baseUrl() + 'api/v1/core/pages/' + this.$data.model.pageId, this.$data.model, { headers: auth.getHeaders() })
-                            .then(() => { window.location.href = conf.baseUrl() + 'admin/pages/' + this.$data.model.pageId; })
+                            .put(conf.pagesApiPathname() + '/' + this.$data.model.pageId, this.$data.model, { headers: auth.getHeaders() })
+                            .then(() => { window.location.href = conf.pagesPathname() + '/' + this.$data.model.pageId; })
                             .catch((error) => { auth.checkAuthorised(error); this.processErrors(error); });
                     },
                     submitClicked() {
@@ -44,7 +44,7 @@
         },
         initialise: function (action, pageId) {
             let axiosPromises = [];
-            axiosPromises.push(axios.get(conf.baseUrl() + 'api/v1/core/pages/' + pageId, { headers: auth.getHeaders() }));
+            axiosPromises.push(axios.get(conf.pagesApiPathname() + '/' + pageId, { headers: auth.getHeaders() }));
             axios.all(axiosPromises).then(axios.spread((pageResponse) => {
                 let page = pageResponse !== undefined ? pageResponse.data : null;
                 this.initialiseUi(action, page);

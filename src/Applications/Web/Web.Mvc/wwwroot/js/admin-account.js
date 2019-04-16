@@ -1,12 +1,12 @@
-﻿var page = (function () {
+﻿var account = (function () {
     return {
-        initialise: function () {
+        initialiseLogin: function () {
             new Vue({
                 el: '#adminPage',
                 data: {
                     model: {
-                        email: 'example@example.com',
-                        password: 'blahblah'
+                        email: '',
+                        password: ''
                     },
                     form: {
                         valid: true,
@@ -21,7 +21,6 @@
                         this.$data.form.valid = forms.validateForm(validationData);
                     },
                     processErrors(error) {
-                        console.log(error.response.data.errors);
                         if (error.response && error.response.data && error.response.data.errors)
                             this.$data.form.customErrorMessages = forms.createCustomErrorMessages(error.response.data.errors);
                         else
@@ -29,21 +28,9 @@
                     },
                     submitClicked() {
                         axios
-                            .post('/api/v1/authentication/authenticate', this.$data.model)
-                            .then((response) => { localStorage.setItem('userSession', JSON.stringify(response.data)); })
+                            .post(conf.accountApiPathname() + '/authenticate', this.$data.model)
+                            .then((response) => { auth.login(response.data); window.location.href = conf.homePathname(); })
                             .catch((error) => { this.processErrors(error); });
-                    },
-                    testClicked() {
-                        let token = JSON.parse(localStorage.getItem('userSession')).security.token;
-                        const authHeader = token ? { 'Authorization': 'Bearer ' + token } : {};
-                        let headers = {
-                            ...authHeader,
-                            'Content-Type': 'application/json'
-                        };
-                        axios
-                            .get('/api/v1/authentication/test', { headers: headers })
-                            .then((response) => { console.log(response.data); })
-                            .catch((error) => { });
                     }
                 }
             });

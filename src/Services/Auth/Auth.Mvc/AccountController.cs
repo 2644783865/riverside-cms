@@ -10,11 +10,11 @@ namespace Riverside.Cms.Services.Auth.Mvc
 {
     [Authorize]
     [MultiTenant()]
-    public class AuthenticationController : ControllerBase
+    public class AccountController : ControllerBase
     {
         private readonly IAuthenticationService _authenticationService;
 
-        public AuthenticationController(IAuthenticationService authenticationService)
+        public AccountController(IAuthenticationService authenticationService)
         {
             _authenticationService = authenticationService;
         }
@@ -23,7 +23,7 @@ namespace Riverside.Cms.Services.Auth.Mvc
 
         [HttpPost]
         [AllowAnonymous]
-        [Route("api/v1/authentication/authenticate")]
+        [Route("api/v1/account/authenticate")]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         public async Task<IActionResult> AuthenticateAsync([FromBody]LogonModel model)
@@ -40,7 +40,7 @@ namespace Riverside.Cms.Services.Auth.Mvc
 
         [HttpGet]
         [Authorize(Policy = "UpdatePageElements")]
-        [Route("api/v1/authentication/test")]
+        [Route("api/v1/account/test")]
         public IActionResult Test()
         {
             return Ok("Test result returned");

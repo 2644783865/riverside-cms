@@ -12,22 +12,45 @@
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600" rel="stylesheet">
 </head>
 <body>
-    <div class="flib-side-bar">
-        <ul class="flib-side-bar-options">
-            <li><a href="~/admin"><i class="fa fa-fw fa-tachometer"></i></a></li>
-            <li><a href="~/admin/webs"><i class="fa fa-fw fa-globe"></i></a></li>
-            <li class="active"><a href="~/admin/pages"><i class="fa fa-fw fa-files-o"></i></a></li>
-            <li><a href="~/account/login"><i class="fa fa-fw fa-user"></i></a></li>
+    <div class="flib-side-bar" id="adminBar">
+        <ul class="flib-side-bar-options" v-cloak>
+            <li v-show="loggedIn"><a href="~/admin" title="Administration portal home"><i class="fa fa-fw fa-home"></i></a></li>
+            <li v-show="loggedIn"><a href="~/admin/webs" title="Administer site settings"><i class="fa fa-fw fa-globe"></i></a></li>
+            <li v-show="loggedIn" class="active"><a href="~/admin/pages" title="Administer pages"><i class="fa fa-fw fa-files-o"></i></a></li>
+            <li v-show="!loggedIn"><a href="~/account/login" title="Login"><i class="fa fa-fw fa-user"></i></a></li>
+            <li v-show="loggedIn"><a href="~/account/logout" v-on:click.prevent="logout" title="Logout"><i class="fa fa-power-off"></i></a></li>
         </ul>
     </div>
     <div class="flib-main" id="adminPage">
         @RenderBody()
     </div>
-    <script src="~/js/vue.min.js"></script>
-    <script src="~/js/axios.min.js"></script>
-    <script src="~/js/forms.js"></script>
-    <script src="~/js/auth.js"></script>
-    <script>var conf = (function () { return { baseUrl() { return '@Url.Content("~/")'; } }; })();</script>
+    <script src="~/js/vue.min.js" asp-append-version="true"></script>
+    <script src="~/js/axios.min.js" asp-append-version="true"></script>
+    <script src="~/js/forms.js" asp-append-version="true"></script>
+    <script>
+        var conf = (function () {
+            return {
+                accountApiPathname() {
+                    return '/api/v1/account';
+                },
+                pagesApiPathname() {
+                    return '/api/v1/core/pages';
+                },
+                pagesPathname() {
+                    return '/admin/pages';
+                },
+                homePathname() {
+                    return '/admin';
+                },
+                loginPathname() {
+                    return '/admin/login';
+                }
+            };
+        })();
+    </script>
+    <script src="~/js/auth.js" asp-append-version="true"></script>
+    <script src="~/js/admin-layout.js" asp-append-version="true"></script>
+    <script>layout.initialise();</script>
     @RenderSection("Scripts", required: false)
 </body>
 </html>

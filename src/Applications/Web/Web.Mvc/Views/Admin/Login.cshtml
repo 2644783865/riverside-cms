@@ -1,12 +1,5 @@
-﻿<div class="flib-panel">
-    <ol class="flib-breadcrumb" v-cloak>
-        <li><a href="~/admin">Home</a></li>
-        <li><a href="~/admin/account/login">Login</a></li>
-    </ol>
-</div>
-
-<div class="flib-form" v-cloak>
-    <h2>Login</h2>
+﻿<div class="flib-form" v-cloak>
+    <h1>Login</h1>
     <flib-validation-summary :custom-error-messages="getCustomErrorMessages"></flib-validation-summary>
     <div class="flib-field-group">
         <flib-text-field :definition="{ id: 'email', label: 'Email', required: true, requiredMessage: 'Email address is required' }" v-model="model.email" @@validate="validateForm" :custom-error-messages="getCustomErrorMessages"></flib-text-field>
@@ -14,14 +7,13 @@
     </div>
     <div class="flib-button-group">
         <flib-button :definition="{ id: 'submitButton', label: 'Login' }" :state="{ disabled: false }" @@click="submitClicked" :enabled="form.valid"></flib-button>
-        <flib-button :definition="{ id: 'submitButton', label: 'Test' }" @@click="testClicked" :enabled="true"></flib-button>
     </div>
 </div>
 
 @section Scripts {
-    <script src="~/js/admin-login.js"></script>
+    <script src="~/js/admin-account.js" asp-append-version="true"></script>
     <script>
-        page.initialise();
+        account.initialiseLogin();
     </script>
 }
 

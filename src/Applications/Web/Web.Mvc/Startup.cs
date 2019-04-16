@@ -265,14 +265,9 @@ namespace Riverside.Cms.Applications.Web.Mvc
                 routes.MapRoute(RouteNames.Robots, "robots.txt", new { controller = "cms", action = "robotsasync" });
                 routes.MapRoute(RouteNames.Sitemap, "sitemap.xml", new { controller = "cms", action = "sitemapasync" });
 
-                // Account management
-                routes.MapRoute("Login", "account/login", new { controller = "account", action = "login" });
-                routes.MapRoute("Logout", "account/logout", new { controller = "account", action = "logout" });
-                routes.MapRoute("Register", "account/register", new { controller = "account", action = "register" });
-                routes.MapRoute("UpdateProfile", "account/updateprofile", new { controller = "account", action = "updateprofile" });
-                routes.MapRoute("ChangePassword", "account/changepassword", new { controller = "account", action = "changepassword" });
-
                 // Administration
+                routes.MapRoute("AdminHome", "admin", new { controller = "admin", action = "home" });
+                routes.MapRoute("AdminLogin", "admin/login", new { controller = "admin", action = "login" });
                 routes.MapRoute("AdminPageRead", "admin/pages/{pageId}", new { controller = "admin", action = "readpage" });
                 routes.MapRoute("AdminPageUpdate", "admin/pages/{pageId}/update", new { controller = "admin", action = "updatepage" });
 
