@@ -17,6 +17,9 @@
     <meta name="format-detection" content="telephone=no">
     <meta name="keywords" content="@Model.View.Keywords" />
     <meta name="description" content="@Model.View.Description" />
+    @if (Model.View.GoogleSiteVerification != string.Empty) {
+        <meta name="google-site-verification" content="@Model.View.GoogleSiteVerification" />
+    }
     <title>@Model.View.Title</title>
     <link href="@Url.Content("~/css/bootstrap.min.css")" rel="stylesheet" type="text/css" />
     <link href="@Url.Content("~/css/font-awesome.min.css")" rel="stylesheet" type="text/css" />

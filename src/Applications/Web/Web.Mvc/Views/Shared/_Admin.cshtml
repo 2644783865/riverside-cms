@@ -14,9 +14,9 @@
 <body>
     <div class="flib-side-bar" id="adminBar">
         <ul class="flib-side-bar-options" v-cloak>
-            <li v-show="loggedIn"><a href="~/admin" title="Administration portal home"><i class="fa fa-fw fa-home"></i></a></li>
-            <li v-show="loggedIn"><a href="~/admin/web" title="Administer site settings"><i class="fa fa-fw fa-globe"></i></a></li>
-            <li v-show="loggedIn" class="active"><a href="~/admin/pages" title="Administer pages"><i class="fa fa-fw fa-files-o"></i></a></li>
+            <li v-show="loggedIn"><a href="~/admin" title="Home"><i class="fa fa-fw fa-home"></i></a></li>
+            <li v-show="loggedIn"><a href="~/admin/web" title="Website"><i class="fa fa-fw fa-globe"></i></a></li>
+            <li v-show="loggedIn" class="active"><a href="~/admin/pages" title="Pages"><i class="fa fa-fw fa-files-o"></i></a></li>
             <li v-show="!loggedIn"><a href="~/account/login" title="Login"><i class="fa fa-fw fa-user"></i></a></li>
             <li v-show="loggedIn"><a href="~/account/logout" v-on:click.prevent="logout" title="Logout"><i class="fa fa-power-off"></i></a></li>
         </ul>

@@ -1,7 +1,7 @@
 ﻿@model string
 
 <div class="flib-form" v-cloak>
-    <h1>{{model.name}}</h1>
+    <h1>Website</h1>
     <flib-validation-summary :custom-error-messages="getCustomErrorMessages"></flib-validation-summary>
     <h2>Details</h2>
     <div class="flib-field-group">
@@ -9,8 +9,7 @@
     </div>
     <h2>Search engine optimisation</h2>
     <div class="flib-field-group">
-        <flib-text-field :definition="{ id: 'googleSiteVerification', label: 'Google site verification', rows: 4 }" :read-only="form.readOnly" v-model="model.googleSiteVerification" @@validate="validateForm" :custom-error-messages="getCustomErrorMessages"></flib-text-field>
-        <flib-text-field :definition="{ id: 'headScript', label: 'Head script', rows: 4 }" :read-only="form.readOnly" v-model="model.headScript" @@validate="validateForm" :custom-error-messages="getCustomErrorMessages"></flib-text-field>
+        <flib-text-field :definition="{ id: 'googleSiteVerification', label: 'Google site verification' }" :read-only="form.readOnly" v-model="model.googleSiteVerification" @@validate="validateForm" :custom-error-messages="getCustomErrorMessages"></flib-text-field>
     </div>
     <div class="flib-button-group" v-show="'@Model' !== ''">
         <flib-button :definition="{ id: 'submitButton', label: '@Model' }" :state="{ disabled: false }" @@click="submitClicked" :enabled="form.valid"></flib-button>

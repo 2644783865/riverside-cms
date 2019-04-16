@@ -17,6 +17,8 @@ namespace Riverside.Cms.Services.Core.Client
         public string BeginRender { get; set; }
         public string EndRender { get; set; }
 
+        public string GoogleSiteVerification { get; set; }
+
         public IEnumerable<PageViewZone> PageViewZones { get; set; }
     }
 }

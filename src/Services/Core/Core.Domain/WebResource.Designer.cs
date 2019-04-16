@@ -61,20 +61,11 @@ namespace Riverside.Cms.Services.Core.Domain {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Google site verification must be between 1 and 256 characters long.
+        ///   Looks up a localized string similar to Google site verification must be between 1 and 100 characters long.
         /// </summary>
         public static string GoogleSiteVerificationLengthMessage {
             get {
                 return ResourceManager.GetString("GoogleSiteVerificationLengthMessage", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Head script must be between 1 and 5000 characters long.
-        /// </summary>
-        public static string HeadScriptLengthMessage {
-            get {
-                return ResourceManager.GetString("HeadScriptLengthMessage", resourceCulture);
             }
         }
         

@@ -8,16 +8,16 @@ namespace Riverside.Cms.Services.Core.Domain
     {
         private readonly IMasterPageRepository _masterPageRepository;
         private readonly IPageRepository _pageRepository;
-        private readonly ITenantService _tenantService;
+        private readonly IWebRepository _webRepository;
 
-        public PageViewService(IMasterPageRepository masterPageRepository, IPageRepository pageRepository, ITenantService tenantService)
+        public PageViewService(IMasterPageRepository masterPageRepository, IPageRepository pageRepository, IWebRepository webRepository)
         {
             _masterPageRepository = masterPageRepository;
             _pageRepository = pageRepository;
-            _tenantService = tenantService;
+            _webRepository = webRepository;
         }
 
-        private async Task<string> GetPageTitle(Page page)
+        private async Task<string> GetPageTitle(Web web, Page page)
         {
             // If a title is specified, then it must be used as the title
             if (page.Title != null && page.Title != string.Empty)
@@ -25,10 +25,7 @@ namespace Riverside.Cms.Services.Core.Domain
 
             // If page is home page, then use website name
             if (page.ParentPageId == null)
-            {
-                Tenant tenant = await _tenantService.ReadTenantAsync(page.TenantId);
-                return tenant.Name;
-            }
+                return web.Name;
 
             // Otherwise, title is pipe separated list of page names from the current page's hierarchy (current page title first, home page title last) 
             IEnumerable<Page> pages = await _pageRepository.ListPagesInHierarchyAsync(page.TenantId, page.PageId);
@@ -150,18 +147,22 @@ namespace Riverside.Cms.Services.Core.Domain
             if (page == null)
                 return null;
             MasterPage masterPage = await _masterPageRepository.ReadMasterPageAsync(tenantId, page.MasterPageId);
+            Web web = null;
+            if (page.ParentPageId == null)
+                web = await _webRepository.ReadWebAsync(tenantId);
             PageView pageView = new PageView
             {
                 TenantId = tenantId,
                 MasterPageId = masterPage.MasterPageId,
                 PreviewImageBlobId = page.PreviewImageBlobId,
                 PageId = pageId,
-                Title = await GetPageTitle(page),
+                Title = await GetPageTitle(web, page),
                 Description = page.Description ?? string.Empty,
                 Keywords = string.Join(", ", page.Tags.Select(t => t.Name)),
                 BeginRender = masterPage.BeginRender,
                 EndRender = masterPage.EndRender,
-                PageViewZones = await SearchPageViewZonesAsync(masterPage, page)
+                PageViewZones = await SearchPageViewZonesAsync(masterPage, page),
+                GoogleSiteVerification = web?.GoogleSiteVerification ?? string.Empty
             };
             return pageView;
         }

@@ -118,10 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="GoogleSiteVerificationLengthMessage" xml:space="preserve">
-    <value>Google site verification must be between 1 and 256 characters long</value>
-  </data>
-  <data name="HeadScriptLengthMessage" xml:space="preserve">
-    <value>Head script must be between 1 and 5000 characters long</value>
+    <value>Google site verification must be between 1 and 100 characters long</value>
   </data>
   <data name="NameLengthMessage" xml:space="preserve">
     <value>Website name must be between 1 and 256 characters long</value>

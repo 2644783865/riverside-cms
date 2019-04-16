@@ -24,8 +24,7 @@ namespace Riverside.Cms.Services.Core.Infrastructure
                     SELECT
                         TenantId,
                         Name,
-                        GoogleSiteVerification,
-                        HeadScript
+                        GoogleSiteVerification
                     FROM
                         cms.Web
                     WHERE
@@ -48,15 +47,13 @@ namespace Riverside.Cms.Services.Core.Infrastructure
                         cms.[Web]
                     SET
                         cms.[Web].Name = @Name,
-                        cms.[Web].GoogleSiteVerification = @GoogleSiteVerification,
-                        cms.[Web].HeadScript = @HeadScript
+                        cms.[Web].GoogleSiteVerification = @GoogleSiteVerification
                     WHERE
                         cms.[Web].TenantId = @TenantId",
                     new
                     {
                         web.Name,
                         web.GoogleSiteVerification,
-                        web.HeadScript,
                         TenantId = tenantId
                     }
                 );

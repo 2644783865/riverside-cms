@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace Riverside.Cms.Services.Core.Domain
 {
@@ -16,6 +14,8 @@ namespace Riverside.Cms.Services.Core.Domain
         public string Keywords { get; set; }
         public string BeginRender { get; set; }
         public string EndRender { get; set; }
+
+        public string GoogleSiteVerification { get; set; }
 
         public IEnumerable<PageViewZone> PageViewZones { get; set; }
     }

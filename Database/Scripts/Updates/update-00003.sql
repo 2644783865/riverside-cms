@@ -7,12 +7,12 @@
 
 IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[cms].[Web]') AND name = 'GoogleSiteVerification')
 BEGIN
-    ALTER TABLE [cms].[Web] ADD GoogleSiteVerification [nvarchar](max) NOT NULL DEFAULT('')
+    ALTER TABLE [cms].[Web] ADD GoogleSiteVerification [nvarchar](100) NULL
 END
 GO
 
-IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[cms].[Web]') AND name = 'HeadScript')
-BEGIN
-    ALTER TABLE [cms].[Web] ADD HeadScript [nvarchar](max) NOT NULL DEFAULT('')
-END
+UPDATE [cms].[Web] SET GoogleSiteVerification = ''
+GO
+
+ALTER TABLE [cms].[Web] ALTER COLUMN GoogleSiteVerification [nvarchar](100) NOT NULL
 GO

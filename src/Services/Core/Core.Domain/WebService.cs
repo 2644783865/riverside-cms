@@ -23,7 +23,6 @@ namespace Riverside.Cms.Services.Core.Domain
             // Ensure properties supplied are in the correct format
             web.Name = (web.Name ?? string.Empty).Trim();
             web.GoogleSiteVerification = (web.GoogleSiteVerification ?? string.Empty).Trim();
-            web.HeadScript = (web.HeadScript ?? string.Empty).Trim();
 
             // Perform validation (including checking that all or none of the image upload properties are specified)
             _webValidator.ValidateUpdateWeb(tenantId, web);
