@@ -17,15 +17,27 @@ namespace Riverside.Cms.Applications.Web.Mvc.Controllers
         }
 
         [HttpGet]
+        public IActionResult ReadPage(long pageId)
+        {
+            return View(pageId);
+        }
+
+        [HttpGet]
         public IActionResult UpdatePage(long pageId)
         {
             return View(pageId);
         }
 
         [HttpGet]
-        public IActionResult ReadPage(long pageId)
+        public IActionResult ReadWeb()
         {
-            return View(pageId);
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult UpdateWeb()
+        {
+            return View();
         }
     }
 }

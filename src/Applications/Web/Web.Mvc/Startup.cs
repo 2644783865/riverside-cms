@@ -78,6 +78,8 @@ namespace Riverside.Cms.Applications.Web.Mvc
             services.AddTransient<ITagService, TagService>();
             services.AddTransient<ITenantService, TenantService>();
             services.AddTransient<IUserService, UserService>();
+            services.AddTransient<IWebService, WebService>();
+            services.AddTransient<IWebValidator, WebValidator>();
 
             // Core infrastructure services
             services.AddTransient<IDomainRepository, SqlDomainRepository>();
@@ -87,6 +89,7 @@ namespace Riverside.Cms.Applications.Web.Mvc
             services.AddTransient<ITagRepository, SqlTagRepository>();
             services.AddTransient<ITenantRepository, SqlTenantRepository>();
             services.AddTransient<IUserRepository, SqlUserRepository>();
+            services.AddTransient<IWebRepository, SqlWebRepository>();
         }
 
         private void ConfigureDependencyInjectionElementServices(IServiceCollection services)
@@ -204,6 +207,7 @@ namespace Riverside.Cms.Applications.Web.Mvc
                 options.AddPolicy("UpdateMasterPages", policy => { policy.RequireRole("Administrator"); });
                 options.AddPolicy("DeleteMasterPages", policy => { policy.RequireRole("Administrator"); });
                 options.AddPolicy("UpdateMasterPageElements", policy => { policy.RequireRole("EditorInChief", "Administrator"); });
+                options.AddPolicy("UpdateWeb", policy => { policy.RequireRole("Administrator"); });
             });
         }
 
@@ -270,6 +274,8 @@ namespace Riverside.Cms.Applications.Web.Mvc
                 routes.MapRoute("AdminLogin", "admin/login", new { controller = "admin", action = "login" });
                 routes.MapRoute("AdminPageRead", "admin/pages/{pageId}", new { controller = "admin", action = "readpage" });
                 routes.MapRoute("AdminPageUpdate", "admin/pages/{pageId}/update", new { controller = "admin", action = "updatepage" });
+                routes.MapRoute("AdminWebRead", "admin/web", new { controller = "admin", action = "readweb" });
+                routes.MapRoute("AdminWebUpdate", "admin/web/update", new { controller = "admin", action = "updateweb" });
 
                 // Default
                 routes.MapRoute(

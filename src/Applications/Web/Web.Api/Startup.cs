@@ -62,6 +62,8 @@ namespace Riverside.Cms.Applications.Web.Api
             services.AddTransient<ITagService, TagService>();
             services.AddTransient<ITenantService, TenantService>();
             services.AddTransient<IUserService, UserService>();
+            services.AddTransient<IWebService, WebService>();
+            services.AddTransient<IWebValidator, WebValidator>();
 
             // Core infrastructure services
             services.AddTransient<IDomainRepository, SqlDomainRepository>();
@@ -71,6 +73,7 @@ namespace Riverside.Cms.Applications.Web.Api
             services.AddTransient<ITagRepository, SqlTagRepository>();
             services.AddTransient<ITenantRepository, SqlTenantRepository>();
             services.AddTransient<IUserRepository, SqlUserRepository>();
+            services.AddTransient<IWebRepository, SqlWebRepository>();
         }
 
         private void ConfigureDependencyInjectionElementServices(IServiceCollection services)
@@ -173,6 +176,7 @@ namespace Riverside.Cms.Applications.Web.Api
                 options.AddPolicy("UpdateMasterPages", policy => { policy.RequireRole("Administrator"); });
                 options.AddPolicy("DeleteMasterPages", policy => { policy.RequireRole("Administrator"); });
                 options.AddPolicy("UpdateMasterPageElements", policy => { policy.RequireRole("EditorInChief", "Administrator"); });
+                options.AddPolicy("UpdateWeb", policy => { policy.RequireRole("Administrator"); });
             });
         }
 

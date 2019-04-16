@@ -13,6 +13,8 @@
 	[UserImageMinHeight] [int] NULL,
 	[FontOption] [nvarchar](100) NULL,
 	[ColourOption] [nvarchar](100) NULL,
+	[GoogleSiteVerification] [nvarchar](max) NOT NULL,
+	[HeadScript] [nvarchar](max) NOT NULL,
  CONSTRAINT [PK_Web] PRIMARY KEY CLUSTERED ([TenantId] ASC),
  CONSTRAINT [FK_Web_Tenant] FOREIGN KEY([TenantId]) REFERENCES [cms].[Tenant] ([TenantId])
 )

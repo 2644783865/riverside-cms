@@ -189,5 +189,6 @@
     <Build Include="cms\Tables\TenantPlace.sql" />
     <None Include="Scripts\Updates\update-00001.sql" />
     <None Include="Scripts\Updates\update-00002.sql" />
+    <None Include="Scripts\Updates\update-00003.sql" />
   </ItemGroup>
 </Project>
