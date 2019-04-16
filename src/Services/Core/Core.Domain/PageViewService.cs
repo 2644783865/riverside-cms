@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Riverside.Cms.Services.Core.Domain
@@ -22,7 +20,7 @@ namespace Riverside.Cms.Services.Core.Domain
         private async Task<string> GetPageTitle(Page page)
         {
             // If a title is specified, then it must be used as the title
-            if (page.Title != null)
+            if (page.Title != null && page.Title != string.Empty)
                 return page.Title;
 
             // If page is home page, then use website name

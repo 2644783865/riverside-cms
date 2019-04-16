@@ -16,10 +16,10 @@ namespace Riverside.Cms.Services.Core.Domain
         [StringLength(256, MinimumLength = 1, ErrorMessageResourceType = typeof(PageResource), ErrorMessageResourceName = "NameLengthMessage")]
         public string Name { get; set; }
 
-        [StringLength(5000, MinimumLength = 1, ErrorMessageResourceType = typeof(PageResource), ErrorMessageResourceName = "DescriptionLengthMessage")]
+        [StringLength(5000, ErrorMessageResourceType = typeof(PageResource), ErrorMessageResourceName = "DescriptionLengthMessage")]
         public string Description { get; set; }
 
-        [StringLength(256, MinimumLength = 1, ErrorMessageResourceType = typeof(PageResource), ErrorMessageResourceName = "TitleLengthMessage")]
+        [StringLength(256, ErrorMessageResourceType = typeof(PageResource), ErrorMessageResourceName = "TitleLengthMessage")]
         public string Title { get; set; }
 
         public DateTime Created { get; set; }

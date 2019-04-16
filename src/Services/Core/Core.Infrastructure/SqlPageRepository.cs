@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
@@ -78,22 +79,22 @@ namespace Riverside.Cms.Services.Core.Infrastructure
                 connection.Open();
                 await connection.ExecuteAsync(@"
                     UPDATE
-	                    cms.[Page]
+                        cms.[Page]
                     SET
                         cms.[Page].ParentPageId = @ParentPageId,
                         cms.[Page].MasterPageId = @MasterPageId,
-	                    cms.[Page].Name = @Name,
-	                    cms.[Page].[Description] = @Description,
+                        cms.[Page].Name = @Name,
+                        cms.[Page].[Description] = @Description,
                         cms.[Page].Title = @Title,
                         cms.[Page].Created = @Created,
-	                    cms.[Page].Updated = @Updated,
-	                    cms.[Page].Occurred = @Occurred,
-                        cms.[Page].ImageBlobId = @ImageBlobId,
-                        cms.[Page].PreviewImageBlobId = @PreviewImageBlobId,
-                        cms.[Page].ThumbnailImageBlobId = @ThumbnailImageBlobId
+                        cms.[Page].Updated = @Updated,
+                        cms.[Page].Occurred = @Occurred,
+                        cms.[Page].ImageUploadId = @ImageBlobId,
+                        cms.[Page].PreviewImageUploadId = @PreviewImageBlobId,
+                        cms.[Page].ThumbnailImageUploadId = @ThumbnailImageBlobId
                     WHERE
-	                    cms.[Page].TenantId = @TenantId AND
-	                    cms.[Page].PageId = @PageId",
+                        cms.[Page].TenantId = @TenantId AND
+                        cms.[Page].PageId = @PageId",
                     new
                     {
                         page.ParentPageId,
@@ -109,7 +110,8 @@ namespace Riverside.Cms.Services.Core.Infrastructure
                         page.ThumbnailImageBlobId,
                         TenantId = tenantId,
                         PageId = pageId
-                    });
+                    }
+                );
             }
         }
 

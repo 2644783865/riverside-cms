@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Riverside.Cms.Services.Core.Common;
 using Riverside.Cms.Services.Core.Domain;
@@ -10,6 +11,7 @@ using Riverside.Cms.Utilities.Validation.Framework;
 
 namespace Riverside.Cms.Services.Core.Mvc
 {
+    [Authorize]
     [MultiTenant()]
     public class PagesController : ControllerBase
     {
@@ -25,6 +27,7 @@ namespace Riverside.Cms.Services.Core.Mvc
         private long TenantId => (long)RouteData.Values["tenantId"];
 
         [HttpGet]
+        [AllowAnonymous]
         [Route("api/v1/core/pages/{pageId:int}")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(Page), (int)HttpStatusCode.OK)]
@@ -37,6 +40,7 @@ namespace Riverside.Cms.Services.Core.Mvc
         }
 
         [HttpGet]
+        [AllowAnonymous]
         [Route("api/v1/core/pages/{pageId:int}/images/{pageImageType}")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> ReadPageImageAsync(long pageId, PageImageType pageImageType)
@@ -47,10 +51,10 @@ namespace Riverside.Cms.Services.Core.Mvc
             return File(blobContent.Stream, blobContent.Type, blobContent.Name);
         }
 
-#if false
         [HttpPut]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
+        [Authorize(Policy = "UpdatePages")]
         [Route("api/v1/core/pages/{pageId:int}")]
         public async Task<IActionResult> UpdatePageAsync(long pageId, [FromBody]Page page)
         {
@@ -64,27 +68,9 @@ namespace Riverside.Cms.Services.Core.Mvc
                 return BadRequest(new { errors = ex.Errors });
             }
         }
-#endif
-        [HttpPut]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(400)]
-        [Route("api/v1/core/pages/{pageId:int}")]
-        public IActionResult UpdatePage(long pageId, [FromBody]Page page)
-        {
-            try
-            {
-                int a = 3;
-                a++;
-                return Ok();
-            }
-            catch (ValidationErrorException ex)
-            {
-                return BadRequest(new { errors = ex.Errors });
-            }
-        }
-
 
         [HttpGet]
+        [AllowAnonymous]
         [Route("api/v1/core/pages/{pageId:int}/hierarchy")]
         [ProducesResponseType(typeof(IEnumerable<Page>), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> ListPagesInHierarchyAsync(long pageId)
@@ -94,6 +80,7 @@ namespace Riverside.Cms.Services.Core.Mvc
         }
 
         [HttpGet]
+        [AllowAnonymous]
         [Route("api/v1/core/pages")]
         [ProducesResponseType(typeof(PageListResult), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(IEnumerable<Page>), (int)HttpStatusCode.OK)]
@@ -114,6 +101,7 @@ namespace Riverside.Cms.Services.Core.Mvc
         }
 
         [HttpGet]
+        [AllowAnonymous]
         [Route("api/v1/core/pages/{pageId:int}/zones")]
         [ProducesResponseType(typeof(IEnumerable<PageZone>), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> SearchPageZonesAsync(long pageId)
@@ -123,6 +111,7 @@ namespace Riverside.Cms.Services.Core.Mvc
         }
 
         [HttpGet]
+        [AllowAnonymous]
         [Route("api/v1/core/pages/{pageId:int}/zones/{pageZoneId:int}")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(PageZone), (int)HttpStatusCode.OK)]
@@ -135,6 +124,7 @@ namespace Riverside.Cms.Services.Core.Mvc
         }
 
         [HttpGet]
+        [AllowAnonymous]
         [Route("api/v1/core/pages/{pageId:int}/zones/{pageZoneId:int}/elements")]
         [ProducesResponseType(typeof(IEnumerable<PageZoneElement>), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> SearchPageZoneElementsAsync(long pageId, long pageZoneId)
@@ -144,6 +134,7 @@ namespace Riverside.Cms.Services.Core.Mvc
         }
 
         [HttpGet]
+        [AllowAnonymous]
         [Route("api/v1/core/pages/{pageId:int}/zones/{pageZoneId:int}/elements/{pageZoneElementId:int}")]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
         [ProducesResponseType(typeof(PageZoneElement), (int)HttpStatusCode.OK)]

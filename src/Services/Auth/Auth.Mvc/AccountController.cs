@@ -37,13 +37,5 @@ namespace Riverside.Cms.Services.Auth.Mvc
                 return BadRequest(new { errors = ex.Errors });
             }
         }
-
-        [HttpGet]
-        [Authorize(Policy = "UpdatePageElements")]
-        [Route("api/v1/account/test")]
-        public IActionResult Test()
-        {
-            return Ok("Test result returned");
-        }
     }
 }
