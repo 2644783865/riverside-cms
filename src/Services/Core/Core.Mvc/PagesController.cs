@@ -99,51 +99,5 @@ namespace Riverside.Cms.Services.Core.Mvc
             }
             return Ok(result);
         }
-
-        [HttpGet]
-        [AllowAnonymous]
-        [Route("api/v1/core/pages/{pageId:int}/zones")]
-        [ProducesResponseType(typeof(IEnumerable<PageZone>), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> SearchPageZonesAsync(long pageId)
-        {
-            IEnumerable<PageZone> pageZones = await _pageService.SearchPageZonesAsync(TenantId, pageId);
-            return Ok(pageZones);
-        }
-
-        [HttpGet]
-        [AllowAnonymous]
-        [Route("api/v1/core/pages/{pageId:int}/zones/{pageZoneId:int}")]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(PageZone), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ReadPageZoneAsync(long pageId, long pageZoneId)
-        {
-            PageZone pageZone = await _pageService.ReadPageZoneAsync(TenantId, pageId, pageZoneId);
-            if (pageZone == null)
-                return NotFound();
-            return Ok(pageZone);
-        }
-
-        [HttpGet]
-        [AllowAnonymous]
-        [Route("api/v1/core/pages/{pageId:int}/zones/{pageZoneId:int}/elements")]
-        [ProducesResponseType(typeof(IEnumerable<PageZoneElement>), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> SearchPageZoneElementsAsync(long pageId, long pageZoneId)
-        {
-            IEnumerable<PageZoneElement> pageZoneElements = await _pageService.SearchPageZoneElementsAsync(TenantId, pageId, pageZoneId);
-            return Ok(pageZoneElements);
-        }
-
-        [HttpGet]
-        [AllowAnonymous]
-        [Route("api/v1/core/pages/{pageId:int}/zones/{pageZoneId:int}/elements/{pageZoneElementId:int}")]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        [ProducesResponseType(typeof(PageZoneElement), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ReadPageZoneElementAsync(long pageId, long pageZoneId, long pageZoneElementId)
-        {
-            PageZoneElement pageZoneElement = await _pageService.ReadPageZoneElementAsync(TenantId, pageId, pageZoneId, pageZoneElementId);
-            if (pageZoneElement == null)
-                return NotFound();
-            return Ok(pageZoneElement);
-        }
     }
 }

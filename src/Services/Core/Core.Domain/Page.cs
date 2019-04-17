@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 
 namespace Riverside.Cms.Services.Core.Domain
 {
@@ -33,5 +32,6 @@ namespace Riverside.Cms.Services.Core.Domain
         public long? ThumbnailImageBlobId { get; set; }
 
         public IEnumerable<Tag> Tags { get; set; }
+        public IEnumerable<PageZone> PageZones { get; set; }
     }
 }

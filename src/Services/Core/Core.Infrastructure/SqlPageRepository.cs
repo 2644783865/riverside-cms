@@ -21,6 +21,15 @@ namespace Riverside.Cms.Services.Core.Infrastructure
             _options = options;
         }
 
+        private IEnumerable<PageZone> GetPageZones(IEnumerable<PageZone> pageZones, IEnumerable<PageZoneElementDto> pageZoneElements)
+        {
+            foreach (PageZone pageZone in pageZones)
+            {
+                pageZone.PageZoneElements = pageZoneElements.Where(e => e.PageZoneId == pageZone.PageZoneId).Select(e => new PageZoneElement { ElementId = e.ElementId, ElementTypeId = e.ElementTypeId, MasterPageZoneElementId = e.MasterPageZoneElementId, PageZoneElementId = e.PageZoneElementId });
+                yield return pageZone;
+            }
+        }
+
         public async Task<Page> ReadPageAsync(long tenantId, long pageId)
         {
             using (SqlConnection connection = new SqlConnection(_options.Value.SqlConnectionString))
@@ -61,12 +70,50 @@ namespace Riverside.Cms.Services.Core.Infrastructure
                         cms.TagPage.TenantId = @TenantId AND
                         cms.TagPage.PageId = @PageId
                     ORDER BY
-                        cms.Tag.Name",
+                        cms.Tag.Name
+
+                    SELECT
+                        PageZoneId,
+                        MasterPageZoneId
+                    FROM
+                        cms.PageZone
+                    WHERE
+                        TenantId = @TenantId AND
+                        PageId = @PageId
+                    ORDER BY
+                        PageZoneId
+
+                    SELECT
+                        cms.PageZoneElement.PageZoneId,
+                        cms.PageZoneElement.PageZoneElementId,
+                        cms.Element.ElementTypeId,
+                        cms.PageZoneElement.ElementId,
+                        cms.PageZoneElement.MasterPageZoneElementId
+	                FROM
+                        cms.PageZoneElement
+                    INNER JOIN
+                        cms.Element
+                    ON 
+                        cms.PageZoneElement.TenantId = cms.Element.TenantId AND
+                        cms.PageZoneElement.ElementId = cms.Element.ElementId
+                    WHERE
+                        cms.PageZoneElement.TenantId = @TenantId AND
+                        cms.PageZoneElement.PageId = @PageId
+                    ORDER BY
+                        cms.PageZoneElement.PageZoneId,
+                        cms.PageZoneElement.SortOrder ASC,
+                        cms.PageZoneElement.PageZoneElementId ASC
+                    ",
                     new { TenantId = tenantId, PageId = pageId }))
                 {
                     Page page = await gr.ReadFirstOrDefaultAsync<Page>();
                     if (page != null)
+                    {
                         page.Tags = await gr.ReadAsync<Tag>();
+                        IEnumerable<PageZone> pageZones = await gr.ReadAsync<PageZone>();
+                        IEnumerable<PageZoneElementDto> pageZoneElements = await gr.ReadAsync<PageZoneElementDto>();
+                        page.PageZones = GetPageZones(pageZones, pageZoneElements);
+                    }
                     return page;
                 }
             }
@@ -680,74 +727,6 @@ namespace Riverside.Cms.Services.Core.Infrastructure
                     IEnumerable<PageTag> pageTabs = await gr.ReadAsync<PageTag>();
                     return PopulatePageTags(pages, pageTabs);
                 }
-            }
-        }
-
-        public async Task<IEnumerable<PageZone>> SearchPageZonesAsync(long tenantId, long pageId)
-        {
-            using (SqlConnection connection = new SqlConnection(_options.Value.SqlConnectionString))
-            {
-                connection.Open();
-                IEnumerable<PageZone> pageZones = await connection.QueryAsync<PageZone>(
-                    @"SELECT TenantId, PageId, PageZoneId, MasterPageId, MasterPageZoneId
-                        FROM cms.PageZone WHERE TenantId = @TenantId AND PageId = @PageId
-                        ORDER BY PageZoneId",
-                    new { TenantId = tenantId, PageId = pageId }
-                );
-                return pageZones;
-            }
-        }
-
-        public async Task<PageZone> ReadPageZoneAsync(long tenantId, long pageId, long pageZoneId)
-        {
-            using (SqlConnection connection = new SqlConnection(_options.Value.SqlConnectionString))
-            {
-                connection.Open();
-
-                PageZone pageZone = await connection.QueryFirstOrDefaultAsync<PageZone>(
-                    @"SELECT TenantId, PageId, PageZoneId, MasterPageId, MasterPageZoneId
-                        FROM cms.PageZone WHERE TenantId = @TenantId AND PageId = @PageId AND PageZoneId = @PageZoneId",
-                    new { TenantId = tenantId, PageId = pageId, PageZoneId = pageZoneId }
-                );
-
-                return pageZone;
-            }
-        }
-
-        public async Task<IEnumerable<PageZoneElement>> SearchPageZoneElementsAsync(long tenantId, long pageId, long pageZoneId)
-        {
-            using (SqlConnection connection = new SqlConnection(_options.Value.SqlConnectionString))
-            {
-                connection.Open();
-                IEnumerable<PageZoneElement> pageZoneElements = await connection.QueryAsync<PageZoneElement>(
-                    @"SELECT cms.PageZoneElement.TenantId, cms.PageZoneElement.PageId, cms.PageZoneElement.PageZoneId, cms.PageZoneElement.PageZoneElementId, cms.PageZoneElement.SortOrder,
-                        cms.Element.ElementTypeId, cms.PageZoneElement.ElementId, cms.PageZoneElement.MasterPageId, cms.PageZoneElement.MasterPageZoneId, cms.PageZoneElement.MasterPageZoneElementId
-	                    FROM cms.PageZoneElement INNER JOIN cms.Element ON 
-                        cms.PageZoneElement.TenantId = cms.Element.TenantId AND cms.PageZoneElement.ElementId = cms.Element.ElementId
-                        WHERE cms.PageZoneElement.TenantId = @TenantId AND cms.PageZoneElement.PageId = @PageId AND cms.PageZoneElement.PageZoneId = @PageZoneId
-                        ORDER BY cms.PageZoneElement.SortOrder ASC, cms.PageZoneElement.PageZoneElementId ASC",
-                    new { TenantId = tenantId, PageId = pageId, PageZoneId = pageZoneId }
-                );
-                return pageZoneElements;
-            }
-        }
-
-        public async Task<PageZoneElement> ReadPageZoneElementAsync(long tenantId, long pageId, long pageZoneId, long pageZoneElementId)
-        {
-            using (SqlConnection connection = new SqlConnection(_options.Value.SqlConnectionString))
-            {
-                connection.Open();
-
-                PageZoneElement pageZoneElement = await connection.QueryFirstOrDefaultAsync<PageZoneElement>(
-                    @"SELECT cms.PageZoneElement.TenantId, cms.PageZoneElement.PageId, cms.PageZoneElement.PageZoneId, cms.PageZoneElement.PageZoneElementId, cms.PageZoneElement.SortOrder,
-                        cms.Element.ElementTypeId, cms.PageZoneElement.ElementId, cms.PageZoneElement.MasterPageId, cms.PageZoneElement.MasterPageZoneId, cms.PageZoneElement.MasterPageZoneElementId
-	                    FROM cms.PageZoneElement INNER JOIN cms.Element ON
-                        cms.PageZoneElement.TenantId = cms.Element.TenantId AND cms.PageZoneElement.ElementId = cms.Element.ElementId
-                        WHERE cms.PageZoneElement.TenantId = @TenantId AND cms.PageZoneElement.PageId = @PageId AND cms.PageZoneElement.PageZoneId = @PageZoneId AND cms.PageZoneElement.PageZoneElementId = @PageZoneElementId",
-                    new { TenantId = tenantId, PageId = pageId, PageZoneId = pageZoneId, PageZoneElementId = pageZoneElementId }
-                );
-
-                return pageZoneElement;
             }
         }
     }

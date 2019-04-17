@@ -93,25 +93,5 @@ namespace Riverside.Cms.Services.Core.Domain
             // Do the update
             await _pageRepository.UpdatePageAsync(tenantId, pageId, page);
         }
-
-        public Task<IEnumerable<PageZone>> SearchPageZonesAsync(long tenantId, long pageId)
-        {
-            return _pageRepository.SearchPageZonesAsync(tenantId, pageId);
-        }
-
-        public Task<PageZone> ReadPageZoneAsync(long tenantId, long pageId, long pageZoneId)
-        {
-            return _pageRepository.ReadPageZoneAsync(tenantId, pageId, pageZoneId);
-        }
-
-        public Task<IEnumerable<PageZoneElement>> SearchPageZoneElementsAsync(long tenantId, long pageId, long pageZoneId)
-        {
-            return _pageRepository.SearchPageZoneElementsAsync(tenantId, pageId, pageZoneId);
-        }
-
-        public Task<PageZoneElement> ReadPageZoneElementAsync(long tenantId, long pageId, long pageZoneId, long pageZoneElementId)
-        {
-            return _pageRepository.ReadPageZoneElementAsync(tenantId, pageId, pageZoneId, pageZoneElementId);
-        }
     }
 }

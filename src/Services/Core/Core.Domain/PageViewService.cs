@@ -78,13 +78,13 @@ namespace Riverside.Cms.Services.Core.Domain
             }
         }
 
-        private async Task<long?> GetPageZoneId(long tenantId, long pageId, long masterPageZoneId)
+        private IEnumerable<PageZoneElement> GetPageZoneElements(Page page, long masterPageZoneId)
         {
-            IEnumerable<PageZone> pageZones = await _pageRepository.SearchPageZonesAsync(tenantId, pageId);
-            PageZone pageZone = pageZones.Where(z => z.MasterPageZoneId == masterPageZoneId).FirstOrDefault();
+            PageZone pageZone = page.PageZones.Where(z => z.MasterPageZoneId == masterPageZoneId).FirstOrDefault();
             if (pageZone == null)
-                return null;
-            return pageZone.PageZoneId;
+                return Enumerable.Empty<PageZoneElement>();
+            else
+                return pageZone.PageZoneElements;
         }
 
         private async Task<IEnumerable<PageViewZoneElement>> SearchPageViewZoneElementsAsync(Page page, MasterPageZone masterPageZone)
@@ -92,18 +92,12 @@ namespace Riverside.Cms.Services.Core.Domain
             switch (masterPageZone.AdminType)
             {
                 case AdminType.Editable:
-                    long? editablePageZoneId = await GetPageZoneId(page.TenantId, page.PageId, masterPageZone.MasterPageZoneId);
-                    if (editablePageZoneId == null)
-                        return Enumerable.Empty<PageViewZoneElement>();
-                    IEnumerable<PageZoneElement> editablePageZoneElements = await _pageRepository.SearchPageZoneElementsAsync(page.TenantId, page.PageId, editablePageZoneId.Value);
+                    IEnumerable<PageZoneElement> editablePageZoneElements = GetPageZoneElements(page, masterPageZone.MasterPageZoneId);
                     IEnumerable<MasterPageZoneElement> editableMasterPageZoneElements = await _masterPageRepository.SearchMasterPageZoneElementsAsync(page.TenantId, page.MasterPageId, masterPageZone.MasterPageZoneId);
                     return EnumeratePageViewZoneElements(editablePageZoneElements, editableMasterPageZoneElements);
 
                 case AdminType.Configurable:
-                    long? pageZoneId = await GetPageZoneId(page.TenantId, page.PageId, masterPageZone.MasterPageZoneId);
-                    if (pageZoneId == null)
-                        return Enumerable.Empty<PageViewZoneElement>();
-                    IEnumerable<PageZoneElement> pageZoneElements = await _pageRepository.SearchPageZoneElementsAsync(page.TenantId, page.PageId, pageZoneId.Value);
+                    IEnumerable<PageZoneElement> pageZoneElements = GetPageZoneElements(page, masterPageZone.MasterPageZoneId);
                     return EnumeratePageViewZoneElements(pageZoneElements);
 
                 default: // AdminType.Static

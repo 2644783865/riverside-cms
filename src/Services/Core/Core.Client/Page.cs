@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Riverside.Cms.Services.Core.Client
 {
@@ -24,7 +23,6 @@ namespace Riverside.Cms.Services.Core.Client
         public long? ThumbnailImageBlobId { get; set; }
 
         public IEnumerable<Tag> Tags { get; set; }
-
-        public List<PageZone> PageZones { get; set; }
+        public IEnumerable<PageZone> PageZones { get; set; }
     }
 }
