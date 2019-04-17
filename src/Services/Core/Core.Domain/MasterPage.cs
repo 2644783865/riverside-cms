@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace Riverside.Cms.Services.Core.Domain
 {
@@ -33,5 +31,7 @@ namespace Riverside.Cms.Services.Core.Domain
         public bool Deletable { get; set; }
         public bool Taggable { get; set; }
         public bool Administration { get; set; }
+
+        public IEnumerable<MasterPageZone> MasterPageZones { get; set; }
     }
 }

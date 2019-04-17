@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace Riverside.Cms.Services.Core.Client
 {
@@ -34,6 +32,6 @@ namespace Riverside.Cms.Services.Core.Client
         public bool Taggable { get; set; }
         public bool Administration { get; set; }
 
-        public List<MasterPageZone> MasterPageZones { get; set; }
+        public IEnumerable<MasterPageZone> MasterPageZones { get; set; }
     }
 }

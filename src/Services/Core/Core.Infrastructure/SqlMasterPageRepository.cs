@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Dapper;
 using Microsoft.Extensions.Options;
@@ -20,112 +18,111 @@ namespace Riverside.Cms.Services.Core.Infrastructure
             _options = options;
         }
 
-        public async Task<MasterPage> ReadMasterPageAsync(long tenantId, long masterPageId)
-        {
-            using (SqlConnection connection = new SqlConnection(_options.Value.SqlConnectionString))
-            {
-                connection.Open();
-
-                MasterPage masterPage = await connection.QueryFirstOrDefaultAsync<MasterPage>(
-                    @"SELECT TenantId, MasterPageId, Name, PageName, PageDescription, AncestorPageId, AncestorPageLevel, PageType, HasOccurred, HasImage,
-                        ThumbnailImageWidth, ThumbnailImageHeight, ThumbnailImageResizeMode, PreviewImageWidth, PreviewImageHeight, PreviewImageResizeMode, ImageMinWidth, ImageMinHeight,
-	                    Creatable, Deletable, Taggable, Administration, BeginRender, EndRender
-                        FROM cms.MasterPage WHERE TenantId = @TenantId AND MasterPageId = @MasterPageId",
-                    new { TenantId = tenantId, MasterPageId = masterPageId }
-                );
-
-                return masterPage;
-            }
-        }
-
-        private IEnumerable<MasterPageZone> PopulateMasterPageZones(IEnumerable<MasterPageZone> masterPageZones, IEnumerable<MasterPageZoneElementTypeDto> masterPageZoneElementTypeIds)
+        private IEnumerable<MasterPageZone> GetMasterPageZones(IEnumerable<MasterPageZone> masterPageZones, IEnumerable<MasterPageZoneElementDto> masterPageZoneElements, IEnumerable<MasterPageZoneElementTypeDto> masterPageZoneElementTypeIds)
         {
             foreach (MasterPageZone masterPageZone in masterPageZones)
             {
+                masterPageZone.MasterPageZoneElements = masterPageZoneElements.Where(e => e.MasterPageZoneId == masterPageZone.MasterPageZoneId).Select(e => new MasterPageZoneElement { ElementId = e.ElementId, ElementTypeId = e.ElementTypeId, MasterPageZoneElementId = e.MasterPageZoneElementId, BeginRender = e.BeginRender, EndRender = e.EndRender });
                 masterPageZone.ElementTypeIds = masterPageZoneElementTypeIds.Where(e => e.MasterPageZoneId == masterPageZone.MasterPageZoneId).Select(e => e.ElementTypeId);
                 yield return masterPageZone;
             }
         }
 
-        public async Task<IEnumerable<MasterPageZone>> SearchMasterPageZonesAsync(long tenantId, long masterPageId)
+        public async Task<MasterPage> ReadMasterPageAsync(long tenantId, long masterPageId)
         {
             using (SqlConnection connection = new SqlConnection(_options.Value.SqlConnectionString))
             {
                 connection.Open();
+                using (GridReader gr = await connection.QueryMultipleAsync(@"
+                    SELECT
+                        TenantId,
+                        MasterPageId,
+                        Name,
+                        PageName,
+                        PageDescription,
+                        AncestorPageId,
+                        AncestorPageLevel,
+                        PageType,
+                        HasOccurred,
+                        HasImage,
+                        ThumbnailImageWidth,
+                        ThumbnailImageHeight,
+                        ThumbnailImageResizeMode,
+                        PreviewImageWidth,
+                        PreviewImageHeight,
+                        PreviewImageResizeMode,
+                        ImageMinWidth,
+                        ImageMinHeight,
+	                    Creatable,
+                        Deletable,
+                        Taggable,
+                        Administration,
+                        BeginRender,
+                        EndRender
+                    FROM
+                        cms.MasterPage
+                    WHERE
+                        TenantId = @TenantId AND
+                        MasterPageId = @MasterPageId
 
-                using (GridReader gr = await connection.QueryMultipleAsync(
-                    @"SELECT TenantId, MasterPageId, MasterPageZoneId, SortOrder, AdminType, ContentType, BeginRender, EndRender, Name
-                        FROM cms.MasterPageZone WHERE TenantId = @TenantId AND MasterPageId = @MasterPageId ORDER BY SortOrder
-                      SELECT MasterPageZoneId, ElementTypeId FROM cms.MasterPageZoneElementType
-                        WHERE TenantId = @TenantId AND MasterPageId = @MasterPageId",
-                    new { TenantId = tenantId, MasterPageId = masterPageId }
-                    )
-                )
+                    SELECT
+                        MasterPageZoneId,
+                        AdminType,
+                        ContentType,
+                        BeginRender,
+                        EndRender,
+                        Name
+                    FROM
+                        cms.MasterPageZone
+                    WHERE
+                        TenantId = @TenantId AND
+                        MasterPageId = @MasterPageId
+                    ORDER BY
+                        SortOrder
+
+                    SELECT
+                        cms.MasterPageZoneElement.MasterPageZoneId,
+                        cms.MasterPageZoneElement.MasterPageZoneElementId,
+                        cms.Element.ElementTypeId,
+                        cms.MasterPageZoneElement.ElementId,
+                        cms.MasterPageZoneElement.BeginRender,
+                        cms.MasterPageZoneElement.EndRender
+                    FROM
+                        cms.MasterPageZoneElement
+                    INNER JOIN
+                        cms.Element
+                    ON
+                        cms.MasterPageZoneElement.TenantId = cms.Element.TenantId AND
+                        cms.MasterPageZoneElement.ElementId = cms.Element.ElementId
+                    WHERE
+                        cms.MasterPageZoneElement.TenantId = @TenantId AND
+                        cms.MasterPageZoneElement.MasterPageId = @MasterPageId
+                    ORDER BY
+                        cms.MasterPageZoneElement.MasterPageZoneId,
+                        cms.MasterPageZoneElement.SortOrder,
+                        cms.MasterPageZoneElement.MasterPageZoneElementId
+
+                    SELECT
+                        MasterPageZoneId,
+                        ElementTypeId
+                    FROM
+                        cms.MasterPageZoneElementType
+                    WHERE
+                        TenantId = @TenantId AND
+                        MasterPageId = @MasterPageId
+                    ",
+                    new { TenantId = tenantId, MasterPageId = masterPageId }))
                 {
-                    IEnumerable<MasterPageZone> masterPageZones = await gr.ReadAsync<MasterPageZone>();
-                    IEnumerable<MasterPageZoneElementTypeDto> masterPageZoneElementTypeIds = await gr.ReadAsync<MasterPageZoneElementTypeDto>();
-                    return PopulateMasterPageZones(masterPageZones, masterPageZoneElementTypeIds);
+                    MasterPage masterPage = await gr.ReadFirstOrDefaultAsync<MasterPage>();
+                    if (masterPage != null)
+                    {
+                        IEnumerable<MasterPageZone> masterPageZones = await gr.ReadAsync<MasterPageZone>();
+                        IEnumerable<MasterPageZoneElementDto> masterPageZoneElements = await gr.ReadAsync<MasterPageZoneElementDto>();
+                        IEnumerable<MasterPageZoneElementTypeDto> masterPageZoneElementTypeIds = await gr.ReadAsync<MasterPageZoneElementTypeDto>();
+                        masterPage.MasterPageZones = GetMasterPageZones(masterPageZones, masterPageZoneElements, masterPageZoneElementTypeIds);
+                    }
+                    return masterPage;
                 }
-            }
-        }
-
-        public async Task<MasterPageZone> ReadMasterPageZoneAsync(long tenantId, long masterPageId, long masterPageZoneId)
-        {
-            using (SqlConnection connection = new SqlConnection(_options.Value.SqlConnectionString))
-            {
-                connection.Open();
-
-                using (GridReader gr = await connection.QueryMultipleAsync(
-                    @"SELECT TenantId, MasterPageId, MasterPageZoneId, SortOrder, AdminType, ContentType, BeginRender, EndRender, Name
-	                    FROM cms.MasterPageZone WHERE TenantId = @TenantId AND MasterPageId = @MasterPageId AND MasterPageZoneId = @MasterPageZoneId
-                      SELECT ElementTypeId FROM cms.MasterPageZoneElementType
-                        WHERE TenantId = @TenantId AND MasterPageId = @MasterPageId AND MasterPageZoneId = @MasterPageZoneId",
-                    new { TenantId = tenantId, MasterPageId = masterPageId, MasterPageZoneId = masterPageZoneId }
-                    )
-                )
-                {
-                    MasterPageZone masterPageZone = await gr.ReadFirstOrDefaultAsync<MasterPageZone>();
-                    masterPageZone.ElementTypeIds = await gr.ReadAsync<Guid>();
-                    return masterPageZone;
-                }
-            }
-        }
-
-        public async Task<IEnumerable<MasterPageZoneElement>> SearchMasterPageZoneElementsAsync(long tenantId, long masterPageId, long masterPageZoneId)
-        {
-            using (SqlConnection connection = new SqlConnection(_options.Value.SqlConnectionString))
-            {
-                connection.Open();
-                IEnumerable<MasterPageZoneElement> masterPageZoneElements = await connection.QueryAsync<MasterPageZoneElement>(
-                    @"SELECT cms.MasterPageZoneElement.TenantId, cms.MasterPageZoneElement.MasterPageId, cms.MasterPageZoneElement.MasterPageZoneId, cms.MasterPageZoneElement.MasterPageZoneElementId, cms.MasterPageZoneElement.SortOrder,
-                        cms.Element.ElementTypeId, cms.MasterPageZoneElement.ElementId, cms.MasterPageZoneElement.BeginRender, cms.MasterPageZoneElement.EndRender
-                        FROM cms.MasterPageZoneElement INNER JOIN cms.Element ON
-                        cms.MasterPageZoneElement.TenantId = cms.Element.TenantId AND cms.MasterPageZoneElement.ElementId = cms.Element.ElementId
-                        WHERE cms.MasterPageZoneElement.TenantId = @TenantId AND cms.MasterPageZoneElement.MasterPageId = @MasterPageId AND cms.MasterPageZoneElement.MasterPageZoneId = @MasterPageZoneId
-                        ORDER BY cms.MasterPageZoneElement.SortOrder",
-                    new { TenantId = tenantId, MasterPageId = masterPageId, MasterPageZoneId = masterPageZoneId }
-                );
-                return masterPageZoneElements;
-            }
-        }
-
-        public async Task<MasterPageZoneElement> ReadMasterPageZoneElementAsync(long tenantId, long masterPageId, long masterPageZoneId, long masterPageZoneElementId)
-        {
-            using (SqlConnection connection = new SqlConnection(_options.Value.SqlConnectionString))
-            {
-                connection.Open();
-
-                MasterPageZoneElement masterPageZoneElement = await connection.QueryFirstOrDefaultAsync<MasterPageZoneElement>(
-                    @"SELECT cms.MasterPageZoneElement.TenantId, cms.MasterPageZoneElement.MasterPageId, cms.MasterPageZoneElement.MasterPageZoneId, cms.MasterPageZoneElement.MasterPageZoneElementId, cms.MasterPageZoneElement.SortOrder,
-                        cms.Element.ElementTypeId, cms.MasterPageZoneElement.ElementId, cms.MasterPageZoneElement.BeginRender, cms.MasterPageZoneElement.EndRender
-                        FROM cms.MasterPageZoneElement INNER JOIN cms.Element ON
-                        cms.MasterPageZoneElement.TenantId = cms.Element.TenantId AND cms.MasterPageZoneElement.ElementId = cms.Element.ElementId
-                        WHERE cms.MasterPageZoneElement.TenantId = @TenantId AND cms.MasterPageZoneElement.MasterPageId = @MasterPageId AND cms.MasterPageZoneElement.MasterPageZoneId = @MasterPageZoneId AND
-                        cms.MasterPageZoneElement.MasterPageZoneElementId = @MasterPageZoneElementId",
-                    new { TenantId = tenantId, MasterPageId = masterPageId, MasterPageZoneId = masterPageZoneId, MasterPageZoneElementId = masterPageZoneElementId }
-                );
-
-                return masterPageZoneElement;
             }
         }
     }

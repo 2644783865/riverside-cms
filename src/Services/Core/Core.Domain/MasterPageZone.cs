@@ -1,17 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Riverside.Cms.Services.Core.Domain
 {
     public class MasterPageZone
     {
-        public long TenantId { get; set; }
-
-        public long MasterPageId { get; set; }
         public long MasterPageZoneId { get; set; }
 
-        public int SortOrder { get; set; }
         public AdminType AdminType { get; set; }
         public ContentType ContentType { get; set; }
         public string Name { get; set; }
@@ -19,5 +14,6 @@ namespace Riverside.Cms.Services.Core.Domain
         public string EndRender { get; set; }
 
         public IEnumerable<Guid> ElementTypeIds { get; set; }
+        public IEnumerable<MasterPageZoneElement> MasterPageZoneElements { get; set; }
     }
 }
