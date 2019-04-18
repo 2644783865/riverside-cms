@@ -83,5 +83,25 @@ namespace Riverside.Cms.Services.Core.Infrastructure
                 );
             }
         }
+
+        public async Task<IEnumerable<ElementType>> ListElementTypesAsync(IEnumerable<Guid> elementTypeIds)
+        {
+            using (SqlConnection connection = new SqlConnection(_options.Value.SqlConnectionString))
+            {
+                connection.Open();
+                return await connection.QueryAsync<ElementType>(@"
+                    SELECT
+                        ElementTypeId,
+                        Name
+                    FROM
+                        cms.ElementType
+                    WHERE
+                        ElementTypeId IN @ElementTypeIds
+                    ORDER BY
+    	                ElementTypeId",
+                    new { ElementTypeIds = elementTypeIds }
+                );
+            }
+        }
     }
 }

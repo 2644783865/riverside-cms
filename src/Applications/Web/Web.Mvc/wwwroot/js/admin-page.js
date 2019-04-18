@@ -73,18 +73,22 @@
             let urls = [];
             let elementsByTypeId = this.getElementsByTypeId(page);
             urls.push(conf.masterPagesApiPathname() + '/' + page.masterPageId);
-            urls.push(conf.elementsApiPathname());
-            Object.keys(elementsByTypeId).forEach(function(elementTypeId) {
-                urls.push(conf.elementsApiPathname() + '/' + elementTypeId + '/elements?elementids=' + elementsByTypeId[elementTypeId].join(','));
-            });
+            if (Object.keys(elementsByTypeId).length > 0) {
+                urls.push(conf.elementsApiPathname() + '?elementtypeids=' + Object.keys(elementsByTypeId).join(','));
+                Object.keys(elementsByTypeId).forEach(function(elementTypeId) {
+                    urls.push(conf.elementsApiPathname() + '/' + elementTypeId + '/elements?elementids=' + elementsByTypeId[elementTypeId].join(','));
+                });
+            }
             let axiosPromises = urls.map(url => axios.get(url, { headers: auth.getHeaders() }));
             axios.all(axiosPromises).then((responses) => { 
                 let items = responses.map(r => r.data);
+                let masterPage = items[0];
+                let elementTypes = items.length > 1 ? items[1] : [];
                 let elementDefinitionsByTypeId = {};
                 Object.keys(elementsByTypeId).forEach(function(elementTypeId, index) {
                     elementDefinitionsByTypeId[elementTypeId] = items[index + 2];
                 });
-                this.initialiseUi(action, items[0], page, items[1], elementDefinitionsByTypeId);
+                this.initialiseUi(action, masterPage, page, elementTypes, elementDefinitionsByTypeId);
             });
         },
         initialise: function (action, pageId) {

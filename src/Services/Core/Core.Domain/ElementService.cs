@@ -27,5 +27,10 @@ namespace Riverside.Cms.Services.Core.Domain
         {
             return _elementRepository.ListElementTypesAsync();
         }
+
+        public Task<IEnumerable<ElementType>> ListElementTypesAsync(IEnumerable<Guid> elementTypeIds)
+        {
+            return _elementRepository.ListElementTypesAsync(elementTypeIds);
+        }
     }
 }

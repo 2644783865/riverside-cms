@@ -51,9 +51,10 @@ namespace Riverside.Cms.Services.Core.Mvc
         [AllowAnonymous]
         [Route("api/v1/core/elementtypes")]
         [ProducesResponseType(typeof(IEnumerable<ElementType>), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> ListElementTypesAsync()
+        public async Task<IActionResult> ListElementTypesAsync([FromQuery]string elementTypeIds)
         {
-            return Ok(await _elementService.ListElementTypesAsync());
+            IEnumerable<Guid> elementTypeIdCollection = !string.IsNullOrWhiteSpace(elementTypeIds) ? elementTypeIds.Split(',').Select(Guid.Parse) : null;
+            return Ok(elementTypeIdCollection == null ? await _elementService.ListElementTypesAsync() : await _elementService.ListElementTypesAsync(elementTypeIdCollection));
         }
     }
 }

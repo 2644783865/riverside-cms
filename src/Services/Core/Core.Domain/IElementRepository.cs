@@ -10,5 +10,6 @@ namespace Riverside.Cms.Services.Core.Domain
         Task<IEnumerable<ElementDefinition>> ListElementDefinitionsAsync(long tenantId, Guid elementTypeId, IEnumerable<long> elementIds);
 
         Task<IEnumerable<ElementType>> ListElementTypesAsync();
+        Task<IEnumerable<ElementType>> ListElementTypesAsync(IEnumerable<Guid> elementTypeIds);
     }
 }
