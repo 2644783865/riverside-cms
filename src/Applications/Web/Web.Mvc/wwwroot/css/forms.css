@@ -693,6 +693,29 @@ ul:focus, .flib-input:focus {
     border-color: #f7c798;
 }
 
+/*----- Table  -----*/
+
+.flib-table {
+    width: 100%;
+}
+.flib-table tr:first-child td {
+    border-top: 1px solid #e0e0e0;
+}
+.flib-table td {
+    padding: 6px 13px;
+    border-bottom: 1px solid #e0e0e0;
+    background-color: #fafafa;
+    vertical-align: top;
+}
+.flib-table td:first-child {
+    width: 33%;
+    color: #707070;
+    font-weight: 700;
+}
+.flib-table td:last-child {
+    width: 67%;
+}
+
 /*----- Entity list -----*/
 
 .entity-list {

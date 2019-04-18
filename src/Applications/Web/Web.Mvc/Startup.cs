@@ -70,6 +70,7 @@ namespace Riverside.Cms.Applications.Web.Mvc
         {
             // Core domain services
             services.AddTransient<IDomainService, DomainService>();
+            services.AddTransient<IElementService, ElementService>();
             services.AddTransient<IForumService, ForumService>();
             services.AddTransient<IMasterPageService, MasterPageService>();
             services.AddTransient<IPageService, PageService>();
@@ -83,6 +84,7 @@ namespace Riverside.Cms.Applications.Web.Mvc
 
             // Core infrastructure services
             services.AddTransient<IDomainRepository, SqlDomainRepository>();
+            services.AddTransient<IElementRepository, SqlElementRepository>();
             services.AddTransient<IForumRepository, SqlForumRepository>();
             services.AddTransient<IMasterPageRepository, SqlMasterPageRepository>();
             services.AddTransient<IPageRepository, SqlPageRepository>();

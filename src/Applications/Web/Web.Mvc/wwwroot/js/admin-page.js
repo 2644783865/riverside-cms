@@ -1,15 +1,28 @@
 ﻿var page = (function () {
     return {
-        initialiseUi: function (action, model) {
+        initialiseUi: function (action, masterPage, page, elementTypes, elementDefinitionsByTypeId) {
             new Vue({
                 el: '#adminPage',
                 data: {
-                    model,
+                    page,
+                    masterPage,
+                    elementTypes,
+                    elementDefinitionsByTypeId,
                     form: {
                         action: action,
                         valid: true,
                         readOnly: action === 'read' || action === 'delete',
                         customErrorMessages: forms.createEmptyCustomErrorMessages()
+                    }
+                },
+                computed: {
+                    zones() {
+                        return page.pageZones.map(pz => {
+                            return {
+                                name: masterPage.masterPageZones.filter(mpz => mpz.masterPageZoneId === pz.masterPageZoneId)[0].name,
+                                elements: pz.pageZoneElements.map(pze => { return { elementTypeId: pze.elementTypeId, elementTypeName: elementTypes.filter(et => et.elementTypeId === pze.elementTypeId)[0].name, elementId: pze.elementId, elementName: elementDefinitionsByTypeId[pze.elementTypeId].filter(ed => ed.elementId === pze.elementId)[0].name }; })
+                            };
+                        });
                     }
                 },
                 methods: {
@@ -27,8 +40,8 @@
                     },
                     update() {
                         axios
-                            .put(conf.pagesApiPathname() + '/' + this.$data.model.pageId, this.$data.model, { headers: auth.getHeaders() })
-                            .then(() => { window.location.href = conf.pagesPathname() + '/' + this.$data.model.pageId; })
+                            .put(conf.pagesApiPathname() + '/' + this.$data.page.pageId, this.$data.page, { headers: auth.getHeaders() })
+                            .then(() => { window.location.href = conf.pagesPathname() + '/' + this.$data.page.pageId; })
                             .catch((error) => { auth.checkAuthorised(error); this.processErrors(error); });
                     },
                     submitClicked() {
@@ -42,13 +55,43 @@
                 }
             });
         },
+        getElementsByTypeId: function (page) {
+            let elementsByTypeId = {};
+            page.pageZones.forEach(function (pageZone) {
+                pageZone.pageZoneElements.forEach(function (pageZoneElement) {
+                    if (elementsByTypeId[pageZoneElement.elementTypeId] === undefined)
+                        elementsByTypeId[pageZoneElement.elementTypeId] = [];
+                    elementsByTypeId[pageZoneElement.elementTypeId].push(pageZoneElement.elementId);
+                });
+            });
+            Object.keys(elementsByTypeId).forEach(function (elementTypeId) {
+                elementsByTypeId[elementTypeId] = Array.from(new Set(elementsByTypeId[elementTypeId]));
+            });
+            return elementsByTypeId;
+        },
+        initialiseWithPage: function (action, page) {
+            let urls = [];
+            let elementsByTypeId = this.getElementsByTypeId(page);
+            urls.push(conf.masterPagesApiPathname() + '/' + page.masterPageId);
+            urls.push(conf.elementsApiPathname());
+            Object.keys(elementsByTypeId).forEach(function(elementTypeId) {
+                urls.push(conf.elementsApiPathname() + '/' + elementTypeId + '/elements?elementids=' + elementsByTypeId[elementTypeId].join(','));
+            });
+            let axiosPromises = urls.map(url => axios.get(url, { headers: auth.getHeaders() }));
+            axios.all(axiosPromises).then((responses) => { 
+                let items = responses.map(r => r.data);
+                let elementDefinitionsByTypeId = {};
+                Object.keys(elementsByTypeId).forEach(function(elementTypeId, index) {
+                    elementDefinitionsByTypeId[elementTypeId] = items[index + 2];
+                });
+                this.initialiseUi(action, items[0], page, items[1], elementDefinitionsByTypeId);
+            });
+        },
         initialise: function (action, pageId) {
-            let axiosPromises = [];
-            axiosPromises.push(axios.get(conf.pagesApiPathname() + '/' + pageId, { headers: auth.getHeaders() }));
-            axios.all(axiosPromises).then(axios.spread((pageResponse) => {
-                let page = pageResponse !== undefined ? pageResponse.data : null;
-                this.initialiseUi(action, page);
-            })).catch((error) => { auth.checkAuthorised(error); });
+            axios
+                .get(conf.pagesApiPathname() + '/' + pageId, { headers: auth.getHeaders() })
+                .then((pageResponse) => { this.initialiseWithPage(action, pageResponse.data); })
+                .catch((error) => { auth.checkAuthorised(error); });
         }
     };
 })();

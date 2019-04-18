@@ -1,16 +1,29 @@
 ﻿@model string
 
 <div class="flib-form" v-cloak>
-    <h1>{{model.name}}</h1>
+    <h1>{{page.name}}</h1>
     <flib-validation-summary :custom-error-messages="getCustomErrorMessages"></flib-validation-summary>
     <h2>Details</h2>
     <div class="flib-field-group">
-        <flib-text-field :definition="{ id: 'name', label: 'Name', required: true, requiredMessage: 'Name is required' }" :read-only="form.readOnly" v-model="model.name" @@validate="validateForm" :custom-error-messages="getCustomErrorMessages"></flib-text-field>
-        <flib-text-field :definition="{ id: 'description', label: 'Description', rows: 4 }" :read-only="form.readOnly" v-model="model.description" @@validate="validateForm" :custom-error-messages="getCustomErrorMessages"></flib-text-field>
+        <flib-text-field :definition="{ id: 'name', label: 'Name', required: true, requiredMessage: 'Name is required' }" :read-only="form.readOnly" v-model="page.name" @@validate="validateForm" :custom-error-messages="getCustomErrorMessages"></flib-text-field>
+        <flib-text-field :definition="{ id: 'description', label: 'Description', rows: 4 }" :read-only="form.readOnly" v-model="page.description" @@validate="validateForm" :custom-error-messages="getCustomErrorMessages"></flib-text-field>
     </div>
     <h2>Search engine optimisation</h2>
     <div class="flib-field-group">
-        <flib-text-field :definition="{ id: 'title', label: 'Title', helpMessage: 'Use this field to override the default web page title' }" :read-only="form.readOnly" v-model="model.title" @@validate="validateForm" :custom-error-messages="getCustomErrorMessages"></flib-text-field>
+        <flib-text-field :definition="{ id: 'title', label: 'Title', helpMessage: 'Use this field to override the default web page title' }" :read-only="form.readOnly" v-model="page.title" @@validate="validateForm" :custom-error-messages="getCustomErrorMessages"></flib-text-field>
+    </div>
+    <div v-show="form.readOnly && zones.length > 0" v-for="zone in zones">
+        <h2>{{zone.name}}</h2>
+        <div class="flib-field-group" v-show="form.readOnly && zone.elements.length > 0">
+            <table class="flib-table">
+                <tbody>
+                    <tr v-for="element in zone.elements">
+                        <td>{{element.elementTypeName}}</td>
+                        <td>{{element.elementName}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
     <div class="flib-button-group" v-show="'@Model' !== ''">
         <flib-button :definition="{ id: 'submitButton', label: '@Model' }" :state="{ disabled: false }" @@click="submitClicked" :enabled="form.valid"></flib-button>

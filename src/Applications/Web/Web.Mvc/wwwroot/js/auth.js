@@ -23,7 +23,7 @@
                 return { 'Authorization': 'Bearer ' + userSession.security.token, 'Content-Type': 'application/json' };
         },
         checkAuthorised(error) {
-            if (error.response.status === 401 || error.response.status === 403) {
+            if (error.response !== undefined && (error.response.status === 401 || error.response.status === 403)) {
                 window.location.href = conf.loginPathname();
             }
         }
