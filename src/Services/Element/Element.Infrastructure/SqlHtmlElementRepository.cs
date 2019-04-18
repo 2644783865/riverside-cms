@@ -9,7 +9,7 @@ using static Dapper.SqlMapper;
 
 namespace Riverside.Cms.Services.Element.Infrastructure
 {
-    public class SqlHtmlElementRepository : IElementRepository<HtmlElementSettings>
+    public class SqlHtmlElementRepository : IElementRepository<HtmlElementSettings>, IHtmlElementRepository
     {
         private readonly IOptions<SqlOptions> _options;
 
@@ -62,6 +62,28 @@ namespace Riverside.Cms.Services.Element.Infrastructure
                         settings.BlobSets = await gr.ReadAsync<HtmlBlobSet>();
                     return settings;
                 }
+            }
+        }
+
+        public async Task UpdateElementSettingsAsync(long tenantId, long elementId, HtmlElementSettings settings)
+        {
+            using (SqlConnection connection = new SqlConnection(_options.Value.SqlConnectionString))
+            {
+                connection.Open();
+                await connection.ExecuteAsync(@"
+                    UPDATE
+                        element.Html
+                    SET
+                        element.Html.Html = @Html
+                    WHERE
+                        element.Html.TenantId = @TenantId AND
+                        element.Html.ElementId = @ElementId",
+                    new
+                    {
+                        TenantId = tenantId,
+                        ElementId = elementId,
+                        settings.Html
+                    });
             }
         }
     }

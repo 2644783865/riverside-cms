@@ -2,10 +2,12 @@
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Riverside.Cms.Services.Core.Common;
 using Riverside.Cms.Services.Element.Domain;
 using Riverside.Cms.Services.Storage.Domain;
+using Riverside.Cms.Utilities.Validation.Framework;
 
 namespace Riverside.Cms.Services.Element.Mvc
 {
@@ -280,6 +282,24 @@ namespace Riverside.Cms.Services.Element.Mvc
             if (view == null)
                 return NotFound();
             return Ok(view);
+        }
+
+        [HttpPut]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [Authorize(Policy = "UpdatePageElements")]
+        [Route("api/v1/element/elementtypes/c92ee4c4-b133-44cc-8322-640e99c334dc/elements/{elementId:long}")]
+        public async Task<IActionResult> UpdateHtmlElementSettingsAsync(long elementId, [FromBody]HtmlElementSettings htmlElementSettings, [FromQuery]long? pageId, [FromQuery]long? masterPageId)
+        {
+            try
+            {
+                await _htmlElementService.UpdateElementSettingsAsync(TenantId, elementId, htmlElementSettings);
+                return Ok();
+            }
+            catch (ValidationErrorException ex)
+            {
+                return BadRequest(new { errors = ex.Errors });
+            }
         }
 
         // LATEST THREADS

@@ -1,0 +1,23 @@
+﻿@model PageElementKey
+
+<div class="flib-panel">
+    <ol class="flib-breadcrumb" v-cloak>
+        <li><a href="~/admin">Home</a></li>
+        <li><a href="~/admin/pages">Pages</a></li>
+        <li><a href="~/admin/pages/@Model.PageId">{{page.name}}</a></li>
+        <li><a href="~/admin/pages/@Model.PageId/elementtypes/@Model.ElementTypeId/elements/@Model.ElementId">{{element.name}}</a></li>
+    </ol>
+    <ul class="flib-actions">
+        <li><a href="~/admin/pages/@Model.PageId/elementtypes/@Model.ElementTypeId/elements/@Model.ElementId/update" title="Edit page element" class="flib-button"><i class="fa fa-pencil"></i></a></li>
+    </ul>
+</div>
+
+@await Html.PartialAsync("PageElementForm.cshtml", string.Empty)
+
+@section Scripts
+{
+    <script src="~/js/admin-page-element.js" asp-append-version="true"></script>
+    <script>
+        page.initialise('read', @Model.PageId, '@Model.ElementTypeId', @Model.ElementId);
+    </script>
+}

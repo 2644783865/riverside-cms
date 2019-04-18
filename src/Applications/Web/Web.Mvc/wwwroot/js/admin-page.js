@@ -74,9 +74,9 @@
             let elementsByTypeId = this.getElementsByTypeId(page);
             urls.push(conf.masterPagesApiPathname() + '/' + page.masterPageId);
             if (Object.keys(elementsByTypeId).length > 0) {
-                urls.push(conf.elementsApiPathname() + '?elementtypeids=' + Object.keys(elementsByTypeId).join(','));
+                urls.push(conf.coreElementsApiPathname() + '?elementtypeids=' + Object.keys(elementsByTypeId).join(','));
                 Object.keys(elementsByTypeId).forEach(function(elementTypeId) {
-                    urls.push(conf.elementsApiPathname() + '/' + elementTypeId + '/elements?elementids=' + elementsByTypeId[elementTypeId].join(','));
+                    urls.push(conf.coreElementsApiPathname() + '/' + elementTypeId + '/elements?elementids=' + elementsByTypeId[elementTypeId].join(','));
                 });
             }
             let axiosPromises = urls.map(url => axios.get(url, { headers: auth.getHeaders() }));

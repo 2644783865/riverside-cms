@@ -46,6 +46,12 @@ namespace Riverside.Cms.Services.Element.Domain
 
     public interface IHtmlElementService : IElementSettingsService<HtmlElementSettings>, IElementViewService<HtmlElementSettings, HtmlElementContent>, IElementStorageService
     {
+        Task UpdateElementSettingsAsync(long tenantId, long elementId, HtmlElementSettings settings);
+    }
+
+    public interface IHtmlElementRepository
+    {
+        Task UpdateElementSettingsAsync(long tenantId, long elementId, HtmlElementSettings settings);
     }
 
     public class HtmlElementService : IHtmlElementService
@@ -174,6 +180,15 @@ namespace Riverside.Cms.Services.Element.Domain
                 return null;
 
             return await _storageService.ReadBlobContentAsync(tenantId, blobId.Value, string.Format(HtmlImagePath, elementId));
+        }
+
+        public async Task UpdateElementSettingsAsync(long tenantId, long elementId, HtmlElementSettings settings)
+        {
+            // Ensure properties supplied are in the correct format
+            settings.Html = (settings.Html ?? string.Empty).Trim();
+
+            // Do the update
+            await ((IHtmlElementRepository)_elementRepository).UpdateElementSettingsAsync(tenantId, elementId, settings);
         }
     }
 }

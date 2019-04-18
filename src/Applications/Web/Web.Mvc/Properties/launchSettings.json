@@ -18,7 +18,7 @@
     "Web.Mvc": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "admin/pages/139/update",
+      "launchUrl": "admin/pages/19/elementtypes/c92ee4c4-b133-44cc-8322-640e99c334dc/elements/186",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },

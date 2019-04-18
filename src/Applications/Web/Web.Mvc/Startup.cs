@@ -274,6 +274,8 @@ namespace Riverside.Cms.Applications.Web.Mvc
                 // Administration
                 routes.MapRoute("AdminHome", "admin", new { controller = "admin", action = "home" });
                 routes.MapRoute("AdminLogin", "admin/login", new { controller = "admin", action = "login" });
+                routes.MapRoute("AdminPageElementRead", "admin/pages/{pageId}/elementtypes/{elementTypeId}/elements/{elementId}", new { controller = "admin", action = "readpageelement" });
+                routes.MapRoute("AdminPageElementUpdate", "admin/pages/{pageId}/elementtypes/{elementTypeId}/elements/{elementId}/update", new { controller = "admin", action = "updatepageelement" });
                 routes.MapRoute("AdminPageRead", "admin/pages/{pageId}", new { controller = "admin", action = "readpage" });
                 routes.MapRoute("AdminPageUpdate", "admin/pages/{pageId}/update", new { controller = "admin", action = "updatepage" });
                 routes.MapRoute("AdminWebRead", "admin/web", new { controller = "admin", action = "readweb" });

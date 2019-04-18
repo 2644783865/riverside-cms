@@ -1,0 +1,11 @@
+﻿<div class="flib-form" v-cloak>
+    <h1>{{element.name}}</h1>
+    <flib-validation-summary :custom-error-messages="getCustomErrorMessages"></flib-validation-summary>
+    <h2>Details</h2>
+    <div class="flib-field-group">
+        <flib-text-field :definition="{ id: 'html', label: 'Html', rows: 10 }" :read-only="form.readOnly" v-model="element.html" @@validate="validateForm" :custom-error-messages="getCustomErrorMessages"></flib-text-field>
+    </div>
+    <div class="flib-button-group" v-show="'@Model' !== ''">
+        <flib-button :definition="{ id: 'submitButton', label: '@Model' }" :state="{ disabled: false }" @@click="submitClicked" :enabled="form.valid"></flib-button>
+    </div>
+</div>
