@@ -19,7 +19,7 @@
                 <tbody>
                     <tr v-for="element in zone.elements">
                         <td>{{element.elementTypeName}}</td>
-                        <td>{{element.elementName}}</td>
+                        <td><a :href="conf.pagesPathname() + '/' + page.pageId + '/elementtypes/' + element.elementTypeId + '/elements/' + element.elementId">{{element.elementName}}</a></td>
                     </tr>
                 </tbody>
             </table>
