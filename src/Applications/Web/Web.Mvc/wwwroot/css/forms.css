@@ -29,7 +29,7 @@ a, a:hover {
     font-size: 18px;
     color: rgb(48, 48, 48);
     font-weight: normal;
-    margin: 0 13px 10px 13px;
+    margin: 0 13px 10px 0;
 }
 .flib-form > p {
     margin: 0 0 10px 0;
