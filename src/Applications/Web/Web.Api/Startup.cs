@@ -15,6 +15,7 @@ using Riverside.Cms.Services.Element.Domain;
 using Riverside.Cms.Services.Element.Infrastructure;
 using Riverside.Cms.Services.Storage.Domain;
 using Riverside.Cms.Services.Storage.Infrastructure;
+using Riverside.Cms.Utilities.Drawing.ImageAnalysis;
 using Riverside.Cms.Utilities.Net.Mail;
 using Riverside.Cms.Utilities.Security.Encryption;
 using Riverside.Cms.Utilities.Text.Csv;
@@ -38,6 +39,7 @@ namespace Riverside.Cms.Applications.Web.Api
             services.AddTransient<IEmailService, SmtpEmailService>();
             services.AddTransient<IModelValidator, ModelValidator>();
             services.AddTransient<IStringUtilities, StringUtilities>();
+            services.AddTransient<IImageAnalysisService, ImageAnalysisService>();
         }
 
         private void ConfigureDependencyInjectionAuthenticationServices(IServiceCollection services)
@@ -124,7 +126,6 @@ namespace Riverside.Cms.Applications.Web.Api
 
             // Storage infrastructure services
             services.AddTransient<IBlobService, AzureBlobService>();
-            services.AddTransient<IImageService, ImageService>();
             services.AddTransient<IStorageRepository, SqlStorageRepository>();
         }
 

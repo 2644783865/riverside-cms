@@ -61,7 +61,7 @@ namespace Riverside.Cms.Services.Core.Domain {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Page description must be between 1 and 5000 characters long.
+        ///   Looks up a localized string similar to Description must be between 1 and 5000 characters long.
         /// </summary>
         internal static string DescriptionLengthMessage {
             get {
@@ -70,7 +70,16 @@ namespace Riverside.Cms.Services.Core.Domain {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Page image upload is invalid.
+        ///   Looks up a localized string similar to Image must be at least {0} by {1} pixels in size.
+        /// </summary>
+        internal static string ImageDimensionsInvalidMessage {
+            get {
+                return ResourceManager.GetString("ImageDimensionsInvalidMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Image upload is invalid.
         /// </summary>
         internal static string ImageInvalidMessage {
             get {
@@ -79,7 +88,16 @@ namespace Riverside.Cms.Services.Core.Domain {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Page name must be between 1 and 256 characters long.
+        ///   Looks up a localized string similar to Image is not allowed.
+        /// </summary>
+        internal static string ImageNotAllowedMessage {
+            get {
+                return ResourceManager.GetString("ImageNotAllowedMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Name must be between 1 and 256 characters long.
         /// </summary>
         internal static string NameLengthMessage {
             get {
@@ -88,7 +106,7 @@ namespace Riverside.Cms.Services.Core.Domain {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Page name is required.
+        ///   Looks up a localized string similar to Name is required.
         /// </summary>
         internal static string NameRequiredMessage {
             get {
@@ -97,7 +115,7 @@ namespace Riverside.Cms.Services.Core.Domain {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Page title must be between 1 and 256 characters long.
+        ///   Looks up a localized string similar to Title must be between 1 and 256 characters long.
         /// </summary>
         internal static string TitleLengthMessage {
             get {

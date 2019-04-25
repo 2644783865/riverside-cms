@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Riverside.Cms.Services.Storage.Domain
+﻿namespace Riverside.Cms.Utilities.Drawing.ImageAnalysis
 {
     public class ImageMetadata
     {

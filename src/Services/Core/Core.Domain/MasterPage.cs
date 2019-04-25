@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Riverside.Cms.Utilities.Drawing.ImageAnalysis;
 
 namespace Riverside.Cms.Services.Core.Domain
 {

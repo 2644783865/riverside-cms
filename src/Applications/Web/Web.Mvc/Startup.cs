@@ -19,6 +19,7 @@ using Riverside.Cms.Services.Mortgage.Domain;
 using Riverside.Cms.Services.Mortgage.Infrastructure;
 using Riverside.Cms.Services.Storage.Domain;
 using Riverside.Cms.Services.Storage.Infrastructure;
+using Riverside.Cms.Utilities.Drawing.ImageAnalysis;
 using Riverside.Cms.Utilities.Net.Mail;
 using Riverside.Cms.Utilities.Security.Encryption;
 using Riverside.Cms.Utilities.Text.Csv;
@@ -48,6 +49,7 @@ namespace Riverside.Cms.Applications.Web.Mvc
             services.AddTransient<IEmailService, SmtpEmailService>();
             services.AddTransient<IModelValidator, ModelValidator>();
             services.AddTransient<IStringUtilities, StringUtilities>();
+            services.AddTransient<IImageAnalysisService, ImageAnalysisService>();
         }
 
         private void ConfigureDependencyInjectionMvcServices(IServiceCollection services)
@@ -154,7 +156,6 @@ namespace Riverside.Cms.Applications.Web.Mvc
 
             // Storage infrastructure services
             services.AddTransient<IBlobService, AzureBlobService>();
-            services.AddTransient<IImageService, ImageService>();
             services.AddTransient<IStorageRepository, SqlStorageRepository>();
         }
 

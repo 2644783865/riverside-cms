@@ -118,18 +118,24 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="DescriptionLengthMessage" xml:space="preserve">
-    <value>Page description must be between 1 and 5000 characters long</value>
+    <value>Description must be between 1 and 5000 characters long</value>
+  </data>
+  <data name="ImageDimensionsInvalidMessage" xml:space="preserve">
+    <value>Image must be at least {0} by {1} pixels in size</value>
   </data>
   <data name="ImageInvalidMessage" xml:space="preserve">
-    <value>Page image upload is invalid</value>
+    <value>Image upload is invalid</value>
+  </data>
+  <data name="ImageNotAllowedMessage" xml:space="preserve">
+    <value>Image is not allowed</value>
   </data>
   <data name="NameLengthMessage" xml:space="preserve">
-    <value>Page name must be between 1 and 256 characters long</value>
+    <value>Name must be between 1 and 256 characters long</value>
   </data>
   <data name="NameRequiredMessage" xml:space="preserve">
-    <value>Page name is required</value>
+    <value>Name is required</value>
   </data>
   <data name="TitleLengthMessage" xml:space="preserve">
-    <value>Page title must be between 1 and 256 characters long</value>
+    <value>Title must be between 1 and 256 characters long</value>
   </data>
 </root>

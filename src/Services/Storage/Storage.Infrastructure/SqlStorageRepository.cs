@@ -124,16 +124,17 @@ namespace Riverside.Cms.Services.Storage.Infrastructure
 
         public async Task<long> CreateBlobAsync(long tenantId, Blob blob)
         {
-            BlobDto dto = GetDtoFromBlob(blob);
-
             using (SqlConnection connection = new SqlConnection(_options.Value.SqlConnectionString))
             {
                 connection.Open();
-                long blobId = await connection.QuerySingleAsync<long>(
-                    @"INSERT INTO Blob (TenantId, Size, ContentType, Name, Folder1, Folder2, Folder3, Width, Height, Created, Updated)
-                        VALUES(@TenantId, @Size, @ContentType, @Name, @Folder1, @Folder2, @Folder3, @Width, @Height, @Created, @Updated)
-                        SELECT CAST(SCOPE_IDENTITY() as bigint)",
-                    dto
+                long blobId = await connection.QuerySingleAsync<long>(@"
+                    INSERT INTO
+                        cms.Upload (TenantId, UploadType, Name, Size, Committed, Created, Updated)
+                    VALUES
+                        (@TenantId, @BlobType, @Name, @Size, 0, @Created, @Updated)
+                    SELECT
+                        CAST(SCOPE_IDENTITY() as bigint)",
+                    blob
                 );
                 return blobId;
             }

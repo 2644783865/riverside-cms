@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Utilities\Drawing\Drawing.ImageAnalysis\Drawing.ImageAnalysis.csproj" />
     <ProjectReference Include="..\..\..\Utilities\Validation\Validation.DataAnnotations\Validation.DataAnnotations.csproj" />
     <ProjectReference Include="..\..\..\Utilities\Validation\Validation.Framework\Validation.Framework.csproj" />
     <ProjectReference Include="..\..\Storage\Storage.Domain\Storage.Domain.csproj" />

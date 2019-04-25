@@ -5,4 +5,8 @@
     <RootNamespace>Riverside.Cms.Services.Storage.Domain</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Utilities\Drawing\Drawing.ImageAnalysis\Drawing.ImageAnalysis.csproj" />
+  </ItemGroup>
+
 </Project>

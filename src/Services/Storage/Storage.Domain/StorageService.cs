@@ -4,19 +4,22 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Riverside.Cms.Utilities.Drawing.ImageAnalysis;
 
 namespace Riverside.Cms.Services.Storage.Domain
 {
     public class StorageService : IStorageService
     {
         private readonly IBlobService _blobService;
-        private readonly IImageService _imageService;
+        private readonly IImageAnalysisService _imageAnalysisService;
         private readonly IStorageRepository _storageRepository;
 
-        public StorageService(IBlobService blobService, IImageService imageService, IStorageRepository storageRepository)
+        private const string UncommittedPath = "uncommitted";
+
+        public StorageService(IBlobService blobService, IImageAnalysisService imageAnalysisService, IStorageRepository storageRepository)
         {
             _blobService = blobService;
-            _imageService = imageService;
+            _imageAnalysisService = imageAnalysisService;
             _storageRepository = storageRepository;
         }
 
@@ -34,24 +37,17 @@ namespace Riverside.Cms.Services.Storage.Domain
             }
         }
 
-        private BlobImage GetBlobImage(Blob blob, Stream stream)
+        private BlobImage GetBlobImage(IBlobContent content)
         {
-            ImageMetadata metadata = _imageService.GetImageMetadata(stream);
-            stream.Position = 0;
-            BlobImage blobImage = new BlobImage
+            long position = content.Stream.Position;
+            ImageMetadata metadata = _imageAnalysisService.GetImageMetadata(content.Stream);
+            content.Stream.Position = position;
+            return new BlobImage
             {
-                BlobId = blob.BlobId,
-                ContentType = blob.ContentType,
-                Created = blob.Created,
-                Name = blob.Name,
-                Path = blob.Path,
-                Size = blob.Size,
-                TenantId = blob.TenantId,
-                Updated = blob.Updated
+                BlobType = BlobType.Image,
+                Height = metadata.Height,
+                Width = metadata.Width
             };
-            blobImage.Width = metadata.Width;
-            blobImage.Height = metadata.Height;
-            return blobImage;
         }
 
         public Task<IEnumerable<Blob>> SearchBlobsAsync(long tenantId, string path)
@@ -61,20 +57,27 @@ namespace Riverside.Cms.Services.Storage.Domain
             return _storageRepository.SearchBlobsAsync(tenantId, path);
         }
 
-        public async Task<long> CreateBlobAsync(long tenantId, Blob blob, Stream stream)
+        public async Task<long> CreateBlobAsync(long tenantId, IBlobContent content)
         {
+            // Construct blob object
+            bool isImage = ContentTypeIsImage(content.Type);
+            Blob blob = isImage ? GetBlobImage(content) : new Blob() { BlobType = BlobType.Document };
             DateTime utcNow = DateTime.UtcNow;
+            blob.ContentType = content.Type;
             blob.Created = utcNow;
+            blob.Name = content.Name;
+            blob.Path = UncommittedPath;
+            blob.Size = (int)content.Stream.Length;
+            blob.TenantId = tenantId;
             blob.Updated = utcNow;
-            blob.Size = (int)stream.Length;
-            if (blob.Path == null)
-                blob.Path = string.Empty;
-
-            if (ContentTypeIsImage(blob.ContentType))
-                blob = GetBlobImage(blob, stream);
-
+            
+            // Create blob record and get back newly allocated blob identifier
             blob.BlobId = await _storageRepository.CreateBlobAsync(tenantId, blob);
-            await _blobService.CreateBlobContentAsync(blob, stream);
+
+            // Create blob content
+            await _blobService.CreateBlobContentAsync(blob, content.Stream);
+
+            // Return newly allocated blob identifier
             return blob.BlobId;
         }
 
@@ -84,9 +87,11 @@ namespace Riverside.Cms.Services.Storage.Domain
             Stream imageStream = await _blobService.ReadBlobContentAsync(blob);
 
             blob.Path = path;
-            Stream resizedImageStream = _imageService.ResizeImage(imageStream, options);
+            Stream resizedImageStream = _imageAnalysisService.ResizeImage(imageStream, options);
 
-            return await CreateBlobAsync(tenantId, blob, resizedImageStream);
+            IBlobContent content = new BlobContent { Name = blob.Name, Type = blob.ContentType, Stream = resizedImageStream };
+
+            return await CreateBlobAsync(tenantId, content);
         }
 
         public Task<Blob> ReadBlobAsync(long tenantId, long blobId)

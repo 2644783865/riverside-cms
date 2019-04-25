@@ -1160,12 +1160,13 @@ Vue.component('flib-upload-field', {
                     vue.percentComplete = Math.round(progressEvent.loaded * 100 / progressEvent.total);
                 },
                 headers: {
-                    'Content-Type': 'multipart/form-data'
+                    'Content-Type': 'multipart/form-data',
+                    'Authorization': 'Bearer ' + auth.userSession().security.token
                 }
             };
             vue.uploading = true;
             vue.percentComplete = 0;
-            axios.post(vue.uploadUrl, files, config)
+            axios.post(vue.definition.uploadUrl, files, config)
                 .then(function (result) {
                     vue.uploading = false;
                     vue.percentComplete = 0;

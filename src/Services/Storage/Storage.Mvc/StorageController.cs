@@ -8,9 +8,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Riverside.Cms.Services.Storage.Domain;
 using Riverside.Cms.Services.Core.Common;
+using Riverside.Cms.Utilities.Drawing.ImageAnalysis;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Riverside.Cms.Services.Storage.Mvc
 {
+    [Authorize]
     [MultiTenant()]
     public class StorageController : ControllerBase
     {
@@ -42,8 +45,9 @@ namespace Riverside.Cms.Services.Storage.Mvc
                 Name = file.FileName,
                 Path = path
             };
-            Stream stream = file.OpenReadStream();
-            long blobId = await _storageService.CreateBlobAsync(tenantId, blob, stream);
+            long blobId;
+            using (Stream stream = file.OpenReadStream())
+                blobId = await _storageService.CreateBlobAsync(tenantId, new BlobContent { Name = Path.GetFileName(file.Name), Type = file.ContentType, Stream = stream });
             return CreatedAtAction(nameof(ReadBlobAsync), new { tenantId, blobId }, null);
         }
 

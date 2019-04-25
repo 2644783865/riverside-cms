@@ -1,20 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using Riverside.Cms.Services.Storage.Domain;
+using Riverside.Cms.Utilities.Drawing.ImageAnalysis;
 
 namespace Riverside.Cms.Services.Core.Domain
 {
     public class PageService : IPageService
     {
+        private readonly IImageAnalysisService _imageAnalysisService;
+        private readonly IMasterPageRepository _masterPageRepository;
         private readonly IPageRepository _pageRepository;
         private readonly IPageValidator _pageValidator;
         private readonly IStorageService _storageService;
 
         private const string PageImagePath = "pages/images";
 
-        public PageService(IPageRepository pageRepository, IPageValidator pageValidator, IStorageService storageService)
+        public PageService(IImageAnalysisService imageAnalysisService, IMasterPageRepository masterPageRepository, IPageRepository pageRepository, IPageValidator pageValidator, IStorageService storageService)
         {
+            _imageAnalysisService = imageAnalysisService;
+            _masterPageRepository = masterPageRepository;
             _pageRepository = pageRepository;
             _pageValidator = pageValidator;
             _storageService = storageService;
@@ -33,6 +39,28 @@ namespace Riverside.Cms.Services.Core.Domain
         public Task<PageListResult> ListPagesAsync(long tenantId, long? parentPageId, bool recursive, PageType pageType, IEnumerable<long> tagIds, SortBy sortBy, bool sortAsc, int pageIndex, int pageSize)
         {
             return _pageRepository.ListPagesAsync(tenantId, parentPageId, recursive, pageType, tagIds, sortBy, sortAsc, pageIndex, pageSize);
+        }
+
+        public async Task<IEnumerable<long>> CreatePageImagesAsync(long tenantId, long pageId, IBlobContent content)
+        {
+            // Validate the request to create page images
+            await _pageValidator.ValidateCreatePageImagesAsync(tenantId, pageId, content);
+
+            // Create thumbnail and preview images
+            Page page = await _pageRepository.ReadPageAsync(tenantId, pageId);
+            MasterPage masterPage = await _masterPageRepository.ReadMasterPageAsync(tenantId, page.MasterPageId);
+            ResizeOptions thumbnailImageResizeOptions = new ResizeOptions { Mode = masterPage.ThumbnailImageResizeMode.Value, Width = masterPage.ThumbnailImageWidth.Value, Height = masterPage.ThumbnailImageHeight.Value };
+            ResizeOptions previewImageResizeOptions = new ResizeOptions { Mode = masterPage.PreviewImageResizeMode.Value, Width = masterPage.PreviewImageWidth.Value, Height = masterPage.PreviewImageHeight.Value };
+            Stream thumbnailImageContentStream = _imageAnalysisService.ResizeImage(content.Stream, thumbnailImageResizeOptions);
+            Stream previewImageContentStream = _imageAnalysisService.ResizeImage(content.Stream, previewImageResizeOptions);
+
+            // Create blobs for thumbnail, preview and original image
+            long imageBlobId = await _storageService.CreateBlobAsync(tenantId, content);
+            long previewImageBlobId = await _storageService.CreateBlobAsync(tenantId, new BlobContent { Name = content.Name, Type = content.Type, Stream = previewImageContentStream });
+            long thumbnailImageBlobId = await _storageService.CreateBlobAsync(tenantId, new BlobContent { Name = content.Name, Type = content.Type, Stream = thumbnailImageContentStream });
+
+            // Return result
+            return new List<long> { imageBlobId, previewImageBlobId, thumbnailImageBlobId };
         }
 
         public Task<Page> ReadPageAsync(long tenantId, long pageId)

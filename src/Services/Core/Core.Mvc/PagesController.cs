@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Riverside.Cms.Services.Core.Common;
 using Riverside.Cms.Services.Core.Domain;
@@ -49,6 +51,27 @@ namespace Riverside.Cms.Services.Core.Mvc
             if (blobContent == null)
                 return NotFound();
             return File(blobContent.Stream, blobContent.Type, blobContent.Name);
+        }
+
+        [HttpPost]
+        [Authorize(Policy = "UpdatePages")]
+        [Route("api/v1/core/pages/{pageId:int}/images")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(typeof(IEnumerable<long>), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> CreatePageImagesAsync(long pageId, IFormCollection files)
+        {
+            try
+            {
+                // TODO: Implement file upload as shown on ASP.NET Core documentation site for large uploads.  See "Uploading large files with streaming":
+                // https://docs.microsoft.com/en-us/aspnet/core/mvc/models/file-uploads?view=aspnetcore-2.2
+                IFormFile file = files.Files.FirstOrDefault();
+                using (Stream stream = file.OpenReadStream())
+                    return Ok(await _pageService.CreatePageImagesAsync(TenantId, pageId, new BlobContent { Name = Path.GetFileName(file.FileName), Stream = stream, Type = file.ContentType }));
+            }
+            catch (ValidationErrorException ex)
+            {
+                return BadRequest(new { errors = ex.Errors });
+            }
         }
 
         [HttpPut]
