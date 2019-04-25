@@ -72,7 +72,7 @@ namespace Riverside.Cms.Services.Storage.Domain
             blob.Updated = utcNow;
             
             // Create blob record and get back newly allocated blob identifier
-            blob.BlobId = await _storageRepository.CreateBlobAsync(tenantId, blob);
+            blob.BlobId = isImage ? await _storageRepository.CreateBlobImageAsync(tenantId, (BlobImage)blob) : await _storageRepository.CreateBlobAsync(tenantId, blob);
 
             // Create blob content
             await _blobService.CreateBlobContentAsync(blob, content.Stream);

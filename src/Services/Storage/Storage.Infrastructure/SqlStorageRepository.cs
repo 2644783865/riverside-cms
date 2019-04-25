@@ -134,7 +134,49 @@ namespace Riverside.Cms.Services.Storage.Infrastructure
                         (@TenantId, @BlobType, @Name, @Size, 0, @Created, @Updated)
                     SELECT
                         CAST(SCOPE_IDENTITY() as bigint)",
-                    blob
+                    new
+                    {
+                        TenantId = tenantId,
+                        blob.BlobType,
+                        blob.Name,
+                        blob.Size,
+                        blob.Created,
+                        blob.Updated
+                    }
+                );
+                return blobId;
+            }
+        }
+
+        public async Task<long> CreateBlobImageAsync(long tenantId, BlobImage blob)
+        {
+            using (SqlConnection connection = new SqlConnection(_options.Value.SqlConnectionString))
+            {
+                connection.Open();
+                long blobId = await connection.QuerySingleAsync<long>(@"
+                    DECLARE @BlobId bigint
+                    INSERT INTO
+                        cms.Upload (TenantId, UploadType, Name, Size, Committed, Created, Updated)
+                    VALUES
+                        (@TenantId, @BlobType, @Name, @Size, 0, @Created, @Updated)
+                    SET @BlobId = (SELECT CAST(SCOPE_IDENTITY() as bigint))
+                    INSERT INTO
+                        cms.[Image] (TenantId, UploadId, Width, Height)
+                    VALUES
+                        (@TenantId, @BlobId, @Width, @Height)
+                    SELECT @BlobId
+                    ",
+                    new
+                    {
+                        TenantId = tenantId,
+                        blob.BlobType,
+                        blob.Name,
+                        blob.Size,
+                        blob.Created,
+                        blob.Updated,
+                        blob.Width,
+                        blob.Height
+                    }
                 );
                 return blobId;
             }
