@@ -82,6 +82,12 @@ a, a:hover {
     -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
     transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
 }
+label.flib-input {
+    margin: 0;
+    display: block;
+    cursor: pointer;
+    font-weight: normal;
+}
 input.flib-input, ul.flib-input {
     padding: 6px 14px;
 }
@@ -714,6 +720,34 @@ ul:focus, .flib-input:focus {
 }
 .flib-table td:last-child {
     width: 67%;
+}
+
+/*----- Progress bar -----*/
+
+.flib-progress {
+    padding: 6px 15px;
+    color: #484848;
+}
+.flib-progress-percent {
+    background-color: #ed7500;
+    width: 0%;
+    color: #fff;
+    font-size: 14px;
+    text-align: center;
+}
+
+/*----- File input control -----*/
+
+input.flib-input[type="file"] {
+    display: none;
+}
+.flib-uploaded {
+    padding: 6px 15px;
+}
+.flib-uploaded ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
 /*----- Entity list -----*/

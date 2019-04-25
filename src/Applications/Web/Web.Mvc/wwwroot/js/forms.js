@@ -1068,3 +1068,131 @@ Vue.component('flib-dynamic-select-field', {
         }
     }
 });
+
+Vue.component('flib-upload-field', {
+    model: {
+        event: 'change'
+    },
+    props: {
+        definition: {
+            type: Object
+        },
+        value: {
+            type: [Array, String, Number, Object],
+            default: null
+        },
+        readOnly: {
+            type: Boolean,
+            default: false
+        },
+        customErrorMessages: {
+            type: Function,
+            default: _value => forms.createEmptyCustomErrorMessages()
+        }
+    },
+    data: function () {
+        return {
+            selected: this.value,
+            valueChanged: false,
+            storageResults: [],
+            percentComplete: 0,
+            uploading: false
+        };
+    },
+    computed: {
+        multiple() {
+            return Array.isArray(this.value);
+        },
+        errorMessages() {
+            var messages = [];
+            if (this.definition.required) {
+                if (this.multiple && this.value.length === 0) {
+                    messages.push(this.definition.requiredMessage);
+                } else if (!this.multiple && this.value === null) {
+                    messages.push(this.definition.requiredMessage);
+                }
+            }
+            this.$emit('validate', { id: this.definition.id, errorMessages: messages });
+            return messages;
+        }
+    },
+    template: `
+        <div class="flib-field" :class="{ 'flib-error': readOnly !== true && errorMessages.length > 0 }">
+            <label :for="definition.id">{{definition.label}}</label>
+            <div class="flib-field-control">
+                <label :for="definition.id" class="flib-input" v-if="!readOnly">Browse...</label>
+                <input 
+                    type="file"
+                    :id="definition.id"
+                    :name="definition.id"
+                    :readonly="readOnly" 
+                    autocomplete="off"
+                    autocorrect="off"
+                    autocapitalize="off"
+                    spellcheck="false"
+                    class="flib-input"
+                    :multiple="multiple"
+                    @change="updateValue($event.target.files)"
+                    v-if="!readOnly"
+                />
+                <input type="text" :id="definition.id" :name="definition.id" :readonly="readOnly" class="flib-input" v-if="readOnly" />
+                <div class="flib-progress" v-if="uploading">
+                    <div class="flib-progress-percent" :style="{ width: percentComplete + '%' }">{{percentComplete}}%</div>
+                </div>
+                <div role="alert" class="flib-uploaded" v-if="storageResults.length > 0">
+                    <ul>
+                        <li v-for="result in storageResults">{{result.name}} ({{result.size}} bytes)</li>
+                    </ul>
+                </div>
+                <div role="alert" class="flib-messages" v-if="errorMessages.length > 0 && valueChanged">
+                    <ul>
+                        <li v-for="message in errorMessages">{{message}}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    `,
+    methods: {
+        uploadFiles(files) {
+            var vue = this;
+            var config = {
+                onUploadProgress: function(progressEvent) {
+                    vue.percentComplete = Math.round(progressEvent.loaded * 100 / progressEvent.total);
+                },
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            };
+            vue.uploading = true;
+            vue.percentComplete = 0;
+            axios.post(vue.uploadUrl, files, config)
+                .then(function (result) {
+                    vue.uploading = false;
+                    vue.percentComplete = 0;
+                    var storageResults = result.data;
+                    if (storageResults.length === 0)
+                        vue.selected = vue.multiple ? [] : null;
+                    else
+                        vue.selected = vue.multiple ? storageResults.map(r => r.id) : storageResults[0].id;
+                    vue.valueChanged = true;
+                    vue.storageResults = storageResults;
+                    vue.$emit('change', vue.selected);
+                })
+                .catch(function (err) {
+                    vue.uploading = false;
+                    vue.percentComplete = 0;
+                    console.log(err.message);
+                });
+        },
+        updateValue(fileList) {
+            var files = new FormData();
+            for (let i = 0; i < fileList.length; i++) {
+                files.append("file", fileList[i], fileList[i].name);
+            }
+            this.selected = this.multiple ? [] : null;
+            this.valueChanged = false;
+            this.$emit('change', this.selected);
+            this.uploadFiles(files);
+        }
+    }
+});
