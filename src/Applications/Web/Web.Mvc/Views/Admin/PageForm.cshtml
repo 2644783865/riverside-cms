@@ -7,7 +7,7 @@
     <div class="flib-field-group">
         <flib-text-field :definition="{ id: 'name', label: 'Name', required: true, requiredMessage: 'Name is required' }" :read-only="form.readOnly" v-model="page.name" @@validate="validateForm" :custom-error-messages="getCustomErrorMessages"></flib-text-field>
         <flib-text-field :definition="{ id: 'description', label: 'Description', rows: 4 }" :read-only="form.readOnly" v-model="page.description" @@validate="validateForm" :custom-error-messages="getCustomErrorMessages"></flib-text-field>
-        <flib-upload-field :definition="{ id: 'imageBlobId', label: 'Image', uploadUrl: conf.pagesApiPathname() + '/' + page.pageId + '/images' }" :read-only="form.readOnly" v-model="uploadResult" @@validate="validateForm" :custom-error-messages="getCustomErrorMessages"></flib-upload-field>
+        <flib-upload-field v-if="masterPage.hasImage" :definition="{ id: 'imageBlobId', label: 'Image', uploadUrl: conf.pagesApiPathname() + '/' + page.pageId + '/images' }" :read-only="form.readOnly" v-model="uploadResult" @@validate="validateForm" :custom-error-messages="getCustomErrorMessages"></flib-upload-field>
     </div>
     <h2>Search engine optimisation</h2>
     <div class="flib-field-group">
