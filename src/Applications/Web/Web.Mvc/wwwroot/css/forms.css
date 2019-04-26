@@ -742,7 +742,7 @@ input.flib-input[type="file"] {
     display: none;
 }
 .flib-uploaded {
-    padding: 6px 15px;
+    padding: 6px 13px;
 }
 .flib-uploaded ul {
     list-style: none;

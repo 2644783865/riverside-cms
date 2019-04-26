@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Dapper;
 using Microsoft.Extensions.Options;
@@ -230,15 +229,54 @@ namespace Riverside.Cms.Services.Storage.Infrastructure
             }
         }
 
+        public async Task CommitBlobAsync(long tenantId, long blobId, DateTime updated)
+        {
+            using (SqlConnection connection = new SqlConnection(_options.Value.SqlConnectionString))
+            {
+                connection.Open();
+                await connection.ExecuteAsync(@"
+                    UPDATE
+                        cms.Upload
+                    SET
+                        cms.Upload.Committed = 1,
+                        cms.Upload.Updated = @Updated
+                    WHERE
+                        cms.Upload.TenantId = @TenantId AND
+                        cms.Upload.UploadId = @BlobId
+                    ",
+                    new
+                    {
+                        Updated = updated,
+                        TenantId = tenantId,
+                        BlobId = blobId
+                    }
+                );
+            }
+        }
+
         public async Task DeleteBlobAsync(long tenantId, long blobId)
         {
             using (SqlConnection connection = new SqlConnection(_options.Value.SqlConnectionString))
             {
                 connection.Open();
 
-                await connection.ExecuteAsync(
-                    @"DELETE FROM Blob WHERE TenantId = @TenantId AND BlobId = @BlobId",
-                    new { TenantId = tenantId, BlobId = blobId }
+                await connection.ExecuteAsync(@"
+                    DELETE
+                        cms.Image
+                    WHERE
+                        TenantId = @TenantId AND
+                        UploadId = @BlobId
+                    DELETE
+                        cms.Upload
+                    WHERE
+                        TenantId = @TenantId AND
+                        UploadId = @BlobId
+                    ",
+                    new
+                    {
+                        TenantId = tenantId,
+                        BlobId = blobId
+                    }
                 );
             }
         }

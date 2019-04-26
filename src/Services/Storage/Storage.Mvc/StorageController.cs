@@ -125,12 +125,12 @@ namespace Riverside.Cms.Services.Storage.Mvc
         [Route("api/v1/storage/blobs/{blobId:int}")]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public async Task<IActionResult> DeleteBlobAsync(long blobId)
+        public async Task<IActionResult> DeleteBlobAsync(long blobId, [FromQuery(Name = "path")]string path)
         {
             Blob blob = await _storageService.ReadBlobAsync(TenantId, blobId);
             if (blob == null)
                 return NotFound();
-            await _storageService.DeleteBlobAsync(TenantId, blobId);
+            await _storageService.DeleteBlobAsync(TenantId, blobId, path);
             return NoContent();
         }
     }

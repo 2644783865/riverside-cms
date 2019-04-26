@@ -41,7 +41,7 @@ namespace Riverside.Cms.Services.Core.Domain
             return _pageRepository.ListPagesAsync(tenantId, parentPageId, recursive, pageType, tagIds, sortBy, sortAsc, pageIndex, pageSize);
         }
 
-        public async Task<IEnumerable<long>> CreatePageImagesAsync(long tenantId, long pageId, IBlobContent content)
+        public async Task<IEnumerable<ImageResizeUploadResult>> CreatePageImagesAsync(long tenantId, long pageId, IBlobContent content)
         {
             // Validate the request to create page images
             await _pageValidator.ValidateCreatePageImagesAsync(tenantId, pageId, content);
@@ -60,7 +60,17 @@ namespace Riverside.Cms.Services.Core.Domain
             long thumbnailImageBlobId = await _storageService.CreateBlobAsync(tenantId, new BlobContent { Name = content.Name, Type = content.Type, Stream = thumbnailImageContentStream });
 
             // Return result
-            return new List<long> { imageBlobId, previewImageBlobId, thumbnailImageBlobId };
+            return new List<ImageResizeUploadResult>
+            {
+                new ImageResizeUploadResult
+                {
+                    Name = content.Name,
+                    Size = content.Stream.Length,
+                    ImageBlobId = imageBlobId,
+                    PreviewImageBlobId = previewImageBlobId,
+                    ThumbnailImageBlobId = thumbnailImageBlobId
+                }
+            };
         }
 
         public Task<Page> ReadPageAsync(long tenantId, long pageId)
@@ -101,13 +111,14 @@ namespace Riverside.Cms.Services.Core.Domain
         {
             // Override properties that are not allowed to be changed
             Page currentPage = await _pageRepository.ReadPageAsync(tenantId, pageId);
+            MasterPage masterPage = await _masterPageRepository.ReadMasterPageAsync(tenantId, page.MasterPageId);
             page.ParentPageId = currentPage.ParentPageId;
             page.MasterPageId = currentPage.MasterPageId;
             page.Created = currentPage.Created;
             page.Occurred = currentPage.Occurred;
-            page.ImageBlobId = currentPage.ImageBlobId;
-            page.PreviewImageBlobId = currentPage.PreviewImageBlobId;
-            page.ThumbnailImageBlobId = currentPage.ThumbnailImageBlobId;
+            page.ImageBlobId = masterPage.HasImage ? page.ImageBlobId : currentPage.ImageBlobId;
+            page.PreviewImageBlobId = masterPage.HasImage ? page.PreviewImageBlobId : currentPage.PreviewImageBlobId;
+            page.ThumbnailImageBlobId = masterPage.HasImage ? page.ThumbnailImageBlobId : currentPage.ThumbnailImageBlobId;
 
             // Ensure properties supplied, which can be changed, are in the correct format
             page.Name = (page.Name ?? string.Empty).Trim();
@@ -118,8 +129,24 @@ namespace Riverside.Cms.Services.Core.Domain
             // Perform validation (including checking that all or none of the image upload properties are specified)
             _pageValidator.ValidateUpdatePage(tenantId, pageId, page);
 
+            // Update page images?
+            if (masterPage.HasImage && page.ImageBlobId.HasValue && page.ImageBlobId != currentPage.ImageBlobId)
+            {
+                await _storageService.CommitBlobAsync(tenantId, page.ImageBlobId.Value, PageImagePath);
+                await _storageService.CommitBlobAsync(tenantId, page.PreviewImageBlobId.Value, PageImagePath);
+                await _storageService.CommitBlobAsync(tenantId, page.ThumbnailImageBlobId.Value, PageImagePath);
+            }
+
             // Do the update
             await _pageRepository.UpdatePageAsync(tenantId, pageId, page);
+
+            // Delete old page images?
+            if (masterPage.HasImage && currentPage.ImageBlobId.HasValue && page.ImageBlobId != currentPage.ImageBlobId)
+            {
+                await _storageService.DeleteBlobAsync(tenantId, currentPage.ThumbnailImageBlobId.Value, PageImagePath);
+                await _storageService.DeleteBlobAsync(tenantId, currentPage.PreviewImageBlobId.Value, PageImagePath);
+                await _storageService.DeleteBlobAsync(tenantId, currentPage.ImageBlobId.Value, PageImagePath);
+            }
         }
     }
 }

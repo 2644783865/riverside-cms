@@ -1094,7 +1094,7 @@ Vue.component('flib-upload-field', {
         return {
             selected: this.value,
             valueChanged: false,
-            storageResults: [],
+            uploadResults: [],
             percentComplete: 0,
             uploading: false
         };
@@ -1139,9 +1139,9 @@ Vue.component('flib-upload-field', {
                 <div class="flib-progress" v-if="uploading">
                     <div class="flib-progress-percent" :style="{ width: percentComplete + '%' }">{{percentComplete}}%</div>
                 </div>
-                <div role="alert" class="flib-uploaded" v-if="storageResults.length > 0">
+                <div role="alert" class="flib-uploaded" v-if="uploadResults.length > 0">
                     <ul>
-                        <li v-for="result in storageResults">{{result.name}} ({{result.size}} bytes)</li>
+                        <li v-for="result in uploadResults">{{result.name}} ({{result.size}} bytes)</li>
                     </ul>
                 </div>
                 <div role="alert" class="flib-messages" v-if="errorMessages.length > 0 && valueChanged">
@@ -1170,13 +1170,13 @@ Vue.component('flib-upload-field', {
                 .then(function (result) {
                     vue.uploading = false;
                     vue.percentComplete = 0;
-                    var storageResults = result.data;
-                    if (storageResults.length === 0)
+                    var uploadResults = result.data;
+                    if (uploadResults.length === 0)
                         vue.selected = vue.multiple ? [] : null;
                     else
-                        vue.selected = vue.multiple ? storageResults.map(r => r.id) : storageResults[0].id;
+                        vue.selected = vue.multiple ? uploadResults : uploadResults[0];
                     vue.valueChanged = true;
-                    vue.storageResults = storageResults;
+                    vue.uploadResults = uploadResults;
                     vue.$emit('change', vue.selected);
                 })
                 .catch(function (err) {

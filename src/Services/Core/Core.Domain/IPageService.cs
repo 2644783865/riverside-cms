@@ -7,7 +7,7 @@ namespace Riverside.Cms.Services.Core.Domain
 {
     public interface IPageService
     {
-        Task<IEnumerable<long>> CreatePageImagesAsync(long tenantId, long pageId, IBlobContent content);
+        Task<IEnumerable<ImageResizeUploadResult>> CreatePageImagesAsync(long tenantId, long pageId, IBlobContent content);
 
         Task<Page> ReadPageAsync(long tenantId, long pageId);
         Task<BlobContent> ReadPageImageAsync(long tenantId, long pageId, PageImageType pageImageType);

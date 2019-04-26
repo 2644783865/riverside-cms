@@ -8,6 +8,7 @@
                     masterPage,
                     elementTypes,
                     elementDefinitionsByTypeId,
+                    uploadResult: null,
                     form: {
                         action: action,
                         valid: true,
@@ -45,10 +46,15 @@
                             .catch((error) => { auth.checkAuthorised(error); this.processErrors(error); });
                     },
                     submitClicked() {
+                        if (this.$data.uploadResult !== null) {
+                            page.imageBlobId = this.$data.uploadResult.imageBlobId;
+                            page.previewImageBlobId = this.$data.uploadResult.previewImageBlobId;
+                            page.thumbnailImageBlobId = this.$data.uploadResult.thumbnailImageBlobId;
+                        }
                         switch (this.$data.form.action)
                         {
                             case 'update':
-                                this.update();  
+                                this.update();
                                 break;
                         }
                     }

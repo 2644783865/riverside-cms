@@ -57,7 +57,7 @@ namespace Riverside.Cms.Services.Core.Mvc
         [Authorize(Policy = "UpdatePages")]
         [Route("api/v1/core/pages/{pageId:int}/images")]
         [ProducesResponseType(400)]
-        [ProducesResponseType(typeof(IEnumerable<long>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<ImageResizeUploadResult>), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> CreatePageImagesAsync(long pageId, IFormCollection files)
         {
             try

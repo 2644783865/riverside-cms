@@ -112,11 +112,32 @@ namespace Riverside.Cms.Services.Storage.Domain
             return blobContent;
         }
 
-        public async Task DeleteBlobAsync(long tenantId, long blobId)
+        public async Task CommitBlobAsync(long tenantId, long blobId, string path)
+        {
+            // Get blob info
+            Blob blob = await _storageRepository.ReadBlobAsync(tenantId, blobId);
+
+            // Set committed flag to true
+            blob.Updated = DateTime.UtcNow;
+            await _storageRepository.CommitBlobAsync(tenantId, blobId, blob.Updated);
+
+            // Create copy of upload at new path location
+            blob.Path = UncommittedPath;
+            Stream stream = await _blobService.ReadBlobContentAsync(blob);
+            blob.Path = path;
+            await _blobService.CreateBlobContentAsync(blob, stream);
+
+            // Delete uncommitted upload from storage
+            blob.Path = UncommittedPath;
+            await _blobService.DeleteBlobContentAsync(blob);
+        }
+
+        public async Task DeleteBlobAsync(long tenantId, long blobId, string path)
         {
             Blob blob = await _storageRepository.ReadBlobAsync(tenantId, blobId);
             if (blob == null)
                 return;
+            blob.Path = path;
             await _blobService.DeleteBlobContentAsync(blob);
             await _storageRepository.DeleteBlobAsync(tenantId, blobId);
         }
